@@ -55,7 +55,7 @@
 
         .input-field {
             width: 100%;
-            padding: 12px;
+            padding: 20px;
             border: none;
             border-radius: 5px;
             background-color: #444;
@@ -85,7 +85,7 @@
 
         .search-button {
             width: 100%;
-            padding: 15px;
+            padding: 20px;
             margin-top: 10px;
             background-color: #ff9800;
             border: none;
@@ -230,7 +230,7 @@ function shareResult(input, result) {
     var message = "Consulta de Alarme CNC:\n\n" +
                   "Alarme digitado: " + input + "\n" +
                   "Resultado da consulta: " + result + "\n\n" +
-                  "Para novas consultas acesse o link:\n" +
+                  "Para novas consultas acesse:\n\n" +
                   "https://zakorchinicw.github.io/dbs/index.html";
 
     var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
@@ -246,6 +246,7 @@ function shareResult(input, result) {
 </body>
 
 </html>
+
 
 
 
