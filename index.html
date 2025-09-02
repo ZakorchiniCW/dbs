@@ -224,16 +224,18 @@
         function clearInput() {
             document.getElementById("alarmInput").value = "";
         }
+        
+function shareResult(input, result) {
+    var message = "Consulta de Alarme CNC:\n\n" +
+                  "Alarme digitado: " + input + "\n" +
+                  "Resultado da consulta: " + result + "\n\n" +
+                  "Para novas consultas acesse o link:\n" +
+                  "https://zakorchinicw.github.io/dbs/index.html";
 
-        function shareResult(input, result) {
-            var message = "Consulta de Alarme CNC:\n\n" +
-                "Alarme digitado: " + input + "\n" +
-                "Resultado da consulta: " + result;
-
-            var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-            window.open(whatsappUrl, '_blank');
-        }
-
+    var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
+    window.open(whatsappUrl, '_blank');
+}
+        
         function checkEnter(e) {
             if (e.key === "Enter") {
                 searchAlarm();
@@ -243,5 +245,6 @@
 </body>
 
 </html>
+
 
 
