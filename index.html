@@ -78,7 +78,7 @@
             cursor: pointer;
             padding: 0;
         }
-        
+
         .clear-button:hover {
             color: #fff;
         }
@@ -138,11 +138,11 @@
         <div class="header">Consulta DBs</div>
         <div class="icon">&harr;</div>
         <div class="input-container">
-    <div class="input-label">Alarme 840d - 7xxxxxx Digite Aqui:</div>
-    <input type="number" id="alarmInput" class="input-field" placeholder="700259" onkeyup="checkEnter(event)">
-    <button class="clear-button" onclick="clearInput()">&times;</button>
-    <button class="search-button" onclick="searchAlarm()">Procurar</button>
+            <div class="input-label">Alarme 840d - 7xxxxxx Digite Aqui:</div>
+            <input type="number" id="alarmInput" class="input-field" placeholder="700259" onkeyup="checkEnter(event)">
+            <button class="clear-button" onclick="clearInput()">&times;</button>
         </div>
+        <button class="search-button" onclick="searchAlarm()">Procurar</button>
         <div class="result-container">
             <div id="resultText" class="result-text"></div>
             <div id="shareIcon" class="share-icon" style="display: none;">&#xe030;</div>
@@ -151,53 +151,88 @@
     <div class="footer">Create by C. W. Zakorchini<br>From CJF Solutions</div>
 
     <script>
-        // Variáveis de consulta mantidas no código, pois é a única forma de funcionar sem servidor
-        var coluna1 = [700000, 700001, 700002, 702102, 702103, 702104, 702105, 702106, 702107, 702108, 702109, 702456, 702457, 702458, 702459, 702460, 702461, 702462, 702463];
-        var coluna2 = [1800, 1801, 1802, 1803, 1804, 1805, 1806, 1807, 1810, 1811, 1812, 1813, 1814, 1815, 1816, 1817, 3785, 3786, 3787, 3790, 3791, 3792, 3793, 3794, 3795, 3796, 3797];
+        // Variáveis globais para armazenar os dados
+        let coluna1 = [];
+        let coluna2 = [];
 
+        // URLs dos arquivos TXT no GitHub (substitua pelas suas URLs reais)
+        const urlColuna1 = 'https://raw.githubusercontent.com/cleitonwilsonzakorchini/repositorio/main/coluna1.txt';
+        const urlColuna2 = 'https://raw.githubusercontent.com/cleitonwilsonzakorchini/repositorio/main/coluna2.txt';
+
+        // Função assíncrona para buscar e processar o arquivo
+        async function fetchAndProcessData() {
+    try {
+        const [response1, response2] = await Promise.all([
+            fetch(urlColuna1),
+            fetch(urlColuna2)
+        ]);
+
+        const text1 = await response1.text();
+        const text2 = await response2.text();
+
+        // O principal ajuste está aqui:
+        // Usei .split(/\s*,\s*/) para dividir a string em uma matriz com base em vírgulas e espaços
+        // Isso vai funcionar tanto para "1, 2, 3" quanto para "1,2,3"
+        coluna1 = text1.split(/\s*,\s*/).filter(Boolean).map(Number);
+        coluna2 = text2.split(/\s*,\s*/).filter(Boolean).map(Number);
+        
+        console.log('Dados carregados com sucesso!');
+        console.log('Coluna 1:', coluna1);
+        console.log('Coluna 2:', coluna2);
+
+    } catch (error) {
+        console.error('Erro ao buscar ou processar os arquivos:', error);
+        document.getElementById("resultText").textContent = "Erro ao carregar dados. Tente novamente mais tarde.";
+    }
+}
+
+        // Chame a função para carregar os dados quando a página for carregada
+        window.onload = fetchAndProcessData;
+
+        // ... O resto do seu código JavaScript permanece o mesmo
         function searchAlarm() {
-    var input = document.getElementById("alarmInput").value;
-    var alarmValue = parseInt(input);
-    var resultElement = document.getElementById("resultText");
-    var shareIcon = document.getElementById("shareIcon");
+            var input = document.getElementById("alarmInput").value;
+            var alarmValue = parseInt(input);
+            var resultElement = document.getElementById("resultText");
+            var shareIcon = document.getElementById("shareIcon");
 
-    resultElement.textContent = "";
-    shareIcon.style.display = "none";
+            resultElement.textContent = "";
+            shareIcon.style.display = "none";
 
-    if (isNaN(alarmValue) || alarmValue < 700000 || alarmValue > 702463) {
-        resultElement.textContent = "Valor inválido!";
-        return;
-    }
+            if (isNaN(alarmValue) || !coluna1.includes(alarmValue)) {
+                resultElement.textContent = "Valor inválido ou alarme não encontrado!";
+                return;
+            }
 
-    var index = coluna1.indexOf(alarmValue);
+            var index = coluna1.indexOf(alarmValue);
 
-    if (index !== -1) {
-        var dbValue = coluna2[index];
-        var dbxValue = (dbValue / 10).toFixed(1);
-        var resultText = "DB2.DBx " + dbxValue;
-        resultElement.textContent = resultText;
-        shareIcon.style.display = "block";
+            if (index !== -1 && coluna2[index] !== undefined) {
+                var dbValue = coluna2[index];
+                var dbxValue = (dbValue / 10).toFixed(1);
+                var resultText = "DB2.DBx " + dbxValue;
+                resultElement.textContent = resultText;
+                shareIcon.style.display = "block";
 
-        shareIcon.onclick = function() {
-            shareResult(input, resultText);
-        };
-    } else {
-        resultElement.textContent = "Alarme não encontrado.";
-    }
-}
+                shareIcon.onclick = function() {
+                    shareResult(input, resultText);
+                };
+            } else {
+                resultElement.textContent = "Alarme não encontrado.";
+            }
+        }
 
-function clearInput() {
-    document.getElementById("alarmInput").value = "";
-}
+        function clearInput() {
+            document.getElementById("alarmInput").value = "";
+        }
 
-function shareResult(input, result) {
-    var message = "Consulta de Alarme CNC:\n\n" +
-                  "Alarme digitado: " + input + "\n" +
-                  "Resultado da consulta: " + result;
+        function shareResult(input, result) {
+            var message = "Consulta de Alarme CNC:\n\n" +
+                "Alarme digitado: " + input + "\n" +
+                "Resultado da consulta: " + result;
 
-    var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-    window.open(whatsappUrl, '_blank');
-}
+            var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
+            window.open(whatsappUrl, '_blank');
+        }
 
         function checkEnter(e) {
             if (e.key === "Enter") {
@@ -208,4 +243,3 @@ function shareResult(input, result) {
 </body>
 
 </html>
-
