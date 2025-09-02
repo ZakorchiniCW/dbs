@@ -43,6 +43,7 @@
         }
 
         .input-container {
+            position: relative;
             margin: 20px 0;
         }
 
@@ -63,6 +64,23 @@
             text-align: center;
             box-sizing: border-box;
             outline: none;
+        }
+
+        .clear-button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        .clear-button:hover {
+            color: #fff;
         }
 
         .search-button {
@@ -96,6 +114,7 @@
             font-size: 2em;
             color: #00bcd4;
             margin-top: 15px;
+            cursor: pointer;
         }
 
         .footer {
@@ -103,27 +122,6 @@
             font-size: 0.8em;
             color: #888;
         }
-        .input-container {
-    position: relative;
-    margin: 20px 0;
-}
-
-.clear-button {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: #ccc;
-    font-size: 1.5em;
-    cursor: pointer;
-    padding: 0;
-}
-
-.clear-button:hover {
-    color: #fff;
-}
 
         /* Responsividade para dispositivos menores */
         @media (max-width: 600px) {
@@ -142,8 +140,8 @@
         <div class="input-container">
             <div class="input-label">Alarme 840d - 7xxxxxx Digite Aqui:</div>
             <input type="number" id="alarmInput" class="input-field" placeholder="700259" onkeyup="checkEnter(event)">
-<button class="clear-button" onclick="clearInput()">&times;</button>
-<button class="search-button" onclick="searchAlarm()">Procurar</button>
+            <button class="clear-button" onclick="clearInput()">&times;</button>
+            <button class="search-button" onclick="searchAlarm()">Procurar</button>
         </div>
         <div class="result-container">
             <div id="resultText" class="result-text"></div>
@@ -153,80 +151,54 @@
     <div class="footer">Create by C. W. Zakorchini<br>From CJF Solutions</div>
 
     <script>
-        var coluna1 = [700000,700001];
-        var coluna2 = [180, 181];
-        function clearInput() {
-    document.getElementById("alarmInput").value = "";
-}
+        // Variáveis de consulta mantidas no código, pois é a única forma de funcionar sem servidor
+        var coluna1 = [700000, 700001, 700002, 702102, 702103, 702104, 702105, 702106, 702107, 702108, 702109, 702456, 702457, 702458, 702459, 702460, 702461, 702462, 702463];
+        var coluna2 = [1800, 1801, 1802, 1803, 1804, 1805, 1806, 1807, 1810, 1811, 1812, 1813, 1814, 1815, 1816, 1817, 3785, 3786, 3787, 3790, 3791, 3792, 3793, 3794, 3795, 3796, 3797];
 
-function shareResult(input, result) {
-    var message = "Consulta de Alarme CNC:\n\n" +
-                  "Alarme digitado: " + input + "\n" +
-                  "Resultado da consulta: " + result;
+        function searchAlarm() {
+            var input = document.getElementById("alarmInput").value;
+            var alarmValue = parseInt(input);
+            var resultElement = document.getElementById("resultText");
+            var shareIcon = document.getElementById("shareIcon");
 
-    var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-    window.open(whatsappUrl, '_blank');
-        }
-    function searchAlarm() {
-    var input = document.getElementById("alarmInput").value;
-    var alarmValue = parseInt(input);
-    var resultElement = document.getElementById("resultText");
-    var shareIcon = document.getElementById("shareIcon");
-
-    // Limpa o resultado anterior
-    resultElement.textContent = "";
-    shareIcon.style.display = "none";
-
-    // Valida a entrada
-    if (isNaN(alarmValue) || alarmValue < 700000 || alarmValue > 702463) {
-        resultElement.textContent = "Valor inválido!";
-        return;
-    }
-
-    // Encontra o índice na coluna1
-    var index = coluna1.indexOf(alarmValue);
-
-    if (index !== -1) {
-        var dbValue = coluna2[index];
-        var dbxValue = (dbValue / 10).toFixed(1);
-        var resultText = "DB2.DBx " + dbxValue;
-        resultElement.textContent = resultText;
-        shareIcon.style.display = "block";
-        
-        // Adiciona o evento de clique para o ícone de compartilhamento
-        shareIcon.onclick = function() {
-            shareResult(input, resultText);
-        };
-    } else {
-        resultElement.textContent = "Alarme não encontrado.";
-    }
-    }
-        
-
-            // Limpa o resultado anterior
             resultElement.textContent = "";
             shareIcon.style.display = "none";
 
-            // Valida a entrada
             if (isNaN(alarmValue) || alarmValue < 700000 || alarmValue > 702463) {
                 resultElement.textContent = "Valor inválido!";
                 return;
             }
 
-            // Encontra o índice na coluna1
             var index = coluna1.indexOf(alarmValue);
 
             if (index !== -1) {
                 var dbValue = coluna2[index];
                 var dbxValue = (dbValue / 10).toFixed(1);
-                resultElement.textContent = "DB2.DBx " + dbxValue;
+                var resultText = "DB2.DBx " + dbxValue;
+                resultElement.textContent = resultText;
                 shareIcon.style.display = "block";
+                
+                shareIcon.onclick = function() {
+                    shareResult(input, resultText);
+                };
             } else {
                 resultElement.textContent = "Alarme não encontrado.";
             }
         }
 
-        // Permite a busca com a tecla "Enter" no campo de entrada
+        function clearInput() {
+            document.getElementById("alarmInput").value = "";
+        }
+
+        function shareResult(input, result) {
+            var message = "Consulta de Alarme CNC:\n\n" +
+                          "Alarme digitado: " + input + "\n" +
+                          "Resultado da consulta: " + result;
+
+            var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
+            window.open(whatsappUrl, '_blank');
+        }
+
         function checkEnter(e) {
             if (e.key === "Enter") {
                 searchAlarm();
@@ -236,5 +208,3 @@ function shareResult(input, result) {
 </body>
 
 </html>
-
-
