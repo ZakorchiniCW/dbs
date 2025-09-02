@@ -138,10 +138,10 @@
         <div class="header">Consulta DBs</div>
         <div class="icon">&harr;</div>
         <div class="input-container">
-            <div class="input-label">Alarme 840d - 7xxxxxx Digite Aqui:</div>
-            <input type="number" id="alarmInput" class="input-field" placeholder="700259" onkeyup="checkEnter(event)">
-            <button class="clear-button" onclick="clearInput()">&times;</button>
-            <button class="search-button" onclick="searchAlarm()">Procurar</button>
+    <div class="input-label">Alarme 840d - 7xxxxxx Digite Aqui:</div>
+    <input type="number" id="alarmInput" class="input-field" placeholder="700259" onkeyup="checkEnter(event)">
+    <button class="clear-button" onclick="clearInput()">&times;</button>
+    <button class="search-button" onclick="searchAlarm()">Procurar</button>
         </div>
         <div class="result-container">
             <div id="resultText" class="result-text"></div>
@@ -156,48 +156,48 @@
         var coluna2 = [1800, 1801, 1802, 1803, 1804, 1805, 1806, 1807, 1810, 1811, 1812, 1813, 1814, 1815, 1816, 1817, 3785, 3786, 3787, 3790, 3791, 3792, 3793, 3794, 3795, 3796, 3797];
 
         function searchAlarm() {
-            var input = document.getElementById("alarmInput").value;
-            var alarmValue = parseInt(input);
-            var resultElement = document.getElementById("resultText");
-            var shareIcon = document.getElementById("shareIcon");
+    var input = document.getElementById("alarmInput").value;
+    var alarmValue = parseInt(input);
+    var resultElement = document.getElementById("resultText");
+    var shareIcon = document.getElementById("shareIcon");
 
-            resultElement.textContent = "";
-            shareIcon.style.display = "none";
+    resultElement.textContent = "";
+    shareIcon.style.display = "none";
 
-            if (isNaN(alarmValue) || alarmValue < 700000 || alarmValue > 702463) {
-                resultElement.textContent = "Valor inválido!";
-                return;
-            }
+    if (isNaN(alarmValue) || alarmValue < 700000 || alarmValue > 702463) {
+        resultElement.textContent = "Valor inválido!";
+        return;
+    }
 
-            var index = coluna1.indexOf(alarmValue);
+    var index = coluna1.indexOf(alarmValue);
 
-            if (index !== -1) {
-                var dbValue = coluna2[index];
-                var dbxValue = (dbValue / 10).toFixed(1);
-                var resultText = "DB2.DBx " + dbxValue;
-                resultElement.textContent = resultText;
-                shareIcon.style.display = "block";
-                
-                shareIcon.onclick = function() {
-                    shareResult(input, resultText);
-                };
-            } else {
-                resultElement.textContent = "Alarme não encontrado.";
-            }
-        }
+    if (index !== -1) {
+        var dbValue = coluna2[index];
+        var dbxValue = (dbValue / 10).toFixed(1);
+        var resultText = "DB2.DBx " + dbxValue;
+        resultElement.textContent = resultText;
+        shareIcon.style.display = "block";
 
-        function clearInput() {
-            document.getElementById("alarmInput").value = "";
-        }
+        shareIcon.onclick = function() {
+            shareResult(input, resultText);
+        };
+    } else {
+        resultElement.textContent = "Alarme não encontrado.";
+    }
+}
 
-        function shareResult(input, result) {
-            var message = "Consulta de Alarme CNC:\n\n" +
-                          "Alarme digitado: " + input + "\n" +
-                          "Resultado da consulta: " + result;
+function clearInput() {
+    document.getElementById("alarmInput").value = "";
+}
 
-            var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
-            window.open(whatsappUrl, '_blank');
-        }
+function shareResult(input, result) {
+    var message = "Consulta de Alarme CNC:\n\n" +
+                  "Alarme digitado: " + input + "\n" +
+                  "Resultado da consulta: " + result;
+
+    var whatsappUrl = "https://api.whatsapp.com/send?text=" + encodeURIComponent(message);
+    window.open(whatsappUrl, '_blank');
+}
 
         function checkEnter(e) {
             if (e.key === "Enter") {
@@ -208,3 +208,4 @@
 </body>
 
 </html>
+
