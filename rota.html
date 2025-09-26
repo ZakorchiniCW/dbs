@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Serviço</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f5; /* Cor de fundo principal alterada */
+        }
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 2px solid #a3b2b4; /* Cor da borda alterada */
+            display: none; /* Initially hidden */
+        }
+        .message-box {
+            padding: 1rem;
+            background-color: #d1e7e4; /* Cor de fundo alterada */
+            border-radius: 0.75rem;
+            border: 1px solid #b7d6d1; /* Cor da borda alterada */
+            margin-top: 1rem;
+            display: none;
+        }
+        .data-display {
+            background-color: #e6f0f2; /* Cor de fundo alterada */
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #c8d8e0; /* Cor da borda alterada */
+            margin-top: 1.5rem;
+        }
+        .data-display div {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #a3b2b4; /* Cor da linha divisória alterada */
+        }
+        .data-display div:last-child {
+            border-bottom: none;
+        }
+        .button-primary {
+            @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors; /* Cor alterada para um verde escuro */
+        }
+        .button-secondary {
+            @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors; /* Cor alterada para um verde claro */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
+
+    <!-- Login Container - Visible by default -->
+    <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
+
+        <!-- Login Form -->
+        <div class="space-y-4">
+            <div>
+                <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
+                <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                    <option value="" disabled selected>Selecione a empresa</option>
+                </select>
+            </div>
+            <div>
+                <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
+                <select id="employee-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" disabled>
+                    <option value="" disabled selected>Selecione um funcionário</option>
+                </select>
+            </div>
+            <div>
+                <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <input type="password" id="password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                Entrar
+            </button>
+        </div>
+        
+        <div id="login-message-box" class="message-box" style="display:none;">
+            <p id="login-message-text" class="text-sm font-medium text-gray-700"></p>
+        </div>
+
+    </div>
+
+    <!-- Main App Container - Hidden until login -->
+    <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full" style="display:none;">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Registro de Serviço</h1>
+        
+        <!-- User authentication will be handled by Power Apps -->
+        <p class="text-center text-gray-600 mb-4">Bem-vindo(a), <span id="logged-in-user"></span>!</p>
+
+        <!-- Service Order Number Input -->
+        <div class="mb-4">
+            <label for="os-number" class="block text-sm font-medium text-gray-700 mb-1">Número da Ordem de Serviço</label>
+            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+        </div>
+
+        <!-- Barcode Scanner View -->
+        <div id="reader"></div>
+
+        <!-- Buttons for Service Start/End -->
+        <div id="action-buttons" class="flex flex-col space-y-3">
+            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                Escanear para Iniciar
+            </button>
+            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
+                Escanear para Finalizar
+            </button>
+        </div>
+
+        <!-- Message Box for User Feedback -->
+        <div id="message-box" class="message-box" style="display:none;">
+            <p id="message-text" class="text-sm font-medium text-gray-700"></p>
+        </div>
+
+        <!-- Data Display Section -->
+        <div id="data-display" class="data-display hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Dados do Serviço</h2>
+            <div id="os-display" class="hidden">
+                <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="start-data-display" class="hidden">
+                <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="end-data-display" class="hidden">
+                <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="location-display" class="hidden">
+                <span class="font-semibold text-gray-600">Localização:</span> <span id="location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="barcode-display" class="hidden">
+                <span class="font-semibold text-gray-600">Cód. de Barras:</span> <span id="barcode-text" class="font-medium text-gray-800"></span>
+            </div>
+        </div>
+        
+        <!-- Save Button -->
+        <button id="save-data-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Salvar no SharePoint
+        </button>
+
+    </div>
+
+    <!-- Html5-QR-Code Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+        // Main application state and data container
+        const appState = {
+            osNumber: '',
+            barcodeData: '',
+            start: {
+                timestamp: null,
+                location: null,
+            },
+            end: {
+                timestamp: null,
+            },
+            scanMode: 'start', // 'start' or 'end'
+        };
+
+        // Mock data for login (would be from SharePoint in the real app)
+        const loginData = {
+            "Arcondi": {
+                "Abc": "123",
+                "Def": "456",
+                "Ghi": "789"
+            },
+            "Lubrica": {
+                "Jk": "123",
+                "Lm": "456",
+                "No": "789"
+            }
+        };
+
+        // DOM element references
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const companySelect = document.getElementById('company-select');
+        const employeeSelect = document.getElementById('employee-select');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const loginMessageBox = document.getElementById('login-message-box');
+        const loginMessageText = document.getElementById('login-message-text');
+        const loggedInUserText = document.getElementById('logged-in-user');
+
+        const osInput = document.getElementById('os-number');
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const finishScanBtn = document.getElementById('finish-scan-btn');
+        const saveDataBtn = document.getElementById('save-data-btn');
+        const readerDiv = document.getElementById('reader');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const dataDisplay = document.getElementById('data-display');
+        const osDisplay = document.getElementById('os-display');
+        const osText = document.getElementById('os-text');
+        const startDataDisplay = document.getElementById('start-data-display');
+        const startDatetimeText = document.getElementById('start-datetime-text');
+        const endDataDisplay = document.getElementById('end-data-display');
+        const endDatetimeText = document.getElementById('end-datetime-text');
+        const locationDisplay = document.getElementById('location-display');
+        const locationText = document.getElementById('location-text');
+        const barcodeDisplay = document.getElementById('barcode-display');
+        const barcodeText = document.getElementById('barcode-text');
+        
+
+        // Helper function to show a temporary message
+        function showMessage(text, isError = false) {
+            messageText.textContent = text;
+            messageBox.style.display = 'block';
+            if (isError) {
+                messageBox.classList.remove('bg-gray-200');
+                messageBox.classList.add('bg-red-200');
+            } else {
+                messageBox.classList.remove('bg-red-200');
+                messageBox.classList.add('bg-gray-200');
+            }
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoginMessage(text, isError = false) {
+            loginMessageText.textContent = text;
+            loginMessageBox.style.display = 'block';
+            if (isError) {
+                loginMessageBox.classList.remove('bg-gray-200');
+                loginMessageBox.classList.add('bg-red-200');
+            } else {
+                loginMessageBox.classList.remove('bg-red-200');
+                loginMessageBox.classList.add('bg-gray-200');
+            }
+            setTimeout(() => {
+                loginMessageBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize login dropdowns
+        function setupLoginDropdowns() {
+            // Populate company dropdown
+            for (const company in loginData) {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                companySelect.appendChild(option);
+            }
+
+            // Listen for company selection change
+            companySelect.addEventListener('change', () => {
+                const selectedCompany = companySelect.value;
+                employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
+                employeeSelect.disabled = false;
+                if (selectedCompany && loginData[selectedCompany]) {
+                    for (const employee in loginData[selectedCompany]) {
+                        const option = document.createElement('option');
+                        option.value = employee;
+                        option.textContent = employee;
+                        employeeSelect.appendChild(option);
+                    }
+                }
+            });
+        }
+        
+        // Handle login attempt
+        loginBtn.addEventListener('click', () => {
+            const company = companySelect.value;
+            const employee = employeeSelect.value;
+            const password = passwordInput.value;
+
+            if (!company || !employee || !password) {
+                showLoginMessage("Por favor, preencha todos os campos.", true);
+                return;
+            }
+
+            if (loginData[company] && loginData[company][employee] === password) {
+                showLoginMessage("Login bem-sucedido!");
+                loggedInUserText.textContent = employee;
+                loginContainer.style.display = 'none';
+                appContainer.style.display = 'block';
+            } else {
+                showLoginMessage("Usuário ou senha incorretos.", true);
+            }
+        });
+
+        // Initialize the QR/barcode scanner
+        let html5QrCodeScanner;
+
+        function startScanner(onScanSuccessCallback) {
+            // Check if the scanner is already running
+            if (html5QrCodeScanner && html5QrCodeScanner.isScanning) {
+                console.log("Scanner is already running.");
+                return;
+            }
+
+            readerDiv.style.display = 'block';
+            startScanBtn.style.display = 'none';
+            finishScanBtn.style.display = 'none';
+
+            html5QrCodeScanner = new Html5QrcodeScanner("reader", {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                supportedScanTypes: [Html5QrcodeSupportedScanTypes.SCAN_TYPE_CAMERA]
+            }, false);
+
+            html5QrCodeScanner.render((decodedText, decodedResult) => {
+                html5QrCodeScanner.clear();
+                onScanSuccessCallback(decodedText, decodedResult);
+            }, (errorMessage) => {
+                // Ignore continuous error messages
+            });
+        }
+
+        function handleStartScanSuccess(decodedText) {
+            showMessage("Código de barras escaneado com sucesso!");
+            appState.barcodeData = decodedText;
+            barcodeText.textContent = decodedText;
+            barcodeDisplay.classList.remove('hidden');
+
+            // Capture start timestamp
+            appState.start.timestamp = new Date();
+            startDatetimeText.textContent = appState.start.timestamp.toLocaleString('pt-BR');
+            startDataDisplay.classList.remove('hidden');
+
+            // Get location
+            if (navigator.geolocation) {
+                showMessage("Obtendo sua localização...");
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.start.location = {
+                            latitude: coords.latitude,
+                            longitude: coords.longitude,
+                            accuracy: coords.accuracy,
+                        };
+                        locationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
+                        locationDisplay.classList.remove('hidden');
+                        showMessage("Localização obtida com sucesso!");
+                    },
+                    (error) => {
+                        showMessage("Não foi possível obter a localização. Verifique as permissões do seu navegador.", true);
+                        console.error("Geolocation error:", error);
+                        locationText.textContent = "Erro ao obter localização";
+                        locationDisplay.classList.remove('hidden');
+                    }
+                );
+            } else {
+                showMessage("Seu navegador não suporta geolocalização.", true);
+                locationText.textContent = "Geolocalização não suportada";
+                locationDisplay.classList.remove('hidden');
+            }
+            
+            // Show data and switch button
+            dataDisplay.classList.remove('hidden');
+            finishScanBtn.style.display = 'block';
+            saveDataBtn.classList.remove('hidden');
+            readerDiv.style.display = 'none';
+        }
+
+        function handleFinishScanSuccess() {
+            showMessage("Fim do serviço registrado!");
+            // Capture end timestamp
+            appState.end.timestamp = new Date();
+            endDatetimeText.textContent = appState.end.timestamp.toLocaleString('pt-BR');
+            endDataDisplay.classList.remove('hidden');
+
+            readerDiv.style.display = 'none';
+            finishScanBtn.style.display = 'none';
+            saveDataBtn.classList.remove('hidden');
+        }
+
+        // Event Listeners for the main app
+        startScanBtn.addEventListener('click', () => {
+            if (!osInput.value.trim()) {
+                showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
+                return;
+            }
+            appState.osNumber = osInput.value.trim();
+            osText.textContent = appState.osNumber;
+            osDisplay.classList.remove('hidden');
+            appState.scanMode = 'start';
+            startScanner(handleStartScanSuccess);
+        });
+
+        finishScanBtn.addEventListener('click', () => {
+            if (!appState.start.timestamp) {
+                showMessage("Por favor, inicie o serviço primeiro.", true);
+                return;
+            }
+            appState.scanMode = 'end';
+            startScanner(handleFinishScanSuccess);
+        });
+
+        saveDataBtn.addEventListener('click', () => {
+            if (!appState.osNumber || !appState.barcodeData || !appState.start.timestamp || !appState.end.timestamp) {
+                showMessage("Por favor, complete todos os campos e escaneamentos antes de salvar.", true);
+                return;
+            }
+
+            // This is the data object that you will pass to Power Apps.
+            const dataToSave = {
+                'OrdemDeServico': appState.osNumber,
+                'CodigoDeBarras': appState.barcodeData,
+                'InicioDoServico': appState.start.timestamp.toISOString(),
+                'FimDoServico': appState.end.timestamp.toISOString(),
+                'Localizacao': appState.start.location,
+            };
+
+            // In Power Apps, you would use a "Patch" or "Collect" function
+            // to send this object to your SharePoint list.
+            // For this HTML file, we will just log it to the console.
+            console.log("Dados prontos para serem enviados para o SharePoint:", JSON.stringify(dataToSave, null, 2));
+            showMessage("Dados preparados para envio. No Power Apps, configure a ação para enviar esses dados.");
+        });
+
+        osInput.addEventListener('input', () => {
+             // Reset UI if OS number changes
+            if (appState.barcodeData || appState.start.timestamp || appState.end.timestamp) {
+                appState.barcodeData = '';
+                appState.start.timestamp = null;
+                appState.start.location = null;
+                appState.end.timestamp = null;
+                dataDisplay.classList.add('hidden');
+                osDisplay.classList.add('hidden');
+                startDataDisplay.classList.add('hidden');
+                endDataDisplay.classList.add('hidden');
+                locationDisplay.classList.add('hidden');
+                barcodeDisplay.classList.add('hidden');
+                finishScanBtn.style.display = 'none';
+                saveDataBtn.classList.add('hidden');
+                startScanBtn.style.display = 'block';
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupLoginDropdowns();
+        });
+    </script>
+</body>
+</html>
