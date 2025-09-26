@@ -110,6 +110,9 @@
             <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
                 Escanear para Finalizar
             </button>
+            <button id="generate-summary-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary" style="display:none;">
+                Gerar Resumo do Serviço ✨
+            </button>
         </div>
 
         <!-- Message Box for User Feedback -->
@@ -143,6 +146,12 @@
             </div>
         </div>
         
+        <!-- Summary Container -->
+        <div id="summary-container" class="data-display hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
+            <p id="summary-text" class="text-gray-700 text-sm italic"></p>
+        </div>
+
         <!-- Save Button -->
         <button id="save-data-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
             Salvar no SharePoint
@@ -198,6 +207,7 @@
         const osInput = document.getElementById('os-number');
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
+        const generateSummaryBtn = document.getElementById('generate-summary-btn');
         const saveDataBtn = document.getElementById('save-data-btn');
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
@@ -217,6 +227,8 @@
         const equipmentTypeText = document.getElementById('equipment-type-text');
         const inventoryDisplay = document.getElementById('inventory-display');
         const inventoryText = document.getElementById('inventory-text');
+        const summaryContainer = document.getElementById('summary-container');
+        const summaryText = document.getElementById('summary-text');
         
         let html5QrCode;
 
@@ -243,7 +255,7 @@
                 loginMessageBox.classList.remove('bg-gray-200');
                 loginMessageBox.classList.add('bg-red-200');
             } else {
-                loginMessageBox.classList.remove('bg-red-200');
+                loginMessageBox.classList.remove('bg-gray-200');
                 loginMessageBox.classList.add('bg-gray-200');
             }
             setTimeout(() => {
@@ -305,42 +317,40 @@
                 readerDiv.style.display = 'block';
                 startScanBtn.style.display = 'none';
                 finishScanBtn.style.display = 'none';
+                generateSummaryBtn.style.display = 'none';
 
-                // Request camera permission
-                const devices = await Html5Qrcode.getCameras();
-                if (devices && devices.length) {
-                    const cameraId = devices[0].id;
-                    html5QrCode = new Html5Qrcode("reader");
+                // Request camera permission with facingMode set to 'environment'
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
+                };
+                const constraints = {
+                    facingMode: { exact: "environment" }
+                };
 
-                    await html5QrCode.start(
-                        cameraId,
-                        {
-                            fps: 10,
-                            qrbox: { width: 250, height: 250 },
-                        },
-                        (decodedText, decodedResult) => {
-                            // On successful scan
-                            html5QrCode.stop().then(() => {
-                                readerDiv.style.display = 'none';
-                                if (appState.scanMode === 'start') {
-                                    handleStartScanSuccess(decodedText);
-                                } else {
-                                    handleFinishScanSuccess();
-                                }
-                            }).catch(err => {
-                                console.error("Error stopping scanner:", err);
-                            });
-                        },
-                        (errorMessage) => {
-                            // Ignore continuous error messages
-                        }
-                    );
-                } else {
-                    showMessage("Nenhuma câmera encontrada no seu dispositivo.", true);
-                    console.error("No cameras found.");
-                    readerDiv.style.display = 'none';
-                    startScanBtn.style.display = 'block';
-                }
+                html5QrCode = new Html5Qrcode("reader");
+
+                await html5QrCode.start(
+                    constraints,
+                    config,
+                    (decodedText, decodedResult) => {
+                        // On successful scan
+                        html5QrCode.stop().then(() => {
+                            readerDiv.style.display = 'none';
+                            if (appState.scanMode === 'start') {
+                                handleStartScanSuccess(decodedText);
+                            } else {
+                                handleFinishScanSuccess();
+                            }
+                        }).catch(err => {
+                            console.error("Error stopping scanner:", err);
+                        });
+                    },
+                    (errorMessage) => {
+                        // Ignore continuous error messages
+                    }
+                );
             } catch (err) {
                 console.error("Erro ao iniciar o scanner:", err);
                 showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
@@ -404,6 +414,7 @@
             // Show data and switch button
             dataDisplay.classList.remove('hidden');
             finishScanBtn.style.display = 'block';
+            generateSummaryBtn.style.display = 'block'; // Show new button
             saveDataBtn.classList.remove('hidden');
         }
 
@@ -417,6 +428,62 @@
             finishScanBtn.style.display = 'none';
             saveDataBtn.classList.remove('hidden');
         }
+
+        // --- Gemini API Integration ---
+        // Constants for the Gemini API call
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        // Event listener for the new "Generate Summary" button
+        generateSummaryBtn.addEventListener('click', async () => {
+            if (!appState.osNumber || !appState.equipmentType) {
+                showMessage("Por favor, preencha a O.S. e escaneie o código de barras primeiro.", true);
+                return;
+            }
+
+            showMessage("Gerando resumo com IA...", false);
+            summaryContainer.classList.add('hidden');
+            summaryText.textContent = '';
+            generateSummaryBtn.disabled = true;
+
+            const userPrompt = `Aja como um técnico experiente. Crie um resumo de um relatório de serviço técnico para um equipamento. O número da Ordem de Serviço é ${appState.osNumber} e o tipo de equipamento é ${appState.equipmentType}. Inclua uma breve descrição da atividade de manutenção, como inspeção ou reparo, e o estado geral do equipamento. Mantenha o tom profissional e conciso.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: {
+                    parts: [{ text: "Você é um gerador de resumo de relatório de serviço técnico." }]
+                }
+            };
+
+            try {
+                let response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Erro de rede: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (generatedText) {
+                    summaryText.textContent = generatedText;
+                    summaryContainer.classList.remove('hidden');
+                    showMessage("Resumo gerado com sucesso!", false);
+                } else {
+                    showMessage("Não foi possível gerar o resumo. Tente novamente.", true);
+                }
+
+            } catch (error) {
+                console.error("Erro na chamada da API Gemini:", error);
+                showMessage(`Erro ao gerar resumo: ${error.message}`, true);
+            } finally {
+                generateSummaryBtn.disabled = false;
+            }
+        });
 
         // Event Listeners for the main app
         startScanBtn.addEventListener('click', () => {
@@ -480,6 +547,8 @@
                 equipmentTypeDisplay.classList.add('hidden');
                 inventoryDisplay.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
+                generateSummaryBtn.style.display = 'none'; // Hide new button
+                summaryContainer.classList.add('hidden'); // Hide summary
                 saveDataBtn.classList.add('hidden');
                 startScanBtn.style.display = 'block';
             }
