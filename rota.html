@@ -10,7 +10,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f5; /* Cor de fundo principal alterada */
+            background-color: #f0f4f5;
         }
         #reader {
             width: 100%;
@@ -18,36 +18,36 @@
             margin: auto;
             border-radius: 0.75rem;
             overflow: hidden;
-            border: 2px solid #a3b2b4; /* Cor da borda alterada */
+            border: 2px solid #a3b2b4;
             display: none;
         }
         .message-box {
             padding: 1rem;
-            background-color: #d1e7e4; /* Cor de fundo alterada */
+            background-color: #d1e7e4;
             border-radius: 0.75rem;
-            border: 1px solid #b7d6d1; /* Cor da borda alterada */
+            border: 1px solid #b7d6d1;
             margin-top: 1rem;
             display: none;
         }
         .data-display {
-            background-color: #e6f0f2; /* Cor de fundo alterada */
+            background-color: #e6f0f2;
             padding: 1rem;
             border-radius: 0.75rem;
-            border: 1px solid #c8d8e0; /* Cor da borda alterada */
+            border: 1px solid #c8d8e0;
             margin-top: 1.5rem;
         }
         .data-display div {
             padding: 0.5rem 0;
-            border-bottom: 1px dashed #a3b2b4; /* Cor da linha divisória alterada */
+            border-bottom: 1px dashed #a3b2b4;
         }
         .data-display div:last-child {
             border-bottom: none;
         }
         .button-primary {
-            @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors; /* Cor alterada para um verde escuro */
+            @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors;
         }
         .button-secondary {
-            @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors; /* Cor alterada para um verde claro */
+            @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors;
         }
     </style>
 </head>
@@ -115,6 +115,20 @@
             </button>
         </div>
 
+        <!-- Field for Technician's Observations -->
+        <div id="observations-input-container" class="mt-4 hidden">
+            <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
+            <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
+        </div>
+
+        <!-- Field for Photo Capture -->
+        <div id="photo-input-container" class="mt-4 hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary mt-3">
+                Tirar Foto 📸
+            </button>
+        </div>
+
         <!-- Message Box for User Feedback -->
         <div id="message-box" class="message-box" style="display:none;">
             <p id="message-text" class="text-sm font-medium text-gray-700"></p>
@@ -132,8 +146,14 @@
             <div id="end-data-display" class="hidden">
                 <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
             </div>
-            <div id="location-display" class="hidden">
-                <span class="font-semibold text-gray-600">Localização:</span> <span id="location-text" class="font-medium text-gray-800"></span>
+            <div id="start-location-display" class="hidden">
+                <span class="font-semibold text-gray-600">Localização (Início):</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
+            </div>
+             <div id="end-location-display" class="hidden">
+                <span class="font-semibold text-gray-600">Localização (Fim):</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="distance-display" class="hidden">
+                <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
             </div>
             <div id="barcode-display" class="hidden">
                 <span class="font-semibold text-gray-600">Cód. de Barras:</span> <span id="barcode-text" class="font-medium text-gray-800"></span>
@@ -143,6 +163,13 @@
             </div>
             <div id="inventory-display" class="hidden">
                 <span class="font-semibold text-gray-600">Inventário:</span> <span id="inventory-text" class="font-medium text-gray-800"></span>
+            </div>
+             <div id="observations-display" class="hidden">
+                <span class="font-semibold text-gray-600">Observações:</span> <span id="observations-text-display" class="font-medium text-gray-800 whitespace-pre-wrap"></span>
+            </div>
+             <div id="photo-display" class="hidden">
+                <span class="font-semibold text-gray-600">Foto:</span>
+                <img id="photo-preview" src="" alt="Prévia da foto tirada" class="rounded-lg mt-2 w-full h-auto max-w-sm">
             </div>
         </div>
         
@@ -169,12 +196,15 @@
             barcodeData: '',
             equipmentType: '',
             inventoryNumber: '',
+            observations: '',
+            photoData: '', // New: Field for photo data in Base64 format
             start: {
                 timestamp: null,
                 location: null,
             },
             end: {
                 timestamp: null,
+                location: null,
             },
             scanMode: 'start', // 'start' or 'end'
         };
@@ -219,14 +249,27 @@
         const startDatetimeText = document.getElementById('start-datetime-text');
         const endDataDisplay = document.getElementById('end-data-display');
         const endDatetimeText = document.getElementById('end-datetime-text');
-        const locationDisplay = document.getElementById('location-display');
-        const locationText = document.getElementById('location-text');
+        const startLocationDisplay = document.getElementById('start-location-display');
+        const startLocationText = document.getElementById('start-location-text');
+        const endLocationDisplay = document.getElementById('end-location-display');
+        const endLocationText = document.getElementById('end-location-text');
+        const distanceDisplay = document.getElementById('distance-display');
+        const distanceText = document.getElementById('distance-text');
         const barcodeDisplay = document.getElementById('barcode-display');
         const barcodeText = document.getElementById('barcode-text');
         const equipmentTypeDisplay = document.getElementById('equipment-type-display');
         const equipmentTypeText = document.getElementById('equipment-type-text');
         const inventoryDisplay = document.getElementById('inventory-display');
         const inventoryText = document.getElementById('inventory-text');
+        const observationsInputContainer = document.getElementById('observations-input-container');
+        const observationsTextArea = document.getElementById('observations-text');
+        const observationsDisplay = document.getElementById('observations-display');
+        const observationsTextDisplay = document.getElementById('observations-text-display');
+        const photoInputContainer = document.getElementById('photo-input-container');
+        const takePhotoButton = document.getElementById('take-photo-btn');
+        const photoFileInput = document.getElementById('photo-file-input');
+        const photoDisplay = document.getElementById('photo-display');
+        const photoPreview = document.getElementById('photo-preview');
         const summaryContainer = document.getElementById('summary-container');
         const summaryText = document.getElementById('summary-text');
         
@@ -240,7 +283,7 @@
                 messageBox.classList.remove('bg-gray-200');
                 messageBox.classList.add('bg-red-200');
             } else {
-                messageBox.classList.remove('bg-red-200');
+                messageBox.classList.remove('bg-gray-200');
                 messageBox.classList.add('bg-gray-200');
             }
             setTimeout(() => {
@@ -318,6 +361,8 @@
                 startScanBtn.style.display = 'none';
                 finishScanBtn.style.display = 'none';
                 generateSummaryBtn.style.display = 'none';
+                observationsInputContainer.classList.add('hidden');
+                photoInputContainer.classList.add('hidden');
 
                 // Request camera permission with facingMode set to 'environment'
                 const config = {
@@ -383,9 +428,9 @@
             startDatetimeText.textContent = appState.start.timestamp.toLocaleString('pt-BR');
             startDataDisplay.classList.remove('hidden');
 
-            // Get location
+            // Get start location
             if (navigator.geolocation) {
-                showMessage("Obtendo sua localização...");
+                showMessage("Obtendo sua localização de início...");
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const coords = position.coords;
@@ -394,28 +439,30 @@
                             longitude: coords.longitude,
                             accuracy: coords.accuracy,
                         };
-                        locationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
-                        locationDisplay.classList.remove('hidden');
-                        showMessage("Localização obtida com sucesso!");
+                        startLocationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
+                        startLocationDisplay.classList.remove('hidden');
+                        showMessage("Localização de início obtida com sucesso!");
                     },
                     (error) => {
-                        showMessage("Não foi possível obter a localização. Verifique as permissões do seu navegador.", true);
+                        showMessage("Não foi possível obter a localização de início. Verifique as permissões do seu navegador.", true);
                         console.error("Geolocation error:", error);
-                        locationText.textContent = "Erro ao obter localização";
-                        locationDisplay.classList.remove('hidden');
+                        startLocationText.textContent = "Erro ao obter localização";
+                        startLocationDisplay.classList.remove('hidden');
                     }
                 );
             } else {
                 showMessage("Seu navegador não suporta geolocalização.", true);
-                locationText.textContent = "Geolocalização não suportada";
-                locationDisplay.classList.remove('hidden');
+                startLocationText.textContent = "Geolocalização não suportada";
+                startLocationDisplay.classList.remove('hidden');
             }
             
             // Show data and switch button
             dataDisplay.classList.remove('hidden');
             finishScanBtn.style.display = 'block';
-            generateSummaryBtn.style.display = 'block'; // Show new button
+            generateSummaryBtn.style.display = 'block';
             saveDataBtn.classList.remove('hidden');
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden');
         }
 
         function handleFinishScanSuccess() {
@@ -424,6 +471,34 @@
             appState.end.timestamp = new Date();
             endDatetimeText.textContent = appState.end.timestamp.toLocaleString('pt-BR');
             endDataDisplay.classList.remove('hidden');
+
+            // Get end location
+            if (navigator.geolocation) {
+                showMessage("Obtendo sua localização de encerramento...");
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.end.location = {
+                            latitude: coords.latitude,
+                            longitude: coords.longitude,
+                            accuracy: coords.accuracy,
+                        };
+                        endLocationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
+                        endLocationDisplay.classList.remove('hidden');
+                        showMessage("Localização de encerramento obtida com sucesso!");
+                    },
+                    (error) => {
+                        showMessage("Não foi possível obter a localização de encerramento. Verifique as permissões do seu navegador.", true);
+                        console.error("Geolocation error:", error);
+                        endLocationText.textContent = "Erro ao obter localização";
+                        endLocationDisplay.classList.remove('hidden');
+                    }
+                );
+            } else {
+                showMessage("Seu navegador não suporta geolocalização.", true);
+                endLocationText.textContent = "Geolocalização não suportada";
+                endLocationDisplay.classList.remove('hidden');
+            }
 
             finishScanBtn.style.display = 'none';
             saveDataBtn.classList.remove('hidden');
@@ -434,7 +509,7 @@
         const apiKey = ""; 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-        // Event listener for the new "Generate Summary" button
+        // Event listener for the new "Gerar Resumo" button
         generateSummaryBtn.addEventListener('click', async () => {
             if (!appState.osNumber || !appState.equipmentType) {
                 showMessage("Por favor, preencha a O.S. e escaneie o código de barras primeiro.", true);
@@ -485,6 +560,50 @@
             }
         });
 
+        // Function to calculate distance between two lat/long points using the Haversine formula
+        function calculateDistance(start, end) {
+            const R = 6371; // Radius of the Earth in kilometers
+            const lat1 = start.latitude;
+            const lon1 = start.longitude;
+            const lat2 = end.latitude;
+            const lon2 = end.longitude;
+
+            // Convert degrees to radians
+            const toRadians = (deg) => deg * (Math.PI / 180);
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+
+            // Haversine formula
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            return R * c; // Distance in kilometers
+        }
+
+        // --- Photo Capture Functions ---
+        takePhotoButton.addEventListener('click', () => {
+            photoFileInput.click();
+        });
+
+        photoFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Store the Base64 data
+                    appState.photoData = e.target.result;
+                    // Display the image preview
+                    photoPreview.src = appState.photoData;
+                    photoDisplay.classList.remove('hidden');
+                    showMessage("Foto capturada com sucesso!");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+
         // Event Listeners for the main app
         startScanBtn.addEventListener('click', () => {
             if (!osInput.value.trim()) {
@@ -508,10 +627,22 @@
         });
 
         saveDataBtn.addEventListener('click', () => {
-            if (!appState.osNumber || !appState.barcodeData || !appState.start.timestamp || !appState.end.timestamp) {
+            if (!appState.osNumber || !appState.barcodeData || !appState.start.timestamp || !appState.end.timestamp || !appState.end.location) {
                 showMessage("Por favor, complete todos os campos e escaneamentos antes de salvar.", true);
                 return;
             }
+
+            // Capture observations from the textarea
+            appState.observations = observationsTextArea.value.trim();
+            if (appState.observations) {
+                 observationsTextDisplay.textContent = appState.observations;
+                 observationsDisplay.classList.remove('hidden');
+            }
+
+            // Calculate the distance between start and end locations
+            const distanceKm = calculateDistance(appState.start.location, appState.end.location);
+            distanceText.textContent = `${distanceKm.toFixed(2)} km`;
+            distanceDisplay.classList.remove('hidden');
 
             // This is the data object that you will pass to Power Apps.
             const dataToSave = {
@@ -521,7 +652,11 @@
                 'NumeroInventario': appState.inventoryNumber,
                 'InicioDoServico': appState.start.timestamp.toISOString(),
                 'FimDoServico': appState.end.timestamp.toISOString(),
-                'Localizacao': appState.start.location,
+                'LocalizacaoInicio': appState.start.location,
+                'LocalizacaoFim': appState.end.location,
+                'DistanciaPercorridaKm': distanceKm,
+                'Observacoes': appState.observations,
+                'FotoEmBase64': appState.photoData, // New: Photo data added to the object
             };
 
             // In Power Apps, you would use a "Patch" or "Collect" function
@@ -538,17 +673,28 @@
                 appState.start.timestamp = null;
                 appState.start.location = null;
                 appState.end.timestamp = null;
+                appState.end.location = null;
+                appState.observations = '';
+                observationsTextArea.value = '';
+                appState.photoData = '';
+                photoPreview.src = '';
                 dataDisplay.classList.add('hidden');
                 osDisplay.classList.add('hidden');
                 startDataDisplay.classList.add('hidden');
                 endDataDisplay.classList.add('hidden');
-                locationDisplay.classList.add('hidden');
+                startLocationDisplay.classList.add('hidden');
+                endLocationDisplay.classList.add('hidden');
+                distanceDisplay.classList.add('hidden');
                 barcodeDisplay.classList.add('hidden');
                 equipmentTypeDisplay.classList.add('hidden');
                 inventoryDisplay.classList.add('hidden');
+                observationsInputContainer.classList.add('hidden');
+                observationsDisplay.classList.add('hidden');
+                photoInputContainer.classList.add('hidden');
+                photoDisplay.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
-                generateSummaryBtn.style.display = 'none'; // Hide new button
-                summaryContainer.classList.add('hidden'); // Hide summary
+                generateSummaryBtn.style.display = 'none';
+                summaryContainer.classList.add('hidden');
                 saveDataBtn.classList.add('hidden');
                 startScanBtn.style.display = 'block';
             }
