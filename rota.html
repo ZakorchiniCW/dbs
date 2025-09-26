@@ -19,7 +19,7 @@
             border-radius: 0.75rem;
             overflow: hidden;
             border: 2px solid #a3b2b4; /* Cor da borda alterada */
-            /* Display is now controlled by JavaScript */
+            display: none;
         }
         .message-box {
             padding: 1rem;
@@ -218,6 +218,7 @@
         const inventoryDisplay = document.getElementById('inventory-display');
         const inventoryText = document.getElementById('inventory-text');
         
+        let html5QrCode;
 
         // Helper function to show a temporary message
         function showMessage(text, isError = false) {
@@ -297,49 +298,57 @@
             }
         });
 
-        // Initialize the QR/barcode scanner
-        let html5QrCodeScanner;
+        // Function to start the camera scanner
+        async function startScanner() {
+            try {
+                // Ensure the reader div is visible
+                readerDiv.style.display = 'block';
+                startScanBtn.style.display = 'none';
+                finishScanBtn.style.display = 'none';
 
-        function startScanner(onScanSuccessCallback) {
-            console.log("Attempting to start barcode reader...");
+                // Request camera permission
+                const devices = await Html5Qrcode.getCameras();
+                if (devices && devices.length) {
+                    const cameraId = devices[0].id;
+                    html5QrCode = new Html5Qrcode("reader");
 
-            // Make sure the reader div is visible
-            readerDiv.style.display = 'block';
-
-            // Hide action buttons
-            startScanBtn.style.display = 'none';
-            finishScanBtn.style.display = 'none';
-
-            // Stop any previous scanner instance
-            if (html5QrCodeScanner) {
-                html5QrCodeScanner.stop().then(() => {
-                    console.log("Previous scanner stopped.");
-                    initializeNewScanner(onScanSuccessCallback);
-                }).catch(err => {
-                    console.error("Error stopping scanner:", err);
-                    initializeNewScanner(onScanSuccessCallback);
-                });
-            } else {
-                initializeNewScanner(onScanSuccessCallback);
+                    await html5QrCode.start(
+                        cameraId,
+                        {
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                        },
+                        (decodedText, decodedResult) => {
+                            // On successful scan
+                            html5QrCode.stop().then(() => {
+                                readerDiv.style.display = 'none';
+                                if (appState.scanMode === 'start') {
+                                    handleStartScanSuccess(decodedText);
+                                } else {
+                                    handleFinishScanSuccess();
+                                }
+                            }).catch(err => {
+                                console.error("Error stopping scanner:", err);
+                            });
+                        },
+                        (errorMessage) => {
+                            // Ignore continuous error messages
+                        }
+                    );
+                } else {
+                    showMessage("Nenhuma câmera encontrada no seu dispositivo.", true);
+                    console.error("No cameras found.");
+                    readerDiv.style.display = 'none';
+                    startScanBtn.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Erro ao iniciar o scanner:", err);
+                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                readerDiv.style.display = 'none';
+                startScanBtn.style.display = 'block';
             }
         }
         
-        function initializeNewScanner(onScanSuccessCallback) {
-            html5QrCodeScanner = new Html5QrcodeScanner("reader", {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-                supportedScanTypes: [Html5QrcodeSupportedScanTypes.SCAN_TYPE_CAMERA]
-            }, false);
-
-            html5QrCodeScanner.render((decodedText, decodedResult) => {
-                console.log("Barcode read successfully:", decodedText);
-                html5QrCodeScanner.clear(); 
-                onScanSuccessCallback(decodedText, decodedResult);
-            }, (errorMessage) => {
-                // Ignore continuous error messages
-            });
-        }
-
         function handleStartScanSuccess(decodedText) {
             showMessage("Código de barras escaneado com sucesso!");
             
@@ -396,7 +405,6 @@
             dataDisplay.classList.remove('hidden');
             finishScanBtn.style.display = 'block';
             saveDataBtn.classList.remove('hidden');
-            readerDiv.style.display = 'none';
         }
 
         function handleFinishScanSuccess() {
@@ -406,7 +414,6 @@
             endDatetimeText.textContent = appState.end.timestamp.toLocaleString('pt-BR');
             endDataDisplay.classList.remove('hidden');
 
-            readerDiv.style.display = 'none';
             finishScanBtn.style.display = 'none';
             saveDataBtn.classList.remove('hidden');
         }
@@ -421,7 +428,7 @@
             osText.textContent = appState.osNumber;
             osDisplay.classList.remove('hidden');
             appState.scanMode = 'start';
-            startScanner(handleStartScanSuccess);
+            startScanner();
         });
 
         finishScanBtn.addEventListener('click', () => {
@@ -430,7 +437,7 @@
                 return;
             }
             appState.scanMode = 'end';
-            startScanner(handleFinishScanSuccess);
+            startScanner();
         });
 
         saveDataBtn.addEventListener('click', () => {
