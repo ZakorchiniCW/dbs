@@ -19,7 +19,7 @@
             border-radius: 0.75rem;
             overflow: hidden;
             border: 2px solid #a3b2b4; /* Cor da borda alterada */
-            display: none; /* Initially hidden */
+            /* Display is now controlled by JavaScript */
         }
         .message-box {
             padding: 1rem;
@@ -301,25 +301,30 @@
         let html5QrCodeScanner;
 
         function startScanner(onScanSuccessCallback) {
-            // Check if the scanner is already running
-            if (html5QrCodeScanner && html5QrCodeScanner.isScanning) {
-                html5QrCodeScanner.stop().then(() => {
-                    console.log("Stopped existing scanner.");
-                    startNewScanner(onScanSuccessCallback);
-                }).catch(err => {
-                    console.error("Error stopping scanner:", err);
-                    startNewScanner(onScanSuccessCallback);
-                });
-            } else {
-                startNewScanner(onScanSuccessCallback);
-            }
-        }
+            console.log("Attempting to start barcode reader...");
 
-        function startNewScanner(onScanSuccessCallback) {
+            // Make sure the reader div is visible
             readerDiv.style.display = 'block';
+
+            // Hide action buttons
             startScanBtn.style.display = 'none';
             finishScanBtn.style.display = 'none';
 
+            // Stop any previous scanner instance
+            if (html5QrCodeScanner) {
+                html5QrCodeScanner.stop().then(() => {
+                    console.log("Previous scanner stopped.");
+                    initializeNewScanner(onScanSuccessCallback);
+                }).catch(err => {
+                    console.error("Error stopping scanner:", err);
+                    initializeNewScanner(onScanSuccessCallback);
+                });
+            } else {
+                initializeNewScanner(onScanSuccessCallback);
+            }
+        }
+        
+        function initializeNewScanner(onScanSuccessCallback) {
             html5QrCodeScanner = new Html5QrcodeScanner("reader", {
                 fps: 10,
                 qrbox: { width: 250, height: 250 },
@@ -327,7 +332,8 @@
             }, false);
 
             html5QrCodeScanner.render((decodedText, decodedResult) => {
-                html5QrCodeScanner.clear();
+                console.log("Barcode read successfully:", decodedText);
+                html5QrCodeScanner.clear(); 
                 onScanSuccessCallback(decodedText, decodedResult);
             }, (errorMessage) => {
                 // Ignore continuous error messages
