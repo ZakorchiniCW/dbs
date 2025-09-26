@@ -135,6 +135,12 @@
             <div id="barcode-display" class="hidden">
                 <span class="font-semibold text-gray-600">Cód. de Barras:</span> <span id="barcode-text" class="font-medium text-gray-800"></span>
             </div>
+             <div id="equipment-type-display" class="hidden">
+                <span class="font-semibold text-gray-600">Tipo de Equipamento:</span> <span id="equipment-type-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="inventory-display" class="hidden">
+                <span class="font-semibold text-gray-600">Inventário:</span> <span id="inventory-text" class="font-medium text-gray-800"></span>
+            </div>
         </div>
         
         <!-- Save Button -->
@@ -152,6 +158,8 @@
         const appState = {
             osNumber: '',
             barcodeData: '',
+            equipmentType: '',
+            inventoryNumber: '',
             start: {
                 timestamp: null,
                 location: null,
@@ -205,6 +213,10 @@
         const locationText = document.getElementById('location-text');
         const barcodeDisplay = document.getElementById('barcode-display');
         const barcodeText = document.getElementById('barcode-text');
+        const equipmentTypeDisplay = document.getElementById('equipment-type-display');
+        const equipmentTypeText = document.getElementById('equipment-type-text');
+        const inventoryDisplay = document.getElementById('inventory-display');
+        const inventoryText = document.getElementById('inventory-text');
         
 
         // Helper function to show a temporary message
@@ -291,10 +303,19 @@
         function startScanner(onScanSuccessCallback) {
             // Check if the scanner is already running
             if (html5QrCodeScanner && html5QrCodeScanner.isScanning) {
-                console.log("Scanner is already running.");
-                return;
+                html5QrCodeScanner.stop().then(() => {
+                    console.log("Stopped existing scanner.");
+                    startNewScanner(onScanSuccessCallback);
+                }).catch(err => {
+                    console.error("Error stopping scanner:", err);
+                    startNewScanner(onScanSuccessCallback);
+                });
+            } else {
+                startNewScanner(onScanSuccessCallback);
             }
+        }
 
+        function startNewScanner(onScanSuccessCallback) {
             readerDiv.style.display = 'block';
             startScanBtn.style.display = 'none';
             finishScanBtn.style.display = 'none';
@@ -315,9 +336,22 @@
 
         function handleStartScanSuccess(decodedText) {
             showMessage("Código de barras escaneado com sucesso!");
+            
+            // Extracting equipment type and inventory number
+            const equipmentType = decodedText.charAt(0).toUpperCase();
+            const inventoryNumber = decodedText.substring(1);
+
             appState.barcodeData = decodedText;
+            appState.equipmentType = equipmentType;
+            appState.inventoryNumber = inventoryNumber;
+
             barcodeText.textContent = decodedText;
+            equipmentTypeText.textContent = equipmentType;
+            inventoryText.textContent = inventoryNumber;
+
             barcodeDisplay.classList.remove('hidden');
+            equipmentTypeDisplay.classList.remove('hidden');
+            inventoryDisplay.classList.remove('hidden');
 
             // Capture start timestamp
             appState.start.timestamp = new Date();
@@ -403,6 +437,8 @@
             const dataToSave = {
                 'OrdemDeServico': appState.osNumber,
                 'CodigoDeBarras': appState.barcodeData,
+                'TipoDeEquipamento': appState.equipmentType,
+                'NumeroInventario': appState.inventoryNumber,
                 'InicioDoServico': appState.start.timestamp.toISOString(),
                 'FimDoServico': appState.end.timestamp.toISOString(),
                 'Localizacao': appState.start.location,
@@ -428,6 +464,8 @@
                 endDataDisplay.classList.add('hidden');
                 locationDisplay.classList.add('hidden');
                 barcodeDisplay.classList.add('hidden');
+                equipmentTypeDisplay.classList.add('hidden');
+                inventoryDisplay.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
                 saveDataBtn.classList.add('hidden');
                 startScanBtn.style.display = 'block';
