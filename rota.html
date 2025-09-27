@@ -44,26 +44,39 @@
             border-bottom: none;
         }
 
-        /* Estilo de Botão Padrão (AGORA VERDE COM SOMBREADO) */
+        /* Estilo de Botão Padrão (AGORA VERDE, LISO E REDONDO CONFORME IMAGEM) */
         .button-primary {
-            /* Strong Green Color */
-            @apply bg-green-600 text-white font-bold transition-all duration-200 ease-in-out;
-            /* Sombreamento/Profundidade customizada (Green-800 for depth) */
-            box-shadow: 0 4px 0 0 #166534; 
-            border-bottom: 4px solid #166534;
+            @apply text-white font-bold transition-all duration-300 ease-in-out;
+            
+            /* Cor base do botão (similar ao tom da imagem) */
+            background-color: #39D379; 
+            /* Gradiente para o efeito de brilho/gloss */
+            background-image: linear-gradient(180deg, #4DE08B 0%, #39D379 100%);
+            
+            /* Borda arredondada completa (Pill Shape) */
+            border-radius: 9999px; 
+            
+            /* Sombreamento suave por baixo */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(57, 211, 121, 0.4);
+            border: none; /* Remove any default border */
         }
         .button-primary:hover {
-            @apply bg-green-700;
+            /* Escurece levemente no hover */
+            background-color: #2FAD63;
+            background-image: linear-gradient(180deg, #4DE08B 0%, #2FAD63 100%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(57, 211, 121, 0.6);
         }
         .button-primary:active {
-            /* On press, remove shadow and translate down for press effect */
-            box-shadow: none;
-            transform: translateY(4px);
-            border-bottom: 0;
+            /* Efeito de clique: reduz o tamanho e o brilho */
+            transform: scale(0.98); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(57, 211, 121, 0.2);
+            background-image: linear-gradient(180deg, #39D379 0%, #2FAD63 100%);
         }
 
+        /* Botão secundário também usa borda redonda para consistência */
         .button-secondary {
             @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
+            border-radius: 9999px; 
         }
 
         .green-led {
@@ -123,7 +136,7 @@
                 <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                 <input type="password" id="password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
             </div>
-            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="login-btn" class="w-full py-3 font-semibold text-lg button-primary">
                 Entrar
             </button>
         </div>
@@ -159,10 +172,10 @@
 
         <!-- Action Buttons (Start/Finish Scan) -->
         <div id="action-buttons" class="flex flex-col space-y-3">
-            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="start-scan-btn" class="w-full py-3 font-semibold text-lg button-primary">
                 Escanear para Iniciar
             </button>
-            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
+            <button id="finish-scan-btn" class="w-full py-3 font-semibold text-lg button-primary" style="display:none;">
                 Escanear para Finalizar
             </button>
         </div>
@@ -187,7 +200,7 @@
         </div>
         
         <!-- Finalize Button (Activated after End Scan) -->
-        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+        <button id="finalize-service-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Finalizar Serviço
         </button>
         
@@ -195,7 +208,7 @@
         <div id="manager-check-container" class="data-display hidden text-center">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
             <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
-            <button id="manager-auth-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+            <button id="manager-auth-btn" class="py-3 px-6 font-semibold text-lg button-primary">
                 OK
             </button>
         </div>
@@ -252,7 +265,7 @@
         </div>
         
         <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
-        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+        <button id="report-close-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Encerrar (Voltar ao Início)
         </button>
 
@@ -264,7 +277,7 @@
             <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
             <p class="mb-4 text-gray-600">O serviço na O.S. <span id="modal-os-number" class="font-bold"></span> foi:</p>
             <div class="flex flex-col space-y-3">
-                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-primary">
+                <button id="modal-finalize-btn" class="py-3 font-semibold text-lg button-primary">
                     Finalizada
                 </button>
                 <button id="modal-interrupt-btn" class="py-3 rounded-lg font-semibold text-lg button-secondary">
@@ -292,7 +305,7 @@
                     <label for="manager-password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                     <input type="password" id="manager-password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                 </div>
-                <button id="manager-login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                <button id="manager-login-btn" class="w-full py-3 font-semibold text-lg button-primary">
                     Acessar Relatório
                 </button>
             </div>
