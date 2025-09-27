@@ -1,161 +1,849 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplicativo de Simulação de Scanner</title>
-    <!-- Carrega Tailwind CSS para estilização moderna e responsiva -->
+    <title>Registro de Serviço - Versão Simples</title>
+    <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Define a fonte Inter para o aplicativo */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f7f9fb;
+            background-color: #f0f4f5;
         }
-        /* Estilização para o indicador de carregamento (Spinner) */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #ffffff;
+        #reader {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 2px solid #a3b2b4;
+            display: none;
+        }
+        .message-box {
+            padding: 1rem;
+            background-color: #d1e7e4;
+            border-radius: 0.75rem;
+            border: 1px solid #b7d6d1;
+            margin-top: 1rem;
+            display: none;
+        }
+        .data-display {
+            background-color: #e6f0f2;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #c8d8e0;
+            margin-top: 1.5rem;
+        }
+        .data-display div {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #a3b2b4;
+        }
+        .data-display div:last-child {
+            border-bottom: none;
+        }
+
+        /* Estilo de Botão Padrão (removido o estilo 3D complexo) */
+        .button-primary {
+            @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors;
+        }
+        .button-secondary {
+            @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
+        }
+
+        .green-led {
+            height: 12px;
+            width: 12px;
+            background-color: #4CAF50;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
+            display: inline-block;
+            box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        /* Modal Overlay Styles */
+        #confirmation-modal, #manager-auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        #modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
     </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#4f46e5', /* Indigo-600 */
-                        'primary-dark': '#4338ca', /* Indigo-700 */
-                    }
-                }
-            }
-        }
-    </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
-    <!-- Container Principal do Aplicativo -->
-    <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl transition-all duration-300">
-        <h1 class="text-3xl font-bold text-gray-900 mb-6 text-center">Simulador de Escaneamento</h1>
+    <!-- Login Container - Visible by default -->
+    <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
 
-        <!-- Painel de Status -->
-        <div class="mb-8 p-4 bg-primary-dark rounded-lg flex items-center justify-between shadow-inner">
-            <span class="text-white font-medium">Status Atual:</span>
-            <span id="statusMessage" class="text-lg font-bold text-yellow-300 transition-colors duration-300">Pronto para Escanear</span>
+        <!-- Login Form -->
+        <div class="space-y-4">
+            <div>
+                <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
+                <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                    <option value="" disabled selected>Selecione a empresa</option>
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+            <div>
+                <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
+                <select id="employee-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" disabled>
+                    <option value="" disabled selected>Selecione um funcionário</option>
+                </select>
+            </div>
+            <div>
+                <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                <input type="password" id="password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            </div>
+            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                Entrar
+            </button>
+        </div>
+        
+        <div id="login-message-box" class="message-box" style="display:none;">
+            <p id="login-message-text" class="text-sm font-medium text-gray-700"></p>
         </div>
 
-        <!-- Botão de Iniciar Escaneamento -->
-        <button id="scanButton" onclick="openConfirmationModal()"
-                class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-lg text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-4 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 transition-all duration-200"
-                aria-label="Clique para iniciar o processo de escaneamento">
-            <span id="buttonText">Iniciar Escaneamento</span>
-            <div id="loadingSpinner" class="spinner ml-3 hidden"></div>
-        </button>
-
-        <p class="text-sm text-gray-500 mt-4 text-center">Clique no botão para iniciar a simulação do scanner.</p>
     </div>
 
-    <!-- Modal de Confirmação Personalizado (Substitui alert/confirm) -->
-    <div id="confirmationModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center transition-opacity duration-300" aria-modal="true" role="dialog">
-        <div class="bg-white rounded-xl p-6 w-11/12 max-w-sm shadow-2xl transform scale-95 transition-transform duration-300">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Confirmação de Escaneamento</h2>
-            <p class="text-gray-700 mb-6">Deseja realmente iniciar o processo de escaneamento agora?</p>
+    <!-- Main App Container - Hidden until login -->
+    <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full" style="display:none;">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Registro de Serviço</h1>
+        
+        <p class="text-center text-gray-600 mb-4">Bem-vindo(a), <span id="logged-in-user"></span>!</p>
 
-            <div class="flex justify-end space-x-3">
-                <!-- Botão Cancelar -->
-                <button onclick="closeConfirmationModal()"
-                        class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                    Cancelar
+        <!-- Service Order Number Input / Display -->
+        <div class="mb-4">
+            <label for="os-number" class="block text-sm font-medium text-gray-700 mb-1">Número da Ordem de Serviço</label>
+            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            
+            <!-- Active Service Status Indicator -->
+            <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
+                <p class="text-sm font-semibold text-green-700 flex items-center">
+                    <span class="green-led mr-2"></span>
+                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> Ativa e em Andamento.
+                </p>
+            </div>
+        </div>
+
+        <!-- Barcode Scanner View -->
+        <div id="reader"></div>
+
+        <!-- Action Buttons (Start/Finish Scan) -->
+        <div id="action-buttons" class="flex flex-col space-y-3">
+            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                Escanear para Iniciar
+            </button>
+            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
+                Escanear para Finalizar
+            </button>
+        </div>
+
+        <!-- Field for Technician's Observations (Visible in Active State) -->
+        <div id="observations-input-container" class="mt-4 hidden">
+            <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
+            <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
+        </div>
+
+        <!-- Field for Photo Capture (Green and Visible in Active State) -->
+        <div id="photo-input-container" class="mt-4 hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
+                Tirar Foto 📸
+            </button>
+            
+            <!-- Captured Photo Previews (visible in active state) -->
+             <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
+                 <!-- Photos will be appended here -->
+             </div>
+        </div>
+        
+        <!-- Finalize Button (Activated after End Scan) -->
+        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Finalizar Serviço
+        </button>
+        
+        <!-- Manager Check Container -->
+        <div id="manager-check-container" class="data-display hidden text-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
+            <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
+            <button id="manager-auth-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+                OK
+            </button>
+        </div>
+
+
+        <!-- Message Box for User Feedback -->
+        <div id="message-box" class="message-box" style="display:none;">
+            <p id="message-text" class="text-sm font-medium text-gray-700"></p>
+        </div>
+
+        <!-- TEMPORARY DATA DISPLAY SECTION (Report View) -->
+        <div id="data-display" class="data-display hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço</h2>
+            <div id="os-display">
+                <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="status-display">
+                <span class="font-semibold text-gray-600">Status:</span> <span id="service-status-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="barcode-display">
+                <span class="font-semibold text-gray-600">Cód. de Barras:</span> <span id="barcode-text" class="font-medium text-gray-800"></span>
+            </div>
+             <div id="equipment-type-display">
+                <span class="font-semibold text-gray-600">Tipo de Equipamento:</span> <span id="equipment-type-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="start-data-display">
+                <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-600">Localização Início:</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="end-data-display">
+                <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-600">Localização Fim:</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="distance-display">
+                <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="observations-display">
+                <span class="font-semibold text-gray-600">Observações:</span> <span id="observations-text-display" class="font-medium text-gray-800 whitespace-pre-wrap"></span>
+            </div>
+             <div id="photos-report-display">
+                <span class="font-semibold text-gray-600">Fotos Capturadas:</span>
+                <div id="photos-report-preview-container" class="mt-2 flex flex-wrap gap-2"></div>
+            </div>
+        </div>
+        
+        <!-- TEMPORARY Summary Container (Report View) -->
+        <div id="summary-container" class="data-display hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
+            <p id="summary-text" class="text-gray-700 text-sm italic">Resumo de IA desativado conforme solicitado.</p>
+        </div>
+        
+        <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
+        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Encerrar (Voltar ao Início)
+        </button>
+
+    </div>
+    
+    <!-- Confirmation Modal Overlay (Technician Finalization - Finalizada/Interrompida) -->
+    <div id="confirmation-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
+            <p class="mb-4 text-gray-600">O serviço na O.S. <span id="modal-os-number" class="font-bold"></span> foi:</p>
+            <div class="flex flex-col space-y-3">
+                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-primary">
+                    Finalizada
                 </button>
-                <!-- Botão de Ação Principal (Iniciar) -->
-                <button onclick="startScanning()"
-                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Sim, Iniciar
+                <button id="modal-interrupt-btn" class="py-3 rounded-lg font-semibold text-lg button-secondary">
+                    Interrompida
                 </button>
             </div>
         </div>
     </div>
+    
+    <!-- Manager Authentication Modal Overlay -->
+    <div id="manager-auth-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Autenticação Gerencial</h3>
+            <p class="mb-4 text-gray-600">Para visualizar o relatório, o Gerente deve se autenticar.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="manager-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Gerente</label>
+                    <select id="manager-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                        <option value="" disabled selected>Selecione o Gerente</option>
+                        <option value="Gerente">Gerente</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="manager-password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="manager-password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                </div>
+                <button id="manager-login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                    Acessar Relatório
+                </button>
+            </div>
+
+             <div id="manager-message-box" class="message-box mt-3" style="display:none; background-color: #fca5a5; border-color: #ef4444;">
+                <p id="manager-message-text" class="text-sm font-medium text-red-800"></p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Html5-QR-Code Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script>
-        const scanButton = document.getElementById('scanButton');
-        const buttonText = document.getElementById('buttonText');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const statusMessage = document.getElementById('statusMessage');
-        const confirmationModal = document.getElementById('confirmationModal');
+        // Main application state and data container
+        const appState = {
+            osNumber: '',
+            barcodeData: '',
+            equipmentType: '',
+            inventoryNumber: '',
+            observations: '',
+            photoData: [], // Array to hold multiple photo Base64 strings
+            serviceStatus: '',
+            start: {
+                timestamp: null,
+                location: null,
+            },
+            end: {
+                timestamp: null,
+                location: null,
+            },
+            scanMode: 'start',
+            isServiceActive: false, // Flag to track active service state
+            // Data persisted after finalization, used for Manager view
+            finalReportData: null, 
+        };
 
-        // Estado da aplicação
-        let isScanning = false;
+        // Mock data for login (Funcionário: '123', Gerente: '111')
+        const loginData = {
+            "Arcondi": { 
+                "Abc": "123", 
+                "Def": "123", 
+                "Ghi": "123",
+                "Gerente": "111" // Usuário Gerente
+            },
+            "Lubrica": { 
+                "Jk": "123", 
+                "Lm": "123", 
+                "No": "123" 
+            }
+        };
+        const MANAGER_USERNAME = "Gerente";
+        const MANAGER_PASSWORD = "111";
 
-        /**
-         * Abre o modal de confirmação.
-         * Esta é a primeira etapa após o clique no botão.
-         */
-        function openConfirmationModal() {
-            if (isScanning) return;
-            confirmationModal.classList.remove('hidden');
-            confirmationModal.classList.add('flex');
-        }
+        // DOM element references
+        const loginContainer = document.getElementById('login-container');
+        const appContainer = document.getElementById('app-container');
+        const companySelect = document.getElementById('company-select');
+        const employeeSelect = document.getElementById('employee-select');
+        const passwordInput = document.getElementById('password-input');
+        const loginBtn = document.getElementById('login-btn');
+        const loggedInUserText = document.getElementById('logged-in-user');
 
-        /**
-         * Fecha o modal de confirmação.
-         */
-        function closeConfirmationModal() {
-            confirmationModal.classList.add('hidden');
-            confirmationModal.classList.remove('flex');
-        }
+        const osInput = document.getElementById('os-number');
+        const osTextActive = document.getElementById('os-text-active');
+        const startScanBtn = document.getElementById('start-scan-btn');
+        const finishScanBtn = document.getElementById('finish-scan-btn');
+        const finalizeServiceBtn = document.getElementById('finalize-service-btn');
+        const reportCloseBtn = document.getElementById('report-close-btn');
 
-        /**
-         * Inicia o processo de escaneamento após a confirmação.
-         * Esta função é chamada a partir do botão 'Sim, Iniciar' no modal.
-         */
-        function startScanning() {
-            closeConfirmationModal(); // Fecha o modal imediatamente
-            
-            if (isScanning) return;
+        const readerDiv = document.getElementById('reader');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const dataDisplay = document.getElementById('data-display');
+        const serviceActiveStatus = document.getElementById('service-active-status');
+        const managerCheckContainer = document.getElementById('manager-check-container'); 
+        const managerAuthBtn = document.getElementById('manager-auth-btn'); 
 
-            isScanning = true;
-            scanButton.disabled = true;
+        // Modals
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const modalOsNumber = document.getElementById('modal-os-number');
+        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
+        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
+        
+        // Manager Auth Modal elements
+        const managerAuthModal = document.getElementById('manager-auth-modal');
+        const managerSelect = document.getElementById('manager-select');
+        const managerPasswordInput = document.getElementById('manager-password-input');
+        const managerLoginBtn = document.getElementById('manager-login-btn');
+        const managerMessageBox = document.getElementById('manager-message-box');
+        const managerMessageText = document.getElementById('manager-message-text');
 
-            // Atualiza o UI para o estado de escaneamento
-            statusMessage.textContent = 'Escaneando...';
-            statusMessage.classList.remove('text-yellow-300', 'text-green-400');
-            statusMessage.classList.add('text-indigo-300');
-            
-            buttonText.textContent = 'Processando...';
-            loadingSpinner.classList.remove('hidden');
 
-            // Simula o tempo de escaneamento (3 segundos)
+        // Report display elements (simplified names for brevity)
+        const observationsTextArea = document.getElementById('observations-text');
+        const observationsInputContainer = document.getElementById('observations-input-container');
+        const photoInputContainer = document.getElementById('photo-input-container');
+        const photoFileInput = document.getElementById('photo-file-input');
+        const photoPreviewContainer = document.getElementById('photo-preview-container');
+        const summaryContainer = document.getElementById('summary-container');
+        
+        let html5QrCode;
+
+        function showMessage(text, isError = false) {
+            messageText.textContent = text;
+            messageBox.style.display = 'block';
+            if (isError) {
+                messageBox.classList.remove('bg-gray-200', 'bg-[#d1e7e4]');
+                messageBox.classList.add('bg-red-200');
+            } else {
+                messageBox.classList.remove('bg-red-200');
+                messageBox.classList.add('bg-gray-200', 'bg-[#d1e7e4]');
+            }
             setTimeout(() => {
-                isScanning = false;
-                scanButton.disabled = false;
-
-                // Atualiza o UI para o estado de concluído
-                statusMessage.textContent = 'Escaneamento Concluído!';
-                statusMessage.classList.remove('text-indigo-300', 'text-yellow-300');
-                statusMessage.classList.add('text-green-400');
-
-                buttonText.textContent = 'Iniciar Novo Escaneamento';
-                loadingSpinner.classList.add('hidden');
-
-                // Após a conclusão, o próximo clique no botão abrirá o modal novamente
-                // MAS não teremos confirmações repetidas durante o processo.
-
-            }, 3000); // 3 segundos de simulação
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+        
+        function showManagerMessage(text) {
+             managerMessageText.textContent = text;
+             managerMessageBox.style.display = 'block';
+             setTimeout(() => {
+                managerMessageBox.style.display = 'none';
+            }, 5000);
         }
 
-        // Garante que o estado inicial do botão esteja correto
-        document.addEventListener('DOMContentLoaded', () => {
-            statusMessage.textContent = 'Pronto para Escanear';
-            statusMessage.classList.add('text-yellow-300');
+        // --- Core Reset Function ---
+        function resetAppState() {
+            // Reset app state
+            appState.osNumber = '';
+            appState.barcodeData = '';
+            appState.equipmentType = '';
+            appState.inventoryNumber = '';
+            appState.observations = '';
+            appState.photoData = [];
+            appState.serviceStatus = '';
+            appState.start.timestamp = null;
+            appState.start.location = null;
+            appState.end.timestamp = null;
+            appState.end.location = null;
+            appState.scanMode = 'start';
+            appState.finalReportData = null;
+            appState.isServiceActive = false; // Reset active flag
+            
+            // Reset input/preview fields
+            osInput.value = '';
+            observationsTextArea.value = '';
+            photoPreviewContainer.innerHTML = '';
+            
+            // Hide all post-service/active elements
+            dataDisplay.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            reportCloseBtn.classList.add('hidden');
+            serviceActiveStatus.classList.add('hidden');
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
+            managerCheckContainer.classList.add('hidden'); 
+            managerAuthModal.style.display = 'none'; 
+            
+            // Show initial input/button
+            osInput.disabled = false;
+            osInput.style.display = 'block';
+            startScanBtn.style.display = 'block';
+
+            loginContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            
+            showMessage("Pronto para uma nova Ordem de Serviço!");
+        }
+
+        function transitionToActiveServiceUI() {
+            // Technician Active Phase (After Start Scan)
+            appState.isServiceActive = true;
+
+            osInput.disabled = true;
+            osInput.style.display = 'none'; // Hide input when active
+            startScanBtn.style.display = 'none';
+
+            osTextActive.textContent = appState.osNumber;
+            serviceActiveStatus.classList.remove('hidden');
+            finishScanBtn.style.display = 'block'; // Show end scan button
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden'); 
+            
+            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
+            finalizeServiceBtn.disabled = true;
+        }
+        
+        function transitionToManagerCheckUI() {
+            // Technician Phase -> Manager Check Phase
+            serviceActiveStatus.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden');
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+
+            managerCheckContainer.classList.remove('hidden');
+            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
+        }
+
+        async function startScanner() {
+            try {
+                // Check for OS before scan
+                const os = osInput.value.trim();
+                if (appState.scanMode === 'start' && !os) {
+                    showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
+                    return;
+                }
+                if (appState.scanMode === 'start') {
+                    appState.osNumber = os;
+                }
+
+                readerDiv.style.display = 'block';
+                // Hide active UI during scan
+                serviceActiveStatus.classList.add('hidden');
+                finishScanBtn.style.display = 'none';
+                finalizeServiceBtn.classList.add('hidden'); 
+                observationsInputContainer.classList.add('hidden');
+                photoInputContainer.classList.add('hidden');
+                startScanBtn.style.display = 'none';
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
+                };
+                const constraints = { facingMode: { exact: "environment" } };
+
+                html5QrCode = new Html5Qrcode("reader");
+
+                await html5QrCode.start( constraints, config,
+                    (decodedText, decodedResult) => {
+                        html5QrCode.stop().then(() => {
+                            readerDiv.style.display = 'none';
+                            if (appState.scanMode === 'start') {
+                                handleStartScanSuccess(decodedText);
+                            } else {
+                                handleFinishScanSuccess();
+                            }
+                        }).catch(err => {
+                            console.error("Error stopping scanner:", err);
+                            showMessage("Erro ao parar o scanner.", true);
+                            resetUIScannerFail();
+                        });
+                    },
+                    (errorMessage) => { /* Ignore continuous error messages */ }
+                );
+            } catch (err) {
+                console.error("Erro ao iniciar o scanner:", err);
+                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                readerDiv.style.display = 'none';
+                resetUIScannerFail();
+            }
+        }
+
+        function resetUIScannerFail() {
+            // Reverte a UI se o scanner falhar
+            if (appState.isServiceActive) {
+                transitionToActiveServiceUI(); 
+            } else {
+                osInput.style.display = 'block';
+                osInput.disabled = false;
+                startScanBtn.style.display = 'block';
+            }
+        }
+        
+        function handleStartScanSuccess(decodedText) {
+            showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
+            
+            // Simulação de parse de dados de equipamento
+            const equipmentType = decodedText.charAt(0).toUpperCase();
+            const inventoryNumber = decodedText.substring(1);
+
+            appState.barcodeData = decodedText;
+            appState.equipmentType = equipmentType;
+            appState.inventoryNumber = inventoryNumber;
+
+            appState.start.timestamp = new Date();
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.start.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                        showMessage("Localização de início obtida com sucesso!");
+                    },
+                    (error) => {
+                        console.error("Geolocation error (start):", error);
+                        showMessage("Não foi possível obter a localização de início.", true);
+                    }
+                );
+            } else {
+                showMessage("Seu navegador não suporta geolocalização.", true);
+            }
+            transitionToActiveServiceUI();
+        }
+
+        function handleFinishScanSuccess() {
+            showMessage("Escaneamento de Finalização concluído. Pronto para Finalizar Serviço.");
+            
+            // 1. Capture end timestamp immediately 
+            appState.end.timestamp = new Date();
+            
+            // 2. Restore active UI and ENABLE Finalize button
+            serviceActiveStatus.classList.remove('hidden'); 
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden');
+            
+            // ENABLE Finalize button
+            finalizeServiceBtn.classList.remove('hidden'); 
+            finalizeServiceBtn.disabled = false; 
+            finishScanBtn.style.display = 'none'; 
+
+            // 3. Get end location (runs asynchronously but doesn't block button)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.end.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                    },
+                    (error) => {
+                        console.error("Geolocation error (end):", error);
+                        showMessage("Localização de encerramento não capturada.", true);
+                    }
+                );
+            }
+        }
+
+        // Haversine formula
+        function calculateDistance(start, end) {
+             if (!start || !end) return 0;
+            const R = 6371;
+            const lat1 = start.latitude;
+            const lon1 = start.longitude;
+            const lat2 = end.latitude;
+            const lon2 = end.longitude;
+            const toRadians = (deg) => deg * (Math.PI / 180);
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+        
+        // --- Report Generation and Display ---
+        async function prepareReportData() {
+            // Step 1: Save technician inputs to a final data structure
+            appState.observations = observationsTextArea.value.trim();
+            const distanceKm = calculateDistance(appState.start.location, appState.end.location);
+            
+            const report = {
+                osNumber: appState.osNumber,
+                serviceStatus: appState.serviceStatus,
+                barcodeData: appState.barcodeData,
+                equipmentType: appState.equipmentType,
+                start: {
+                    timestamp: appState.start.timestamp,
+                    location: appState.start.location,
+                },
+                end: {
+                    timestamp: appState.end.timestamp,
+                    location: appState.end.location,
+                },
+                distance: distanceKm,
+                observations: appState.observations,
+                photoData: [...appState.photoData], 
+            };
+
+            // Step 2: AI Summary is disabled
+            report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
+
+            // Save for Manager View
+            appState.finalReportData = report;
+
+            transitionToManagerCheckUI();
+        }
+
+        function displayFinalReport() {
+            if (!appState.finalReportData) {
+                showMessage("Erro: Nenhum dado de relatório para exibir.", true);
+                return;
+            }
+
+            const report = appState.finalReportData;
+            
+            // Hide Manager Check and Auth Modal
+            document.getElementById('manager-check-container').classList.add('hidden');
+            document.getElementById('manager-auth-modal').style.display = 'none';
+
+            // Populate Report (use specific IDs)
+            document.getElementById('os-text').textContent = report.osNumber;
+            document.getElementById('service-status-text').textContent = report.serviceStatus;
+            document.getElementById('barcode-text').textContent = report.barcodeData;
+            document.getElementById('equipment-type-text').textContent = report.equipmentType;
+            document.getElementById('start-datetime-text').textContent = report.start.timestamp ? report.start.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('end-datetime-text').textContent = report.end.timestamp ? report.end.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('distance-text').textContent = report.distance.toFixed(2) + ' km';
+            document.getElementById('observations-text-display').textContent = report.observations || 'Nenhuma observação registrada.';
+            
+            // Set location text 
+            document.getElementById('start-location-text').textContent = report.start.location 
+                ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
+                : 'Localização de Início não capturada.';
+            document.getElementById('end-location-text').textContent = report.end.location 
+                ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
+                : 'Localização de Fim não capturada.';
+
+            // Populate Photo Report Preview
+            document.getElementById('photos-report-preview-container').innerHTML = '';
+            if (report.photoData.length > 0) {
+                 report.photoData.forEach(base64Data => {
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
+                    document.getElementById('photos-report-preview-container').appendChild(img);
+                });
+            } else {
+                 document.getElementById('photos-report-preview-container').textContent = 'Nenhuma foto capturada.';
+            }
+
+            // Show Summary (Inativa, apenas exibe a mensagem)
+            document.getElementById('summary-text').textContent = report.aiSummary; 
+            document.getElementById('summary-container').classList.remove('hidden');
+            
+            // Show the report and CLOSE button
+            document.getElementById('data-display').classList.remove('hidden');
+            document.getElementById('report-close-btn').classList.remove('hidden');
+
+            showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
+        }
+
+        // --- Photo Capture Functions ---
+        document.getElementById('take-photo-btn').addEventListener('click', () => { photoFileInput.click(); });
+
+        photoFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Data = e.target.result;
+                    appState.photoData.push(base64Data);
+                    
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.alt = `Foto ${appState.photoData.length}`;
+                    img.className = 'w-20 h-20 object-cover rounded-lg shadow-md';
+                    photoPreviewContainer.appendChild(img);
+                    
+                    showMessage(`Foto ${appState.photoData.length} capturada com sucesso!`);
+                };
+                reader.readAsDataURL(file);
+            }
+            photoFileInput.value = '';
         });
 
+
+        // --- Event Listeners for the Main App ---
+        
+        // Login - Check technician/employee login
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const selectedCompany = companySelect.value;
+            const selectedEmployee = employeeSelect.value;
+            const inputPassword = passwordInput.value;
+            
+            if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
+                document.getElementById('logged-in-user').textContent = selectedEmployee;
+                resetAppState();
+            } else {
+                showMessage("Login ou senha inválidos.", true);
+            }
+        });
+
+        // Start Scan Button (Directly calls scanner after OS check)
+        startScanBtn.addEventListener('click', () => {
+            appState.scanMode = 'start';
+            startScanner();
+        });
+
+        // Finish Scan Button (Starts barcode scan for end)
+        finishScanBtn.addEventListener('click', () => {
+            if (!appState.start.timestamp) {
+                showMessage("Por favor, inicie o serviço primeiro.", true);
+                return;
+            }
+            appState.scanMode = 'end';
+            startScanner();
+        });
+        
+        // Finalize Service Button (Shows Finalization/Interruption Modal)
+        finalizeServiceBtn.addEventListener('click', () => {
+             if (!appState.end.timestamp) {
+                showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
+                return;
+            }
+            modalOsNumber.textContent = appState.osNumber;
+            confirmationModal.style.display = 'flex'; // Abre o modal de finalização/interrupção
+        });
+
+        // Modal Confirmation: Finalizada
+        modalFinalizeBtn.addEventListener('click', () => {
+            appState.serviceStatus = 'Finalizada';
+            confirmationModal.style.display = 'none';
+            prepareReportData(); 
+        });
+
+        // Modal Confirmation: Interrompida
+        modalInterruptBtn.addEventListener('click', () => {
+            appState.serviceStatus = 'Interrompida';
+            confirmationModal.style.display = 'none';
+            prepareReportData(); 
+        });
+
+        // Manager Auth Button (Shows Auth Modal)
+        managerAuthBtn.addEventListener('click', () => {
+            managerAuthModal.style.display = 'flex'; 
+        });
+
+        // Manager Login Button (Checks Auth and Shows Report)
+        managerLoginBtn.addEventListener('click', () => {
+            const selectedManager = managerSelect.value;
+            const inputPassword = managerPasswordInput.value;
+            
+            if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
+                managerPasswordInput.value = '';
+                managerSelect.value = '';
+                displayFinalReport(); 
+            } else {
+                showManagerMessage("Nome do Gerente ou senha inválidos.", true);
+            }
+        });
+
+        // Report CLOSE Button (Resets flow)
+        document.getElementById('report-close-btn').addEventListener('click', () => {
+            resetAppState();
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial login setup
+             for (const company in loginData) {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                companySelect.appendChild(option);
+            }
+             companySelect.addEventListener('change', () => {
+                const selectedCompany = companySelect.value;
+                employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
+                employeeSelect.disabled = false;
+                if (selectedCompany && loginData[selectedCompany]) {
+                    for (const employee in loginData[selectedCompany]) {
+                        const option = document.createElement('option');
+                        option.value = employee;
+                        option.textContent = employee;
+                        employeeSelect.appendChild(option);
+                    }
+                }
+            });
+            
+        });
     </script>
 </body>
 </html>
