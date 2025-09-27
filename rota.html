@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Serviço</title>
+    <title>Registro de Serviço - Versão Simples</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -43,11 +43,44 @@
         .data-display div:last-child {
             border-bottom: none;
         }
+
+        /* Estilo de Botão Padrão (removido o estilo 3D complexo) */
         .button-primary {
-            @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors;
+            @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors;
         }
         .button-secondary {
-            @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors;
+            @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
+        }
+
+        .green-led {
+            height: 12px;
+            width: 12px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50;
+        }
+        
+        /* Modal Overlay Styles */
+        #confirmation-modal, #manager-auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        #modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -63,6 +96,7 @@
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     <option value="" disabled selected>Selecione a empresa</option>
+                    <!-- Options populated by JS -->
                 </select>
             </div>
             <div>
@@ -90,19 +124,26 @@
     <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full" style="display:none;">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Registro de Serviço</h1>
         
-        <!-- User authentication will be handled by Power Apps -->
         <p class="text-center text-gray-600 mb-4">Bem-vindo(a), <span id="logged-in-user"></span>!</p>
 
-        <!-- Service Order Number Input -->
+        <!-- Service Order Number Input / Display -->
         <div class="mb-4">
             <label for="os-number" class="block text-sm font-medium text-gray-700 mb-1">Número da Ordem de Serviço</label>
-            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            
+            <!-- Active Service Status Indicator -->
+            <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
+                <p class="text-sm font-semibold text-green-700 flex items-center">
+                    <span class="green-led mr-2"></span>
+                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> Ativa e em Andamento.
+                </p>
+            </div>
         </div>
 
         <!-- Barcode Scanner View -->
         <div id="reader"></div>
 
-        <!-- Buttons for Service Start/End -->
+        <!-- Action Buttons (Start/Finish Scan) -->
         <div id="action-buttons" class="flex flex-col space-y-3">
             <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
                 Escanear para Iniciar
@@ -110,81 +151,144 @@
             <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
                 Escanear para Finalizar
             </button>
-            <button id="generate-summary-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary" style="display:none;">
-                Gerar Resumo do Serviço ✨
-            </button>
         </div>
 
-        <!-- Field for Technician's Observations -->
+        <!-- Field for Technician's Observations (Visible in Active State) -->
         <div id="observations-input-container" class="mt-4 hidden">
             <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
             <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
         </div>
 
-        <!-- Field for Photo Capture -->
+        <!-- Field for Photo Capture (Green and Visible in Active State) -->
         <div id="photo-input-container" class="mt-4 hidden">
              <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
-             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary mt-3">
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
                 Tirar Foto 📸
             </button>
+            
+            <!-- Captured Photo Previews (visible in active state) -->
+             <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
+                 <!-- Photos will be appended here -->
+             </div>
         </div>
+        
+        <!-- Finalize Button (Activated after End Scan) -->
+        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Finalizar Serviço
+        </button>
+        
+        <!-- Manager Check Container -->
+        <div id="manager-check-container" class="data-display hidden text-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
+            <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
+            <button id="manager-auth-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+                OK
+            </button>
+        </div>
+
 
         <!-- Message Box for User Feedback -->
         <div id="message-box" class="message-box" style="display:none;">
             <p id="message-text" class="text-sm font-medium text-gray-700"></p>
         </div>
 
-        <!-- Data Display Section -->
+        <!-- TEMPORARY DATA DISPLAY SECTION (Report View) -->
         <div id="data-display" class="data-display hidden">
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Dados do Serviço</h2>
-            <div id="os-display" class="hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço</h2>
+            <div id="os-display">
                 <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
             </div>
-            <div id="start-data-display" class="hidden">
-                <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
+            <div id="status-display">
+                <span class="font-semibold text-gray-600">Status:</span> <span id="service-status-text" class="font-medium text-gray-800"></span>
             </div>
-            <div id="end-data-display" class="hidden">
-                <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
-            </div>
-            <div id="start-location-display" class="hidden">
-                <span class="font-semibold text-gray-600">Localização (Início):</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
-            </div>
-             <div id="end-location-display" class="hidden">
-                <span class="font-semibold text-gray-600">Localização (Fim):</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
-            </div>
-            <div id="distance-display" class="hidden">
-                <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
-            </div>
-            <div id="barcode-display" class="hidden">
+            <div id="barcode-display">
                 <span class="font-semibold text-gray-600">Cód. de Barras:</span> <span id="barcode-text" class="font-medium text-gray-800"></span>
             </div>
-             <div id="equipment-type-display" class="hidden">
+             <div id="equipment-type-display">
                 <span class="font-semibold text-gray-600">Tipo de Equipamento:</span> <span id="equipment-type-text" class="font-medium text-gray-800"></span>
             </div>
-            <div id="inventory-display" class="hidden">
-                <span class="font-semibold text-gray-600">Inventário:</span> <span id="inventory-text" class="font-medium text-gray-800"></span>
+            <div id="start-data-display">
+                <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
             </div>
-             <div id="observations-display" class="hidden">
+            <div>
+                <span class="font-semibold text-gray-600">Localização Início:</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="end-data-display">
+                <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div>
+                <span class="font-semibold text-gray-600">Localização Fim:</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="distance-display">
+                <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="observations-display">
                 <span class="font-semibold text-gray-600">Observações:</span> <span id="observations-text-display" class="font-medium text-gray-800 whitespace-pre-wrap"></span>
             </div>
-             <div id="photo-display" class="hidden">
-                <span class="font-semibold text-gray-600">Foto:</span>
-                <img id="photo-preview" src="" alt="Prévia da foto tirada" class="rounded-lg mt-2 w-full h-auto max-w-sm">
+             <div id="photos-report-display">
+                <span class="font-semibold text-gray-600">Fotos Capturadas:</span>
+                <div id="photos-report-preview-container" class="mt-2 flex flex-wrap gap-2"></div>
             </div>
         </div>
         
-        <!-- Summary Container -->
+        <!-- TEMPORARY Summary Container (Report View) -->
         <div id="summary-container" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
-            <p id="summary-text" class="text-gray-700 text-sm italic"></p>
+            <p id="summary-text" class="text-gray-700 text-sm italic">Resumo de IA desativado conforme solicitado.</p>
         </div>
-
-        <!-- Save Button -->
-        <button id="save-data-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
-            Salvar no SharePoint
+        
+        <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
+        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Encerrar (Voltar ao Início)
         </button>
 
     </div>
+    
+    <!-- Confirmation Modal Overlay (Technician Finalization - Finalizada/Interrompida) -->
+    <div id="confirmation-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
+            <p class="mb-4 text-gray-600">O serviço na O.S. <span id="modal-os-number" class="font-bold"></span> foi:</p>
+            <div class="flex flex-col space-y-3">
+                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-primary">
+                    Finalizada
+                </button>
+                <button id="modal-interrupt-btn" class="py-3 rounded-lg font-semibold text-lg button-secondary">
+                    Interrompida
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manager Authentication Modal Overlay -->
+    <div id="manager-auth-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Autenticação Gerencial</h3>
+            <p class="mb-4 text-gray-600">Para visualizar o relatório, o Gerente deve se autenticar.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="manager-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Gerente</label>
+                    <select id="manager-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                        <option value="" disabled selected>Selecione o Gerente</option>
+                        <option value="Gerente">Gerente</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="manager-password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="manager-password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                </div>
+                <button id="manager-login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                    Acessar Relatório
+                </button>
+            </div>
+
+             <div id="manager-message-box" class="message-box mt-3" style="display:none; background-color: #fca5a5; border-color: #ef4444;">
+                <p id="manager-message-text" class="text-sm font-medium text-red-800"></p>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Html5-QR-Code Library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -197,7 +301,8 @@
             equipmentType: '',
             inventoryNumber: '',
             observations: '',
-            photoData: '', // New: Field for photo data in Base64 format
+            photoData: [], // Array to hold multiple photo Base64 strings
+            serviceStatus: '',
             start: {
                 timestamp: null,
                 location: null,
@@ -206,22 +311,28 @@
                 timestamp: null,
                 location: null,
             },
-            scanMode: 'start', // 'start' or 'end'
+            scanMode: 'start',
+            isServiceActive: false, // Flag to track active service state
+            // Data persisted after finalization, used for Manager view
+            finalReportData: null, 
         };
 
-        // Mock data for login (would be from SharePoint in the real app)
+        // Mock data for login (Funcionário: '123', Gerente: '111')
         const loginData = {
-            "Arcondi": {
-                "Abc": "123",
-                "Def": "123",
-                "Ghi": "123"
+            "Arcondi": { 
+                "Abc": "123", 
+                "Def": "123", 
+                "Ghi": "123",
+                "Gerente": "111" // Usuário Gerente
             },
-            "Lubrica": {
-                "Jk": "123",
-                "Lm": "123",
-                "No": "123"
+            "Lubrica": { 
+                "Jk": "123", 
+                "Lm": "123", 
+                "No": "123" 
             }
         };
+        const MANAGER_USERNAME = "Gerente";
+        const MANAGER_PASSWORD = "111";
 
         // DOM element references
         const loginContainer = document.getElementById('login-container');
@@ -230,94 +341,510 @@
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
         const loginBtn = document.getElementById('login-btn');
-        const loginMessageBox = document.getElementById('login-message-box');
-        const loginMessageText = document.getElementById('login-message-text');
         const loggedInUserText = document.getElementById('logged-in-user');
 
         const osInput = document.getElementById('os-number');
+        const osTextActive = document.getElementById('os-text-active');
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
-        const generateSummaryBtn = document.getElementById('generate-summary-btn');
-        const saveDataBtn = document.getElementById('save-data-btn');
+        const finalizeServiceBtn = document.getElementById('finalize-service-btn');
+        const reportCloseBtn = document.getElementById('report-close-btn');
+
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const dataDisplay = document.getElementById('data-display');
-        const osDisplay = document.getElementById('os-display');
-        const osText = document.getElementById('os-text');
-        const startDataDisplay = document.getElementById('start-data-display');
-        const startDatetimeText = document.getElementById('start-datetime-text');
-        const endDataDisplay = document.getElementById('end-data-display');
-        const endDatetimeText = document.getElementById('end-datetime-text');
-        const startLocationDisplay = document.getElementById('start-location-display');
-        const startLocationText = document.getElementById('start-location-text');
-        const endLocationDisplay = document.getElementById('end-location-display');
-        const endLocationText = document.getElementById('end-location-text');
-        const distanceDisplay = document.getElementById('distance-display');
-        const distanceText = document.getElementById('distance-text');
-        const barcodeDisplay = document.getElementById('barcode-display');
-        const barcodeText = document.getElementById('barcode-text');
-        const equipmentTypeDisplay = document.getElementById('equipment-type-display');
-        const equipmentTypeText = document.getElementById('equipment-type-text');
-        const inventoryDisplay = document.getElementById('inventory-display');
-        const inventoryText = document.getElementById('inventory-text');
-        const observationsInputContainer = document.getElementById('observations-input-container');
+        const serviceActiveStatus = document.getElementById('service-active-status');
+        const managerCheckContainer = document.getElementById('manager-check-container'); 
+        const managerAuthBtn = document.getElementById('manager-auth-btn'); 
+
+        // Modals
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const modalOsNumber = document.getElementById('modal-os-number');
+        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
+        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
+        
+        // Manager Auth Modal elements
+        const managerAuthModal = document.getElementById('manager-auth-modal');
+        const managerSelect = document.getElementById('manager-select');
+        const managerPasswordInput = document.getElementById('manager-password-input');
+        const managerLoginBtn = document.getElementById('manager-login-btn');
+        const managerMessageBox = document.getElementById('manager-message-box');
+        const managerMessageText = document.getElementById('manager-message-text');
+
+
+        // Report display elements (simplified names for brevity)
         const observationsTextArea = document.getElementById('observations-text');
-        const observationsDisplay = document.getElementById('observations-display');
-        const observationsTextDisplay = document.getElementById('observations-text-display');
+        const observationsInputContainer = document.getElementById('observations-input-container');
         const photoInputContainer = document.getElementById('photo-input-container');
-        const takePhotoButton = document.getElementById('take-photo-btn');
         const photoFileInput = document.getElementById('photo-file-input');
-        const photoDisplay = document.getElementById('photo-display');
-        const photoPreview = document.getElementById('photo-preview');
+        const photoPreviewContainer = document.getElementById('photo-preview-container');
         const summaryContainer = document.getElementById('summary-container');
-        const summaryText = document.getElementById('summary-text');
         
         let html5QrCode;
 
-        // Helper function to show a temporary message
         function showMessage(text, isError = false) {
             messageText.textContent = text;
             messageBox.style.display = 'block';
             if (isError) {
-                messageBox.classList.remove('bg-gray-200');
+                messageBox.classList.remove('bg-gray-200', 'bg-[#d1e7e4]');
                 messageBox.classList.add('bg-red-200');
             } else {
-                messageBox.classList.remove('bg-gray-200');
-                messageBox.classList.add('bg-gray-200');
+                messageBox.classList.remove('bg-red-200');
+                messageBox.classList.add('bg-gray-200', 'bg-[#d1e7e4]');
             }
             setTimeout(() => {
                 messageBox.style.display = 'none';
             }, 5000);
         }
-
-        function showLoginMessage(text, isError = false) {
-            loginMessageText.textContent = text;
-            loginMessageBox.style.display = 'block';
-            if (isError) {
-                loginMessageBox.classList.remove('bg-gray-200');
-                loginMessageBox.classList.add('bg-red-200');
-            } else {
-                loginMessageBox.classList.remove('bg-gray-200');
-                loginMessageBox.classList.add('bg-gray-200');
-            }
-            setTimeout(() => {
-                loginMessageBox.style.display = 'none';
+        
+        function showManagerMessage(text) {
+             managerMessageText.textContent = text;
+             managerMessageBox.style.display = 'block';
+             setTimeout(() => {
+                managerMessageBox.style.display = 'none';
             }, 5000);
         }
 
-        // Initialize login dropdowns
-        function setupLoginDropdowns() {
-            // Populate company dropdown
-            for (const company in loginData) {
+        // --- Core Reset Function ---
+        function resetAppState() {
+            // Reset app state
+            appState.osNumber = '';
+            appState.barcodeData = '';
+            appState.equipmentType = '';
+            appState.inventoryNumber = '';
+            appState.observations = '';
+            appState.photoData = [];
+            appState.serviceStatus = '';
+            appState.start.timestamp = null;
+            appState.start.location = null;
+            appState.end.timestamp = null;
+            appState.end.location = null;
+            appState.scanMode = 'start';
+            appState.finalReportData = null;
+            appState.isServiceActive = false; // Reset active flag
+            
+            // Reset input/preview fields
+            osInput.value = '';
+            observationsTextArea.value = '';
+            photoPreviewContainer.innerHTML = '';
+            
+            // Hide all post-service/active elements
+            dataDisplay.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            reportCloseBtn.classList.add('hidden');
+            serviceActiveStatus.classList.add('hidden');
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
+            managerCheckContainer.classList.add('hidden'); 
+            managerAuthModal.style.display = 'none'; 
+            
+            // Show initial input/button
+            osInput.disabled = false;
+            osInput.style.display = 'block';
+            startScanBtn.style.display = 'block';
+
+            loginContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            
+            showMessage("Pronto para uma nova Ordem de Serviço!");
+        }
+
+        function transitionToActiveServiceUI() {
+            // Technician Active Phase (After Start Scan or failure return)
+            appState.isServiceActive = true;
+
+            osInput.disabled = true;
+            osInput.style.display = 'none'; // Hide input when active
+            startScanBtn.style.display = 'none';
+
+            osTextActive.textContent = appState.osNumber;
+            serviceActiveStatus.classList.remove('hidden');
+            finishScanBtn.style.display = 'block'; // Show end scan button
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden'); 
+            
+            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
+            finalizeServiceBtn.disabled = true;
+        }
+        
+        function transitionToManagerCheckUI() {
+            // Technician Phase -> Manager Check Phase
+            serviceActiveStatus.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden');
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+
+            managerCheckContainer.classList.remove('hidden');
+            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
+        }
+
+        async function startScanner() {
+            try {
+                // Check for OS before scan
+                const os = osInput.value.trim();
+                if (appState.scanMode === 'start' && !os) {
+                    showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
+                    return;
+                }
+                if (appState.scanMode === 'start') {
+                    appState.osNumber = os;
+                }
+
+                readerDiv.style.display = 'block';
+                // Hide active UI during scan
+                serviceActiveStatus.classList.add('hidden');
+                finishScanBtn.style.display = 'none';
+                finalizeServiceBtn.classList.add('hidden'); 
+                observationsInputContainer.classList.add('hidden');
+                photoInputContainer.classList.add('hidden');
+                startScanBtn.style.display = 'none';
+
+                const config = {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
+                };
+                const constraints = { facingMode: { exact: "environment" } };
+
+                html5QrCode = new Html5Qrcode("reader");
+
+                await html5QrCode.start( constraints, config,
+                    (decodedText, decodedResult) => {
+                        html5QrCode.stop().then(() => {
+                            readerDiv.style.display = 'none';
+                            if (appState.scanMode === 'start') {
+                                handleStartScanSuccess(decodedText);
+                            } else {
+                                handleFinishScanSuccess();
+                            }
+                        }).catch(err => {
+                            console.error("Error stopping scanner:", err);
+                            showMessage("Erro ao parar o scanner.", true);
+                            resetUIScannerFail();
+                        });
+                    },
+                    (errorMessage) => { /* Ignore continuous error messages */ }
+                );
+            } catch (err) {
+                console.error("Erro ao iniciar o scanner:", err);
+                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                readerDiv.style.display = 'none';
+                resetUIScannerFail();
+            }
+        }
+
+        function resetUIScannerFail() {
+            // Reverte a UI se o scanner falhar
+            if (appState.isServiceActive) {
+                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visível)
+                if (appState.end.timestamp) {
+                    // Restaura a UI para mostrar o botão Finalizar
+                    serviceActiveStatus.classList.remove('hidden'); 
+                    observationsInputContainer.classList.remove('hidden');
+                    photoInputContainer.classList.remove('hidden');
+                    finalizeServiceBtn.classList.remove('hidden'); // AQUI é onde o botão Finalizar é restaurado
+                    finalizeServiceBtn.disabled = false;
+                    finishScanBtn.style.display = 'none'; 
+                    showMessage("Falha no scanner. O.S. pronta para Finalizar Serviço.");
+                } else {
+                    // Restaura a UI para o estado ativo (aguardando escaneamento de fim)
+                    transitionToActiveServiceUI(); 
+                    showMessage("Falha no scanner. Por favor, tente escanear novamente para finalizar.", true);
+                }
+            } else {
+                // Restaura a UI para o estado inicial (pré-escaneamento de início)
+                osInput.style.display = 'block';
+                osInput.disabled = false;
+                startScanBtn.style.display = 'block';
+            }
+        }
+        
+        function handleStartScanSuccess(decodedText) {
+            showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
+            
+            // Simulação de parse de dados de equipamento
+            const equipmentType = decodedText.charAt(0).toUpperCase();
+            const inventoryNumber = decodedText.substring(1);
+
+            appState.barcodeData = decodedText;
+            appState.equipmentType = equipmentType;
+            appState.inventoryNumber = inventoryNumber;
+
+            appState.start.timestamp = new Date();
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.start.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                        showMessage("Localização de início obtida com sucesso!");
+                    },
+                    (error) => {
+                        console.error("Geolocation error (start):", error);
+                        showMessage("Não foi possível obter a localização de início.", true);
+                    }
+                );
+            } else {
+                showMessage("Seu navegador não suporta geolocalização.", true);
+            }
+            transitionToActiveServiceUI();
+        }
+
+        function handleFinishScanSuccess() {
+            showMessage("Escaneamento de Finalização concluído. Pronto para Finalizar Serviço.");
+            
+            // 1. Capture end timestamp immediately 
+            appState.end.timestamp = new Date();
+            
+            // 2. Restore active UI and ENABLE Finalize button
+            serviceActiveStatus.classList.remove('hidden'); 
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden');
+            
+            // ENABLE Finalize button
+            finalizeServiceBtn.classList.remove('hidden'); 
+            finalizeServiceBtn.disabled = false; 
+            finishScanBtn.style.display = 'none'; 
+
+            // 3. Get end location (runs asynchronously but doesn't block button)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = position.coords;
+                        appState.end.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                    },
+                    (error) => {
+                        console.error("Geolocation error (end):", error);
+                        showMessage("Localização de encerramento não capturada.", true);
+                    }
+                );
+            }
+        }
+
+        // Haversine formula
+        function calculateDistance(start, end) {
+             if (!start || !end) return 0;
+            const R = 6371;
+            const lat1 = start.latitude;
+            const lon1 = start.longitude;
+            const lat2 = end.latitude;
+            const lon2 = end.longitude;
+            const toRadians = (deg) => deg * (Math.PI / 180);
+            const dLat = toRadians(lat2 - lat1);
+            const dLon = toRadians(lon2 - lon1);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+        
+        // --- Report Generation and Display ---
+        async function prepareReportData() {
+            // Step 1: Save technician inputs to a final data structure
+            appState.observations = observationsTextArea.value.trim();
+            const distanceKm = calculateDistance(appState.start.location, appState.end.location);
+            
+            const report = {
+                osNumber: appState.osNumber,
+                serviceStatus: appState.serviceStatus,
+                barcodeData: appState.barcodeData,
+                equipmentType: appState.equipmentType,
+                start: {
+                    timestamp: appState.start.timestamp,
+                    location: appState.start.location,
+                },
+                end: {
+                    timestamp: appState.end.timestamp,
+                    location: appState.end.location,
+                },
+                distance: distanceKm,
+                observations: appState.observations,
+                photoData: [...appState.photoData], 
+            };
+
+            // Step 2: AI Summary is disabled
+            report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
+
+            // Save for Manager View
+            appState.finalReportData = report;
+
+            transitionToManagerCheckUI();
+        }
+
+        function displayFinalReport() {
+            if (!appState.finalReportData) {
+                showMessage("Erro: Nenhum dado de relatório para exibir.", true);
+                return;
+            }
+
+            const report = appState.finalReportData;
+            
+            // Hide Manager Check and Auth Modal
+            document.getElementById('manager-check-container').classList.add('hidden');
+            document.getElementById('manager-auth-modal').style.display = 'none';
+
+            // Populate Report (use specific IDs)
+            document.getElementById('os-text').textContent = report.osNumber;
+            document.getElementById('service-status-text').textContent = report.serviceStatus;
+            document.getElementById('barcode-text').textContent = report.barcodeData;
+            document.getElementById('equipment-type-text').textContent = report.equipmentType;
+            document.getElementById('start-datetime-text').textContent = report.start.timestamp ? report.start.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('end-datetime-text').textContent = report.end.timestamp ? report.end.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('distance-text').textContent = report.distance.toFixed(2) + ' km';
+            document.getElementById('observations-text-display').textContent = report.observations || 'Nenhuma observação registrada.';
+            
+            // Set location text 
+            document.getElementById('start-location-text').textContent = report.start.location 
+                ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
+                : 'Localização de Início não capturada.';
+            document.getElementById('end-location-text').textContent = report.end.location 
+                ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
+                : 'Localização de Fim não capturada.';
+
+            // Populate Photo Report Preview
+            document.getElementById('photos-report-preview-container').innerHTML = '';
+            if (report.photoData.length > 0) {
+                 report.photoData.forEach(base64Data => {
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
+                    document.getElementById('photos-report-preview-container').appendChild(img);
+                });
+            } else {
+                 document.getElementById('photos-report-preview-container').textContent = 'Nenhuma foto capturada.';
+            }
+
+            // Show Summary (Inativa, apenas exibe a mensagem)
+            document.getElementById('summary-text').textContent = report.aiSummary; 
+            document.getElementById('summary-container').classList.remove('hidden');
+            
+            // Show the report and CLOSE button
+            document.getElementById('data-display').classList.remove('hidden');
+            document.getElementById('report-close-btn').classList.remove('hidden');
+
+            showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
+        }
+
+        // --- Photo Capture Functions ---
+        document.getElementById('take-photo-btn').addEventListener('click', () => { photoFileInput.click(); });
+
+        photoFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Data = e.target.result;
+                    appState.photoData.push(base64Data);
+                    
+                    const img = document.createElement('img');
+                    img.src = base64Data;
+                    img.alt = `Foto ${appState.photoData.length}`;
+                    img.className = 'w-20 h-20 object-cover rounded-lg shadow-md';
+                    photoPreviewContainer.appendChild(img);
+                    
+                    showMessage(`Foto ${appState.photoData.length} capturada com sucesso!`);
+                };
+                reader.readAsDataURL(file);
+            }
+            photoFileInput.value = '';
+        });
+
+
+        // --- Event Listeners for the Main App ---
+        
+        // Login - Check technician/employee login
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const selectedCompany = companySelect.value;
+            const selectedEmployee = employeeSelect.value;
+            const inputPassword = passwordInput.value;
+            
+            if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
+                document.getElementById('logged-in-user').textContent = selectedEmployee;
+                resetAppState();
+            } else {
+                showMessage("Login ou senha inválidos.", true);
+            }
+        });
+
+        // Start Scan Button (Directly calls scanner after OS check)
+        startScanBtn.addEventListener('click', () => {
+            appState.scanMode = 'start';
+            startScanner();
+        });
+
+        // Finish Scan Button (Starts barcode scan for end)
+        finishScanBtn.addEventListener('click', () => {
+            if (!appState.start.timestamp) {
+                showMessage("Por favor, inicie o serviço primeiro.", true);
+                return;
+            }
+            appState.scanMode = 'end';
+            startScanner();
+        });
+        
+        // Finalize Service Button (Shows Finalization/Interruption Modal)
+        finalizeServiceBtn.addEventListener('click', () => {
+             if (!appState.end.timestamp) {
+                showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
+                return;
+            }
+            modalOsNumber.textContent = appState.osNumber;
+            confirmationModal.style.display = 'flex'; // Abre o modal de finalização/interrupção
+        });
+
+        // Modal Confirmation: Finalizada
+        modalFinalizeBtn.addEventListener('click', () => {
+            appState.serviceStatus = 'Finalizada';
+            confirmationModal.style.display = 'none';
+            prepareReportData(); 
+        });
+
+        // Modal Confirmation: Interrompida
+        modalInterruptBtn.addEventListener('click', () => {
+            appState.serviceStatus = 'Interrompida';
+            confirmationModal.style.display = 'none';
+            prepareReportData(); 
+        });
+
+        // Manager Auth Button (Shows Auth Modal)
+        managerAuthBtn.addEventListener('click', () => {
+            managerAuthModal.style.display = 'flex'; 
+        });
+
+        // Manager Login Button (Checks Auth and Shows Report)
+        managerLoginBtn.addEventListener('click', () => {
+            const selectedManager = managerSelect.value;
+            const inputPassword = managerPasswordInput.value;
+            
+            if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
+                managerPasswordInput.value = '';
+                managerSelect.value = '';
+                displayFinalReport(); 
+            } else {
+                showManagerMessage("Nome do Gerente ou senha inválidos.", true);
+            }
+        });
+
+        // Report CLOSE Button (Resets flow)
+        document.getElementById('report-close-btn').addEventListener('click', () => {
+            resetAppState();
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+             // Initial login setup
+             for (const company in loginData) {
                 const option = document.createElement('option');
                 option.value = company;
                 option.textContent = company;
                 companySelect.appendChild(option);
             }
-
-            // Listen for company selection change
-            companySelect.addEventListener('change', () => {
+             companySelect.addEventListener('change', () => {
                 const selectedCompany = companySelect.value;
                 employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
                 employeeSelect.disabled = false;
@@ -330,381 +857,8 @@
                     }
                 }
             });
-        }
-        
-        // Handle login attempt
-        loginBtn.addEventListener('click', () => {
-            const company = companySelect.value;
-            const employee = employeeSelect.value;
-            const password = passwordInput.value;
-
-            if (!company || !employee || !password) {
-                showLoginMessage("Por favor, preencha todos os campos.", true);
-                return;
-            }
-
-            if (loginData[company] && loginData[company][employee] === password) {
-                showLoginMessage("Login bem-sucedido!");
-                loggedInUserText.textContent = employee;
-                loginContainer.style.display = 'none';
-                appContainer.style.display = 'block';
-            } else {
-                showLoginMessage("Usuário ou senha incorretos.", true);
-            }
-        });
-
-        // Function to start the camera scanner
-        async function startScanner() {
-            try {
-                // Ensure the reader div is visible
-                readerDiv.style.display = 'block';
-                startScanBtn.style.display = 'none';
-                finishScanBtn.style.display = 'none';
-                generateSummaryBtn.style.display = 'none';
-                observationsInputContainer.classList.add('hidden');
-                photoInputContainer.classList.add('hidden');
-
-                // Request camera permission with facingMode set to 'environment'
-                const config = {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
-                };
-                const constraints = {
-                    facingMode: { exact: "environment" }
-                };
-
-                html5QrCode = new Html5Qrcode("reader");
-
-                await html5QrCode.start(
-                    constraints,
-                    config,
-                    (decodedText, decodedResult) => {
-                        // On successful scan
-                        html5QrCode.stop().then(() => {
-                            readerDiv.style.display = 'none';
-                            if (appState.scanMode === 'start') {
-                                handleStartScanSuccess(decodedText);
-                            } else {
-                                handleFinishScanSuccess();
-                            }
-                        }).catch(err => {
-                            console.error("Error stopping scanner:", err);
-                        });
-                    },
-                    (errorMessage) => {
-                        // Ignore continuous error messages
-                    }
-                );
-            } catch (err) {
-                console.error("Erro ao iniciar o scanner:", err);
-                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
-                readerDiv.style.display = 'none';
-                startScanBtn.style.display = 'block';
-            }
-        }
-        
-        function handleStartScanSuccess(decodedText) {
-            showMessage("Código de barras escaneado com sucesso!");
             
-            // Extracting equipment type and inventory number
-            const equipmentType = decodedText.charAt(0).toUpperCase();
-            const inventoryNumber = decodedText.substring(1);
-
-            appState.barcodeData = decodedText;
-            appState.equipmentType = equipmentType;
-            appState.inventoryNumber = inventoryNumber;
-
-            barcodeText.textContent = decodedText;
-            equipmentTypeText.textContent = equipmentType;
-            inventoryText.textContent = inventoryNumber;
-
-            barcodeDisplay.classList.remove('hidden');
-            equipmentTypeDisplay.classList.remove('hidden');
-            inventoryDisplay.classList.remove('hidden');
-
-            // Capture start timestamp
-            appState.start.timestamp = new Date();
-            startDatetimeText.textContent = appState.start.timestamp.toLocaleString('pt-BR');
-            startDataDisplay.classList.remove('hidden');
-
-            // Get start location
-            if (navigator.geolocation) {
-                showMessage("Obtendo sua localização de início...");
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const coords = position.coords;
-                        appState.start.location = {
-                            latitude: coords.latitude,
-                            longitude: coords.longitude,
-                            accuracy: coords.accuracy,
-                        };
-                        startLocationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
-                        startLocationDisplay.classList.remove('hidden');
-                        showMessage("Localização de início obtida com sucesso!");
-                    },
-                    (error) => {
-                        showMessage("Não foi possível obter a localização de início. Verifique as permissões do seu navegador.", true);
-                        console.error("Geolocation error:", error);
-                        startLocationText.textContent = "Erro ao obter localização";
-                        startLocationDisplay.classList.remove('hidden');
-                    }
-                );
-            } else {
-                showMessage("Seu navegador não suporta geolocalização.", true);
-                startLocationText.textContent = "Geolocalização não suportada";
-                startLocationDisplay.classList.remove('hidden');
-            }
-            
-            // Show data and switch button
-            dataDisplay.classList.remove('hidden');
-            finishScanBtn.style.display = 'block';
-            generateSummaryBtn.style.display = 'block';
-            saveDataBtn.classList.remove('hidden');
-            observationsInputContainer.classList.remove('hidden');
-            photoInputContainer.classList.remove('hidden');
-        }
-
-        function handleFinishScanSuccess() {
-            showMessage("Fim do serviço registrado!");
-            // Capture end timestamp
-            appState.end.timestamp = new Date();
-            endDatetimeText.textContent = appState.end.timestamp.toLocaleString('pt-BR');
-            endDataDisplay.classList.remove('hidden');
-
-            // Get end location
-            if (navigator.geolocation) {
-                showMessage("Obtendo sua localização de encerramento...");
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const coords = position.coords;
-                        appState.end.location = {
-                            latitude: coords.latitude,
-                            longitude: coords.longitude,
-                            accuracy: coords.accuracy,
-                        };
-                        endLocationText.textContent = `Lat: ${coords.latitude.toFixed(4)}, Long: ${coords.longitude.toFixed(4)}`;
-                        endLocationDisplay.classList.remove('hidden');
-                        showMessage("Localização de encerramento obtida com sucesso!");
-                    },
-                    (error) => {
-                        showMessage("Não foi possível obter a localização de encerramento. Verifique as permissões do seu navegador.", true);
-                        console.error("Geolocation error:", error);
-                        endLocationText.textContent = "Erro ao obter localização";
-                        endLocationDisplay.classList.remove('hidden');
-                    }
-                );
-            } else {
-                showMessage("Seu navegador não suporta geolocalização.", true);
-                endLocationText.textContent = "Geolocalização não suportada";
-                endLocationDisplay.classList.remove('hidden');
-            }
-
-            finishScanBtn.style.display = 'none';
-            saveDataBtn.classList.remove('hidden');
-        }
-
-        // --- Gemini API Integration ---
-        // Constants for the Gemini API call
-        const apiKey = ""; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-        // Event listener for the new "Gerar Resumo" button
-        generateSummaryBtn.addEventListener('click', async () => {
-            if (!appState.osNumber || !appState.equipmentType) {
-                showMessage("Por favor, preencha a O.S. e escaneie o código de barras primeiro.", true);
-                return;
-            }
-
-            showMessage("Gerando resumo com IA...", false);
-            summaryContainer.classList.add('hidden');
-            summaryText.textContent = '';
-            generateSummaryBtn.disabled = true;
-
-            const userPrompt = `Aja como um técnico experiente. Crie um resumo de um relatório de serviço técnico para um equipamento. O número da Ordem de Serviço é ${appState.osNumber} e o tipo de equipamento é ${appState.equipmentType}. Inclua uma breve descrição da atividade de manutenção, como inspeção ou reparo, e o estado geral do equipamento. Mantenha o tom profissional e conciso.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: "Você é um gerador de resumo de relatório de serviço técnico." }]
-                }
-            };
-
-            try {
-                let response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Erro de rede: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                if (generatedText) {
-                    summaryText.textContent = generatedText;
-                    summaryContainer.classList.remove('hidden');
-                    showMessage("Resumo gerado com sucesso!", false);
-                } else {
-                    showMessage("Não foi possível gerar o resumo. Tente novamente.", true);
-                }
-
-            } catch (error) {
-                console.error("Erro na chamada da API Gemini:", error);
-                showMessage(`Erro ao gerar resumo: ${error.message}`, true);
-            } finally {
-                generateSummaryBtn.disabled = false;
-            }
-        });
-
-        // Function to calculate distance between two lat/long points using the Haversine formula
-        function calculateDistance(start, end) {
-            const R = 6371; // Radius of the Earth in kilometers
-            const lat1 = start.latitude;
-            const lon1 = start.longitude;
-            const lat2 = end.latitude;
-            const lon2 = end.longitude;
-
-            // Convert degrees to radians
-            const toRadians = (deg) => deg * (Math.PI / 180);
-            const dLat = toRadians(lat2 - lat1);
-            const dLon = toRadians(lon2 - lon1);
-
-            // Haversine formula
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-            return R * c; // Distance in kilometers
-        }
-
-        // --- Photo Capture Functions ---
-        takePhotoButton.addEventListener('click', () => {
-            photoFileInput.click();
-        });
-
-        photoFileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Store the Base64 data
-                    appState.photoData = e.target.result;
-                    // Display the image preview
-                    photoPreview.src = appState.photoData;
-                    photoDisplay.classList.remove('hidden');
-                    showMessage("Foto capturada com sucesso!");
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-
-        // Event Listeners for the main app
-        startScanBtn.addEventListener('click', () => {
-            if (!osInput.value.trim()) {
-                showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
-                return;
-            }
-            appState.osNumber = osInput.value.trim();
-            osText.textContent = appState.osNumber;
-            osDisplay.classList.remove('hidden');
-            appState.scanMode = 'start';
-            startScanner();
-        });
-
-        finishScanBtn.addEventListener('click', () => {
-            if (!appState.start.timestamp) {
-                showMessage("Por favor, inicie o serviço primeiro.", true);
-                return;
-            }
-            appState.scanMode = 'end';
-            startScanner();
-        });
-
-        saveDataBtn.addEventListener('click', () => {
-            if (!appState.osNumber || !appState.barcodeData || !appState.start.timestamp || !appState.end.timestamp || !appState.end.location) {
-                showMessage("Por favor, complete todos os campos e escaneamentos antes de salvar.", true);
-                return;
-            }
-
-            // Capture observations from the textarea
-            appState.observations = observationsTextArea.value.trim();
-            if (appState.observations) {
-                 observationsTextDisplay.textContent = appState.observations;
-                 observationsDisplay.classList.remove('hidden');
-            }
-
-            // Calculate the distance between start and end locations
-            const distanceKm = calculateDistance(appState.start.location, appState.end.location);
-            distanceText.textContent = `${distanceKm.toFixed(2)} km`;
-            distanceDisplay.classList.remove('hidden');
-
-            // This is the data object that you will pass to Power Apps.
-            const dataToSave = {
-                'OrdemDeServico': appState.osNumber,
-                'CodigoDeBarras': appState.barcodeData,
-                'TipoDeEquipamento': appState.equipmentType,
-                'NumeroInventario': appState.inventoryNumber,
-                'InicioDoServico': appState.start.timestamp.toISOString(),
-                'FimDoServico': appState.end.timestamp.toISOString(),
-                'LocalizacaoInicio': appState.start.location,
-                'LocalizacaoFim': appState.end.location,
-                'DistanciaPercorridaKm': distanceKm,
-                'Observacoes': appState.observations,
-                'FotoEmBase64': appState.photoData, // New: Photo data added to the object
-            };
-
-            // In Power Apps, you would use a "Patch" or "Collect" function
-            // to send this object to your SharePoint list.
-            // For this HTML file, we will just log it to the console.
-            console.log("Dados prontos para serem enviados para o SharePoint:", JSON.stringify(dataToSave, null, 2));
-            showMessage("Dados preparados para envio. No Power Apps, configure a ação para enviar esses dados.");
-        });
-
-        osInput.addEventListener('input', () => {
-             // Reset UI if OS number changes
-            if (appState.barcodeData || appState.start.timestamp || appState.end.timestamp) {
-                appState.barcodeData = '';
-                appState.start.timestamp = null;
-                appState.start.location = null;
-                appState.end.timestamp = null;
-                appState.end.location = null;
-                appState.observations = '';
-                observationsTextArea.value = '';
-                appState.photoData = '';
-                photoPreview.src = '';
-                dataDisplay.classList.add('hidden');
-                osDisplay.classList.add('hidden');
-                startDataDisplay.classList.add('hidden');
-                endDataDisplay.classList.add('hidden');
-                startLocationDisplay.classList.add('hidden');
-                endLocationDisplay.classList.add('hidden');
-                distanceDisplay.classList.add('hidden');
-                barcodeDisplay.classList.add('hidden');
-                equipmentTypeDisplay.classList.add('hidden');
-                inventoryDisplay.classList.add('hidden');
-                observationsInputContainer.classList.add('hidden');
-                observationsDisplay.classList.add('hidden');
-                photoInputContainer.classList.add('hidden');
-                photoDisplay.classList.add('hidden');
-                finishScanBtn.style.display = 'none';
-                generateSummaryBtn.style.display = 'none';
-                summaryContainer.classList.add('hidden');
-                saveDataBtn.classList.add('hidden');
-                startScanBtn.style.display = 'block';
-            }
-        });
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            setupLoginDropdowns();
         });
     </script>
 </body>
 </html>
-
