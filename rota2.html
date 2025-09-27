@@ -44,23 +44,32 @@
             border-bottom: none;
         }
 
-        /* Cor Primária Original (para Login/Inicial) - Mantida para consistência no login */
+        /* Cor Primária Original (para Login/Inicial) */
         .button-primary-login {
             @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors;
         }
 
-        /* NOVO Estilo de Botão - Padrão Verde (cor próxima à da imagem #2ecc71) com aparência 3D */
+        /* NOVO Estilo de Botão - Padrão Verde (cor próxima à da imagem #60b31e) com aparência 3D */
         .button-app-style {
             /* Cor de fundo: Verde vibrante */
-            @apply bg-[#2ecc71] text-white font-bold transition-all duration-100 ease-in-out;
-            /* Efeito 3D sutil (sombra mais escura) */
-            box-shadow: 0 4px 0 #1e8449; /* Sombra mais escura para profundidade */
+            background-color: #60b31e;
+            color: white;
+            font-weight: 700;
+            transition: all 0.1s ease-out;
+            border-radius: 1rem; /* Cantos bem arredondados */
+            box-shadow: 0 6px 0 #468716; /* Sombra mais escura para profundidade */
             transform: translateY(0);
         }
         /* Efeito de clique (pressionar) */
         .button-app-style:active {
-            box-shadow: 0 1px 0 #1e8449; /* Sombra reduzida */
-            transform: translateY(3px); /* Move levemente para baixo */
+            box-shadow: 0 2px 0 #468716; /* Sombra reduzida */
+            transform: translateY(4px); /* Move levemente para baixo */
+        }
+        .button-app-style:disabled {
+            background-color: #9ccc6e;
+            box-shadow: 0 4px 0 #79994f;
+            cursor: not-allowed;
+            transform: translateY(0);
         }
         .button-secondary {
             @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors;
@@ -76,7 +85,7 @@
         }
         
         /* Modal Overlay Styles */
-        #confirmation-modal, #manager-auth-modal {
+        #confirmation-modal, #manager-auth-modal, #os-confirmation-modal, #reset-confirmation-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -143,7 +152,7 @@
         <!-- Service Order Number Input / Display -->
         <div class="mb-4">
             <label for="os-number" class="block text-sm font-medium text-gray-700 mb-1">Número da Ordem de Serviço</label>
-            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+            <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
             
             <!-- Active Service Status Indicator -->
             <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
@@ -186,8 +195,8 @@
              </div>
         </div>
         
-        <!-- Finalize Button (Activated after End Scan) -->
-        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-app-style mt-6 hidden" disabled>
+        <!-- Finalize Button (Activated after End Scan OR used as Reset before Start Scan) -->
+        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-app-style mt-6 hidden">
             Finalizar Serviço
         </button>
         
@@ -258,7 +267,7 @@
 
     </div>
     
-    <!-- Confirmation Modal Overlay (Technician Finalization) -->
+    <!-- Confirmation Modal Overlay (Technician Finalization - Finalizada/Interrompida) -->
     <div id="confirmation-modal">
         <div id="modal-content">
             <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
@@ -274,7 +283,41 @@
         </div>
     </div>
     
-    <!-- Manager Authentication Modal Overlay (New) -->
+    <!-- Modal de Confirmação da O.S. (Novo) -->
+    <div id="os-confirmation-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmar Ordem de Serviço</h3>
+            <p class="mb-4 text-gray-700">A O.S. digitada é <span id="os-confirmation-text" class="font-bold text-red-600"></span>. Confirma que o número está correto para iniciar o serviço?</p>
+            <div class="flex space-x-3 mt-4">
+                <button id="modal-os-confirm-btn" class="flex-1 py-3 rounded-lg font-semibold text-lg button-app-style">
+                    Sim, está Correto
+                </button>
+                <button id="modal-os-cancel-btn" class="flex-1 py-3 rounded-lg font-semibold text-lg button-secondary">
+                    Corrigir
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Reset/Correção (Novo) -->
+    <div id="reset-confirmation-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Cancelar e Corrigir O.S.</h3>
+            <p class="mb-4 text-gray-700">Você tem certeza que deseja **cancelar a O.S. <span id="reset-os-text" class="font-bold text-red-600"></span>** e retornar para a tela de inserção?</p>
+            <p class="mb-4 text-sm text-gray-500 italic">Use esta opção se você digitou a O.S. incorretamente ou está no equipamento errado.</p>
+            <div class="flex space-x-3 mt-4">
+                <button id="modal-reset-confirm-btn" class="flex-1 py-3 rounded-lg font-semibold text-lg button-app-style">
+                    Sim, Cancelar
+                </button>
+                <button id="modal-reset-cancel-btn" class="flex-1 py-3 rounded-lg font-semibold text-lg button-secondary">
+                    Não, Manter
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Manager Authentication Modal Overlay -->
     <div id="manager-auth-modal">
         <div id="modal-content">
             <h3 class="text-xl font-bold mb-4 text-gray-800">Autenticação Gerencial</h3>
@@ -326,17 +369,18 @@
                 location: null,
             },
             scanMode: 'start',
+            isServiceActive: false, // NEW: Flag to track active service state
             // Data persisted after finalization, used for Manager view
             finalReportData: null, 
         };
 
-        // Mock data for login (TODAS as senhas de funcionário são '123'. Gerente é '111')
+        // Mock data for login (Funcionário: '123', Gerente: '111')
         const loginData = {
             "Arcondi": { 
                 "Abc": "123", 
                 "Def": "123", 
                 "Ghi": "123",
-                "Gerente": "111" // Novo usuário Gerente
+                "Gerente": "111" // Usuário Gerente
             },
             "Lubrica": { 
                 "Jk": "123", 
@@ -369,7 +413,24 @@
         const dataDisplay = document.getElementById('data-display');
         const serviceActiveStatus = document.getElementById('service-active-status');
         const managerCheckContainer = document.getElementById('manager-check-container'); 
-        const managerAuthBtn = document.getElementById('manager-auth-btn'); // Botão OK do Gerente que abre o modal de autenticação
+        const managerAuthBtn = document.getElementById('manager-auth-btn'); 
+
+        // Modals
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const modalOsNumber = document.getElementById('modal-os-number');
+        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
+        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
+        
+        const osConfirmationModal = document.getElementById('os-confirmation-modal');
+        const osConfirmationText = document.getElementById('os-confirmation-text');
+        const modalOsConfirmBtn = document.getElementById('modal-os-confirm-btn');
+        const modalOsCancelBtn = document.getElementById('modal-os-cancel-btn');
+
+        const resetConfirmationModal = document.getElementById('reset-confirmation-modal');
+        const resetOsText = document.getElementById('reset-os-text');
+        const modalResetConfirmBtn = document.getElementById('modal-reset-confirm-btn');
+        const modalResetCancelBtn = document.getElementById('modal-reset-cancel-btn');
+
 
         // Manager Auth Modal elements
         const managerAuthModal = document.getElementById('manager-auth-modal');
@@ -381,32 +442,12 @@
 
 
         // Report display elements (simplified names for brevity)
-        const osText = document.getElementById('os-text');
-        const serviceStatusText = document.getElementById('service-status-text');
-        const barcodeText = document.getElementById('barcode-text');
-        const equipmentTypeText = document.getElementById('equipment-type-text');
-        const startDatetimeText = document.getElementById('start-datetime-text');
-        const endDatetimeText = document.getElementById('end-datetime-text');
-        const distanceText = document.getElementById('distance-text');
         const observationsTextArea = document.getElementById('observations-text');
-        const observationsTextDisplay = document.getElementById('observations-text-display');
         const observationsInputContainer = document.getElementById('observations-input-container');
         const photoInputContainer = document.getElementById('photo-input-container');
-        const takePhotoButton = document.getElementById('take-photo-btn');
         const photoFileInput = document.getElementById('photo-file-input');
         const photoPreviewContainer = document.getElementById('photo-preview-container');
-        const photosReportPreviewContainer = document.getElementById('photos-report-preview-container');
-        const startLocationText = document.getElementById('start-location-text');
-        const endLocationText = document.getElementById('end-location-text');
-
         const summaryContainer = document.getElementById('summary-container');
-        const summaryText = document.getElementById('summary-text');
-        
-        // Modal elements
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const modalOsNumber = document.getElementById('modal-os-number');
-        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
-        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
         
         let html5QrCode;
 
@@ -414,11 +455,11 @@
             messageText.textContent = text;
             messageBox.style.display = 'block';
             if (isError) {
-                messageBox.classList.remove('bg-gray-200', 'bg-d1e7e4');
+                messageBox.classList.remove('bg-gray-200', 'bg-[#d1e7e4]');
                 messageBox.classList.add('bg-red-200');
             } else {
                 messageBox.classList.remove('bg-red-200');
-                messageBox.classList.add('bg-gray-200', 'bg-d1e7e4');
+                messageBox.classList.add('bg-gray-200', 'bg-[#d1e7e4]');
             }
             setTimeout(() => {
                 messageBox.style.display = 'none';
@@ -433,6 +474,7 @@
             }, 5000);
         }
 
+        // --- Core Reset Function ---
         function resetAppState() {
             // Reset app state
             appState.osNumber = '';
@@ -447,7 +489,8 @@
             appState.end.timestamp = null;
             appState.end.location = null;
             appState.scanMode = 'start';
-            appState.finalReportData = null; // Clear saved report data
+            appState.finalReportData = null;
+            appState.isServiceActive = false; // Reset active flag
             
             // Reset input/preview fields
             osInput.value = '';
@@ -461,15 +504,21 @@
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            finalizeServiceBtn.classList.add('hidden');
             finishScanBtn.style.display = 'none';
-            managerCheckContainer.classList.add('hidden'); // Esconder Manager Check
-            managerAuthModal.style.display = 'none'; // Esconder Modal de Autenticação Gerencial
+            managerCheckContainer.classList.add('hidden'); 
+            managerAuthModal.style.display = 'none'; 
             
             // Show initial input/button
             osInput.disabled = false;
             osInput.style.display = 'block';
             startScanBtn.style.display = 'block';
+
+            // Reset Finalize Button to Initial (Reset) State
+            finalizeServiceBtn.classList.remove('hidden'); // Manter visível após login
+            finalizeServiceBtn.textContent = 'Finalizar Serviço'; // Texto padrão
+            finalizeServiceBtn.disabled = true;
+            finalizeServiceBtn.classList.add('button-secondary'); 
+            finalizeServiceBtn.classList.remove('button-app-style');
 
             loginContainer.style.display = 'none';
             appContainer.style.display = 'block';
@@ -477,18 +526,47 @@
             showMessage("Pronto para uma nova Ordem de Serviço!");
         }
 
+        function transitionToPreScanUI() {
+             // Technician Pre-Scan Phase (O.S. confirmed, awaiting barcode)
+            appState.isServiceActive = false; // Still pre-active
+
+            osInput.disabled = true;
+            startScanBtn.style.display = 'block'; // Show start scan button
+
+            osTextActive.textContent = appState.osNumber;
+            serviceActiveStatus.classList.remove('hidden');
+            finishScanBtn.style.display = 'none'; 
+            observationsInputContainer.classList.add('hidden'); // Still hidden
+            photoInputContainer.classList.add('hidden'); // Still hidden
+
+            // Finalize Button is visible but acts as RESET/CORRECTION
+            finalizeServiceBtn.classList.remove('hidden'); 
+            finalizeServiceBtn.textContent = 'Corrigir O.S.'; // Mudar texto para indicar função de correção
+            finalizeServiceBtn.disabled = false; // Habilitado para correção
+            finalizeServiceBtn.classList.add('button-secondary');
+            finalizeServiceBtn.classList.remove('button-app-style');
+
+            osConfirmationModal.style.display = 'none'; // Fecha o modal de confirmação
+            showMessage(`O.S. ${appState.osNumber} confirmada. Prossiga para o equipamento.`, false);
+        }
+
         function transitionToActiveServiceUI() {
-            // Technician Active Phase
+            // Technician Active Phase (After Start Scan)
+            appState.isServiceActive = true;
+
             osInput.disabled = true;
             startScanBtn.style.display = 'none';
 
             osTextActive.textContent = appState.osNumber;
             serviceActiveStatus.classList.remove('hidden');
-            finishScanBtn.style.display = 'block'; 
+            finishScanBtn.style.display = 'block'; // Show end scan button
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden'); 
-            finalizeServiceBtn.classList.remove('hidden'); // Certifica que o botão está visível
-            finalizeServiceBtn.disabled = true; // Still disabled until end scan
+            
+            // Finalize Button becomes Finalize (but is disabled until End Scan)
+            finalizeServiceBtn.textContent = 'Finalizar Serviço';
+            finalizeServiceBtn.classList.remove('hidden'); 
+            finalizeServiceBtn.disabled = true; 
             finalizeServiceBtn.classList.add('button-secondary'); 
             finalizeServiceBtn.classList.remove('button-app-style');
         }
@@ -511,13 +589,10 @@
                 // Hide active UI during scan
                 serviceActiveStatus.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
-                finalizeServiceBtn.classList.add('hidden'); // Esconde enquanto escaneia
+                finalizeServiceBtn.classList.add('hidden'); 
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
-
-                if (appState.scanMode === 'start') {
-                    startScanBtn.style.display = 'none';
-                }
+                startScanBtn.style.display = 'none';
 
                 const config = {
                     fps: 10,
@@ -547,8 +622,9 @@
                 console.error("Erro ao iniciar o scanner:", err);
                 showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
                 readerDiv.style.display = 'none';
+                // Revert UI based on scanMode if scanner fails to start
                 if (appState.scanMode === 'start') {
-                    startScanBtn.style.display = 'block';
+                    transitionToPreScanUI(); 
                 } else {
                     transitionToActiveServiceUI();
                 }
@@ -589,7 +665,7 @@
         function handleFinishScanSuccess() {
             showMessage("Escaneamento de Finalização concluído. Pronto para Finalizar Serviço.");
             
-            // 1. Capture end timestamp immediately (CRITICAL FIX)
+            // 1. Capture end timestamp immediately 
             appState.end.timestamp = new Date();
             
             // 2. Restore active UI and ENABLE Finalize button
@@ -598,12 +674,12 @@
             photoInputContainer.classList.remove('hidden');
             
             // GARANTE que o botão finalize esteja visível e ATIVADO
+            finalizeServiceBtn.textContent = 'Finalizar Serviço';
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false;
             finalizeServiceBtn.classList.remove('button-secondary');
-            finalizeServiceBtn.classList.add('button-app-style'); // Aplica o novo estilo
-            finishScanBtn.style.display = 'none'; // Esconde o botão de scan de fim
-
+            finalizeServiceBtn.classList.add('button-app-style'); 
+            finishScanBtn.style.display = 'none'; 
 
             // 3. Get end location (runs asynchronously but doesn't block button)
             if (navigator.geolocation) {
@@ -659,10 +735,10 @@
                 },
                 distance: distanceKm,
                 observations: appState.observations,
-                photoData: [...appState.photoData], // Deep copy photos
+                photoData: [...appState.photoData], 
             };
 
-            // Step 2: Generate AI Summary (REMOVED/INATIVO conforme solicitado)
+            // Step 2: AI Summary is disabled
             report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
 
             // Save for Manager View
@@ -680,59 +756,53 @@
             const report = appState.finalReportData;
             
             // Hide Manager Check and Auth Modal
-            managerCheckContainer.classList.add('hidden');
-            managerAuthModal.style.display = 'none';
+            document.getElementById('manager-check-container').classList.add('hidden');
+            document.getElementById('manager-auth-modal').style.display = 'none';
 
-            // Populate Report
-            osText.textContent = report.osNumber;
-            serviceStatusText.textContent = report.serviceStatus;
-            barcodeText.textContent = report.barcodeData;
-            equipmentTypeText.textContent = report.equipmentType;
-            startDatetimeText.textContent = report.start.timestamp ? report.start.timestamp.toLocaleString('pt-BR') : 'N/A';
-            endDatetimeText.textContent = report.end.timestamp ? report.end.timestamp.toLocaleString('pt-BR') : 'N/A';
-            distanceText.textContent = report.distance.toFixed(2) + ' km';
-            observationsTextDisplay.textContent = report.observations || 'Nenhuma observação registrada.';
+            // Populate Report (use specific IDs)
+            document.getElementById('os-text').textContent = report.osNumber;
+            document.getElementById('service-status-text').textContent = report.serviceStatus;
+            document.getElementById('barcode-text').textContent = report.barcodeData;
+            document.getElementById('equipment-type-text').textContent = report.equipmentType;
+            document.getElementById('start-datetime-text').textContent = report.start.timestamp ? report.start.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('end-datetime-text').textContent = report.end.timestamp ? report.end.timestamp.toLocaleString('pt-BR') : 'N/A';
+            document.getElementById('distance-text').textContent = report.distance.toFixed(2) + ' km';
+            document.getElementById('observations-text-display').textContent = report.observations || 'Nenhuma observação registrada.';
             
             // Set location text 
-            startLocationText.textContent = report.start.location 
+            document.getElementById('start-location-text').textContent = report.start.location 
                 ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
                 : 'Localização de Início não capturada.';
-            endLocationText.textContent = report.end.location 
+            document.getElementById('end-location-text').textContent = report.end.location 
                 ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
                 : 'Localização de Fim não capturada.';
 
             // Populate Photo Report Preview
-            photosReportPreviewContainer.innerHTML = '';
+            document.getElementById('photos-report-preview-container').innerHTML = '';
             if (report.photoData.length > 0) {
                  report.photoData.forEach(base64Data => {
                     const img = document.createElement('img');
                     img.src = base64Data;
                     img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
-                    photosReportPreviewContainer.appendChild(img);
+                    document.getElementById('photos-report-preview-container').appendChild(img);
                 });
             } else {
-                 photosReportPreviewContainer.textContent = 'Nenhuma foto capturada.';
+                 document.getElementById('photos-report-preview-container').textContent = 'Nenhuma foto capturada.';
             }
 
             // Show Summary (Inativa, apenas exibe a mensagem)
-            summaryText.textContent = report.aiSummary; 
-            summaryContainer.classList.remove('hidden');
+            document.getElementById('summary-text').textContent = report.aiSummary; 
+            document.getElementById('summary-container').classList.remove('hidden');
             
             // Show the report and CLOSE button
-            dataDisplay.classList.remove('hidden');
-            reportCloseBtn.classList.remove('hidden');
+            document.getElementById('data-display').classList.remove('hidden');
+            document.getElementById('report-close-btn').classList.remove('hidden');
 
             showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
         }
 
-        // Gemini API Integration - KEEPING CODE BUT RETURNING MOCK TEXT
-        async function generateAISummary(report) {
-            // IA Summary explicitly disabled as requested.
-            return 'Resumo de IA desativado conforme solicitado.';
-        }
-
         // --- Photo Capture Functions ---
-        takePhotoButton.addEventListener('click', () => { photoFileInput.click(); });
+        document.getElementById('take-photo-btn').addEventListener('click', () => { photoFileInput.click(); });
 
         photoFileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -772,18 +842,32 @@
             }
         });
 
-        // Start Scan Button
+        // Start Scan Button (Now triggers OS Confirmation Modal)
         startScanBtn.addEventListener('click', () => {
-            if (!osInput.value.trim()) {
+            const os = osInput.value.trim();
+            if (!os) {
                 showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
                 return;
             }
-            appState.osNumber = osInput.value.trim();
-            appState.scanMode = 'start';
-            startScanner();
+            appState.osNumber = os;
+            osConfirmationText.textContent = os;
+            osConfirmationModal.style.display = 'flex'; // Abre o modal de confirmação
         });
 
-        // Finish Scan Button
+        // OS Confirmation Modal: Confirm (Move to pre-scan UI)
+        modalOsConfirmBtn.addEventListener('click', () => {
+            appState.scanMode = 'start';
+            transitionToPreScanUI();
+        });
+        
+        // OS Confirmation Modal: Cancel (Stay on input screen)
+        modalOsCancelBtn.addEventListener('click', () => {
+            osConfirmationModal.style.display = 'none';
+            osInput.focus();
+        });
+
+
+        // Finish Scan Button (Starts barcode scan for end)
         finishScanBtn.addEventListener('click', () => {
             if (!appState.start.timestamp) {
                 showMessage("Por favor, inicie o serviço primeiro.", true);
@@ -793,33 +877,51 @@
             startScanner();
         });
         
-        // Finalize Service Button (Shows Modal)
+        // Finalize Service Button (Dual Functionality)
         finalizeServiceBtn.addEventListener('click', () => {
-             if (!appState.end.timestamp) {
-                showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
-                return;
-            }
-            modalOsNumber.textContent = appState.osNumber;
-            confirmationModal.style.display = 'flex'; // Abre o modal
+             if (appState.isServiceActive) {
+                // Fuction 1: Finalize service (only enabled after end scan)
+                if (!appState.end.timestamp) {
+                    showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
+                    return;
+                }
+                modalOsNumber.textContent = appState.osNumber;
+                confirmationModal.style.display = 'flex'; // Abre o modal de finalização/interrupção
+             } else if (finalizeServiceBtn.textContent === 'Corrigir O.S.') {
+                // Function 2: Reset/Correction (only enabled before start scan)
+                resetOsText.textContent = appState.osNumber;
+                resetConfirmationModal.style.display = 'flex'; // Abre o modal de confirmação de reset
+             }
+        });
+        
+        // Reset Confirmation Modal: Confirm Reset
+        modalResetConfirmBtn.addEventListener('click', () => {
+            resetConfirmationModal.style.display = 'none';
+            resetAppState();
+        });
+
+        // Reset Confirmation Modal: Cancel Reset
+        modalResetCancelBtn.addEventListener('click', () => {
+            resetConfirmationModal.style.display = 'none';
         });
 
         // Modal Confirmation: Finalizada
         modalFinalizeBtn.addEventListener('click', () => {
             appState.serviceStatus = 'Finalizada';
             confirmationModal.style.display = 'none';
-            prepareReportData(); // Prepara dados e transiciona para tela do Gerente
+            prepareReportData(); 
         });
 
         // Modal Confirmation: Interrompida
         modalInterruptBtn.addEventListener('click', () => {
             appState.serviceStatus = 'Interrompida';
             confirmationModal.style.display = 'none';
-            prepareReportData(); // Prepara dados e transiciona para tela do Gerente
+            prepareReportData(); 
         });
 
         // Manager Auth Button (Shows Auth Modal)
         managerAuthBtn.addEventListener('click', () => {
-            managerAuthModal.style.display = 'flex'; // Abre o modal de autenticação
+            managerAuthModal.style.display = 'flex'; 
         });
 
         // Manager Login Button (Checks Auth and Shows Report)
@@ -827,18 +929,17 @@
             const selectedManager = managerSelect.value;
             const inputPassword = managerPasswordInput.value;
             
-            // Simula a autenticação do gerente
             if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
                 managerPasswordInput.value = '';
                 managerSelect.value = '';
-                displayFinalReport(); // Exibe o relatório
+                displayFinalReport(); 
             } else {
                 showManagerMessage("Nome do Gerente ou senha inválidos.", true);
             }
         });
 
         // Report CLOSE Button (Resets flow)
-        reportCloseBtn.addEventListener('click', () => {
+        document.getElementById('report-close-btn').addEventListener('click', () => {
             resetAppState();
         });
 
@@ -856,7 +957,6 @@
                 employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
                 employeeSelect.disabled = false;
                 if (selectedCompany && loginData[selectedCompany]) {
-                    // Populate employees, including the 'Gerente' for 'Arcondi'
                     for (const employee in loginData[selectedCompany]) {
                         const option = document.createElement('option');
                         option.value = employee;
