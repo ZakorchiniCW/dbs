@@ -453,7 +453,7 @@
         }
 
         function transitionToActiveServiceUI() {
-            // Technician Active Phase (After Start Scan)
+            // Technician Active Phase (After Start Scan or failure return)
             appState.isServiceActive = true;
 
             osInput.disabled = true;
@@ -540,8 +540,23 @@
         function resetUIScannerFail() {
             // Reverte a UI se o scanner falhar
             if (appState.isServiceActive) {
-                transitionToActiveServiceUI(); 
+                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visível)
+                if (appState.end.timestamp) {
+                    // Restaura a UI para mostrar o botão Finalizar
+                    serviceActiveStatus.classList.remove('hidden'); 
+                    observationsInputContainer.classList.remove('hidden');
+                    photoInputContainer.classList.remove('hidden');
+                    finalizeServiceBtn.classList.remove('hidden'); // AQUI é onde o botão Finalizar é restaurado
+                    finalizeServiceBtn.disabled = false;
+                    finishScanBtn.style.display = 'none'; 
+                    showMessage("Falha no scanner. O.S. pronta para Finalizar Serviço.");
+                } else {
+                    // Restaura a UI para o estado ativo (aguardando escaneamento de fim)
+                    transitionToActiveServiceUI(); 
+                    showMessage("Falha no scanner. Por favor, tente escanear novamente para finalizar.", true);
+                }
             } else {
+                // Restaura a UI para o estado inicial (pré-escaneamento de início)
                 osInput.style.display = 'block';
                 osInput.disabled = false;
                 startScanBtn.style.display = 'block';
