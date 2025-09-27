@@ -43,17 +43,29 @@
         .data-display div:last-child {
             border-bottom: none;
         }
-        /* Cor Primária Original (para Login/Inicial) */
-        .button-primary {
+
+        /* Cor Primária Original (para Login/Inicial) - Mantida para consistência no login */
+        .button-primary-login {
             @apply bg-[#1a4a44] text-white shadow-md hover:bg-[#123631] transition-colors;
         }
-        /* Cor Verde para Ações Ativas (conforme solicitado) */
-        .button-green {
-            @apply bg-green-600 text-white shadow-md hover:bg-green-700 transition-colors;
+
+        /* NOVO Estilo de Botão - Padrão Verde (cor próxima à da imagem #2ecc71) com aparência 3D */
+        .button-app-style {
+            /* Cor de fundo: Verde vibrante */
+            @apply bg-[#2ecc71] text-white font-bold transition-all duration-100 ease-in-out;
+            /* Efeito 3D sutil (sombra mais escura) */
+            box-shadow: 0 4px 0 #1e8449; /* Sombra mais escura para profundidade */
+            transform: translateY(0);
+        }
+        /* Efeito de clique (pressionar) */
+        .button-app-style:active {
+            box-shadow: 0 1px 0 #1e8449; /* Sombra reduzida */
+            transform: translateY(3px); /* Move levemente para baixo */
         }
         .button-secondary {
             @apply bg-[#a3b2b4] text-gray-800 shadow-sm hover:bg-[#8e9c9f] transition-colors;
         }
+
         .green-led {
             height: 12px;
             width: 12px;
@@ -64,7 +76,7 @@
         }
         
         /* Modal Overlay Styles */
-        #confirmation-modal {
+        #confirmation-modal, #manager-auth-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -111,7 +123,7 @@
                 <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                 <input type="password" id="password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
             </div>
-            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary-login">
                 Entrar
             </button>
         </div>
@@ -147,10 +159,10 @@
 
         <!-- Action Buttons (Start/Finish Scan) -->
         <div id="action-buttons" class="flex flex-col space-y-3">
-            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-app-style">
                 Escanear para Iniciar
             </button>
-            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-green" style="display:none;">
+            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-app-style" style="display:none;">
                 Escanear para Finalizar
             </button>
         </div>
@@ -164,7 +176,7 @@
         <!-- Field for Photo Capture (Green and Visible in Active State) -->
         <div id="photo-input-container" class="mt-4 hidden">
              <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
-             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-green">
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-app-style">
                 Tirar Foto 📸
             </button>
             
@@ -175,7 +187,7 @@
         </div>
         
         <!-- Finalize Button (Activated after End Scan) -->
-        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden" disabled>
+        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-app-style mt-6 hidden" disabled>
             Finalizar Serviço
         </button>
         
@@ -183,7 +195,7 @@
         <div id="manager-check-container" class="data-display hidden text-center">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
             <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
-            <button id="manager-ok-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+            <button id="manager-auth-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-app-style">
                 OK
             </button>
         </div>
@@ -196,7 +208,7 @@
 
         <!-- TEMPORARY DATA DISPLAY SECTION (Report View) -->
         <div id="data-display" class="data-display hidden">
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço (Simulação)</h2>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço</h2>
             <div id="os-display">
                 <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
             </div>
@@ -236,28 +248,57 @@
         <!-- TEMPORARY Summary Container (Report View) -->
         <div id="summary-container" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
-            <p id="summary-text" class="text-gray-700 text-sm italic"></p>
+            <p id="summary-text" class="text-gray-700 text-sm italic">Resumo de IA desativado conforme solicitado.</p>
         </div>
         
         <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
-        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-app-style mt-6 hidden">
             Encerrar (Voltar ao Início)
         </button>
 
     </div>
     
-    <!-- Confirmation Modal Overlay -->
+    <!-- Confirmation Modal Overlay (Technician Finalization) -->
     <div id="confirmation-modal">
         <div id="modal-content">
             <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
             <p class="mb-4 text-gray-600">O serviço na O.S. <span id="modal-os-number" class="font-bold"></span> foi:</p>
             <div class="flex flex-col space-y-3">
-                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-green">
+                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-app-style">
                     Finalizada
                 </button>
                 <button id="modal-interrupt-btn" class="py-3 rounded-lg font-semibold text-lg button-secondary">
                     Interrompida
                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Manager Authentication Modal Overlay (New) -->
+    <div id="manager-auth-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Autenticação Gerencial</h3>
+            <p class="mb-4 text-gray-600">Para visualizar o relatório, o Gerente deve se autenticar.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="manager-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Gerente</label>
+                    <select id="manager-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                        <option value="" disabled selected>Selecione o Gerente</option>
+                        <option value="Gerente">Gerente</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="manager-password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="manager-password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                </div>
+                <button id="manager-login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-app-style">
+                    Acessar Relatório
+                </button>
+            </div>
+
+             <div id="manager-message-box" class="message-box mt-3" style="display:none; background-color: #fca5a5; border-color: #ef4444;">
+                <p id="manager-message-text" class="text-sm font-medium text-red-800"></p>
             </div>
         </div>
     </div>
@@ -289,11 +330,22 @@
             finalReportData: null, 
         };
 
-        // Mock data for login (would be from SharePoint in the real app)
+        // Mock data for login (TODAS as senhas de funcionário são '123'. Gerente é '111')
         const loginData = {
-            "Arcondi": { "Abc": "123", "Def": "456", "Ghi": "789" },
-            "Lubrica": { "Jk": "123", "Lm": "456", "No": "789" }
+            "Arcondi": { 
+                "Abc": "123", 
+                "Def": "123", 
+                "Ghi": "123",
+                "Gerente": "111" // Novo usuário Gerente
+            },
+            "Lubrica": { 
+                "Jk": "123", 
+                "Lm": "123", 
+                "No": "123" 
+            }
         };
+        const MANAGER_USERNAME = "Gerente";
+        const MANAGER_PASSWORD = "111";
 
         // DOM element references
         const loginContainer = document.getElementById('login-container');
@@ -309,15 +361,24 @@
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
         const finalizeServiceBtn = document.getElementById('finalize-service-btn');
-        const reportCloseBtn = document.getElementById('report-close-btn'); // Renomeado
+        const reportCloseBtn = document.getElementById('report-close-btn');
 
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const dataDisplay = document.getElementById('data-display');
         const serviceActiveStatus = document.getElementById('service-active-status');
-        const managerCheckContainer = document.getElementById('manager-check-container'); // Novo Container do Gerente
-        const managerOkBtn = document.getElementById('manager-ok-btn'); // Botão OK do Gerente
+        const managerCheckContainer = document.getElementById('manager-check-container'); 
+        const managerAuthBtn = document.getElementById('manager-auth-btn'); // Botão OK do Gerente que abre o modal de autenticação
+
+        // Manager Auth Modal elements
+        const managerAuthModal = document.getElementById('manager-auth-modal');
+        const managerSelect = document.getElementById('manager-select');
+        const managerPasswordInput = document.getElementById('manager-password-input');
+        const managerLoginBtn = document.getElementById('manager-login-btn');
+        const managerMessageBox = document.getElementById('manager-message-box');
+        const managerMessageText = document.getElementById('manager-message-text');
+
 
         // Report display elements (simplified names for brevity)
         const osText = document.getElementById('os-text');
@@ -363,6 +424,14 @@
                 messageBox.style.display = 'none';
             }, 5000);
         }
+        
+        function showManagerMessage(text) {
+             managerMessageText.textContent = text;
+             managerMessageBox.style.display = 'block';
+             setTimeout(() => {
+                managerMessageBox.style.display = 'none';
+            }, 5000);
+        }
 
         function resetAppState() {
             // Reset app state
@@ -395,6 +464,7 @@
             finalizeServiceBtn.classList.add('hidden');
             finishScanBtn.style.display = 'none';
             managerCheckContainer.classList.add('hidden'); // Esconder Manager Check
+            managerAuthModal.style.display = 'none'; // Esconder Modal de Autenticação Gerencial
             
             // Show initial input/button
             osInput.disabled = false;
@@ -420,7 +490,7 @@
             finalizeServiceBtn.classList.remove('hidden'); // Certifica que o botão está visível
             finalizeServiceBtn.disabled = true; // Still disabled until end scan
             finalizeServiceBtn.classList.add('button-secondary'); 
-            finalizeServiceBtn.classList.remove('button-primary');
+            finalizeServiceBtn.classList.remove('button-app-style');
         }
         
         function transitionToManagerCheckUI() {
@@ -488,6 +558,7 @@
         function handleStartScanSuccess(decodedText) {
             showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
             
+            // Simulação de parse de dados de equipamento
             const equipmentType = decodedText.charAt(0).toUpperCase();
             const inventoryNumber = decodedText.substring(1);
 
@@ -520,7 +591,6 @@
             
             // 1. Capture end timestamp immediately (CRITICAL FIX)
             appState.end.timestamp = new Date();
-            console.log("End Timestamp captured:", appState.end.timestamp);
             
             // 2. Restore active UI and ENABLE Finalize button
             serviceActiveStatus.classList.remove('hidden'); 
@@ -531,10 +601,8 @@
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false;
             finalizeServiceBtn.classList.remove('button-secondary');
-            finalizeServiceBtn.classList.add('button-primary');
+            finalizeServiceBtn.classList.add('button-app-style'); // Aplica o novo estilo
             finishScanBtn.style.display = 'none'; // Esconde o botão de scan de fim
-
-            console.log("Finalize Button ENABLED and VISIBLE.");
 
 
             // 3. Get end location (runs asynchronously but doesn't block button)
@@ -543,7 +611,6 @@
                     (position) => {
                         const coords = position.coords;
                         appState.end.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
-                        console.log("Localização de encerramento capturada com sucesso.");
                     },
                     (error) => {
                         console.error("Geolocation error (end):", error);
@@ -595,13 +662,12 @@
                 photoData: [...appState.photoData], // Deep copy photos
             };
 
-            // Step 2: Generate AI Summary (runs asynchronously, saves to report object)
-            report.aiSummary = await generateAISummary(report);
+            // Step 2: Generate AI Summary (REMOVED/INATIVO conforme solicitado)
+            report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
 
             // Save for Manager View
             appState.finalReportData = report;
 
-            console.log("Relatório final preparado para Manager:", report);
             transitionToManagerCheckUI();
         }
 
@@ -613,8 +679,9 @@
 
             const report = appState.finalReportData;
             
-            // Hide Manager Check
+            // Hide Manager Check and Auth Modal
             managerCheckContainer.classList.add('hidden');
+            managerAuthModal.style.display = 'none';
 
             // Populate Report
             osText.textContent = report.osNumber;
@@ -647,8 +714,8 @@
                  photosReportPreviewContainer.textContent = 'Nenhuma foto capturada.';
             }
 
-            // Show Summary
-            summaryText.textContent = report.aiSummary;
+            // Show Summary (Inativa, apenas exibe a mensagem)
+            summaryText.textContent = report.aiSummary; 
             summaryContainer.classList.remove('hidden');
             
             // Show the report and CLOSE button
@@ -658,37 +725,10 @@
             showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
         }
 
-        // --- Gemini API Integration ---
-        const apiKey = ""; 
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
+        // Gemini API Integration - KEEPING CODE BUT RETURNING MOCK TEXT
         async function generateAISummary(report) {
-            if (!report.equipmentType) {
-                return 'Resumo de IA não gerado pois o tipo de equipamento está faltando.';
-            }
-            
-            const userPrompt = `Aja como um técnico experiente. Crie um resumo de um relatório de serviço técnico para um equipamento. O número da Ordem de Serviço é ${report.osNumber} e o tipo de equipamento é ${report.equipmentType}. O status final do serviço é ${report.serviceStatus}. Mantenha o tom profissional e conciso.`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: "Você é um gerador de resumo de relatório de serviço técnico." }]
-                }
-            };
-
-            try {
-                let response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const result = await response.json();
-                const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-                return generatedText || "Não foi possível gerar o resumo de IA.";
-            } catch (error) {
-                console.error("Erro na chamada da API Gemini:", error);
-                return `Erro ao gerar resumo: ${error.message}.`;
-            }
+            // IA Summary explicitly disabled as requested.
+            return 'Resumo de IA desativado conforme solicitado.';
         }
 
         // --- Photo Capture Functions ---
@@ -718,10 +758,14 @@
 
         // --- Event Listeners for the Main App ---
         
-        // Login
+        // Login - Check technician/employee login
         document.getElementById('login-btn').addEventListener('click', () => {
-            if (loginData[companySelect.value] && loginData[companySelect.value][employeeSelect.value] === passwordInput.value) {
-                document.getElementById('logged-in-user').textContent = employeeSelect.value;
+            const selectedCompany = companySelect.value;
+            const selectedEmployee = employeeSelect.value;
+            const inputPassword = passwordInput.value;
+            
+            if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
+                document.getElementById('logged-in-user').textContent = selectedEmployee;
                 resetAppState();
             } else {
                 showMessage("Login ou senha inválidos.", true);
@@ -773,12 +817,27 @@
             prepareReportData(); // Prepara dados e transiciona para tela do Gerente
         });
 
-        // Manager OK Button (Shows Report)
-        managerOkBtn.addEventListener('click', () => {
-            displayFinalReport(); // Exibe o relatório
+        // Manager Auth Button (Shows Auth Modal)
+        managerAuthBtn.addEventListener('click', () => {
+            managerAuthModal.style.display = 'flex'; // Abre o modal de autenticação
         });
 
-        // Report CLOSE Button (Resets flow) - NOVO NOME
+        // Manager Login Button (Checks Auth and Shows Report)
+        managerLoginBtn.addEventListener('click', () => {
+            const selectedManager = managerSelect.value;
+            const inputPassword = managerPasswordInput.value;
+            
+            // Simula a autenticação do gerente
+            if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
+                managerPasswordInput.value = '';
+                managerSelect.value = '';
+                displayFinalReport(); // Exibe o relatório
+            } else {
+                showManagerMessage("Nome do Gerente ou senha inválidos.", true);
+            }
+        });
+
+        // Report CLOSE Button (Resets flow)
         reportCloseBtn.addEventListener('click', () => {
             resetAppState();
         });
@@ -797,6 +856,7 @@
                 employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
                 employeeSelect.disabled = false;
                 if (selectedCompany && loginData[selectedCompany]) {
+                    // Populate employees, including the 'Gerente' for 'Arcondi'
                     for (const employee in loginData[selectedCompany]) {
                         const option = document.createElement('option');
                         option.value = employee;
@@ -805,6 +865,7 @@
                     }
                 }
             });
+            
         });
     </script>
 </body>
