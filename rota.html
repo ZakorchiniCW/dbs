@@ -44,14 +44,14 @@
             border-bottom: none;
         }
 
-        /* Estilo de Botão Padrão (AGORA VERDE, LISO E REDONDO CONFORME IMAGEM) */
+        /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
             @apply text-white font-bold transition-all duration-300 ease-in-out;
             
             /* Cor base do botão (similar ao tom da imagem) */
-            background-color: #00893d; 
+            background-color: #39D379; 
             /* Gradiente para o efeito de brilho/gloss */
-            background-image: linear-gradient(180deg, #00891d 0%, #00893d 100%);
+            background-image: linear-gradient(180deg, #4DE08B 0%, #39D379 100%);
             
             /* Borda arredondada completa (Pill Shape) */
             border-radius: 9999px; 
@@ -62,20 +62,21 @@
         }
         .button-primary:hover {
             /* Escurece levemente no hover */
-            background-color: #00893d;
-            background-image: linear-gradient(180deg, #00891d 0%, #00893d 100%);
+            background-color: #2FAD63;
+            background-image: linear-gradient(180deg, #4DE08B 0%, #2FAD63 100%);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(57, 211, 121, 0.6);
         }
         .button-primary:active {
             /* Efeito de clique: reduz o tamanho e o brilho */
             transform: scale(0.98); 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(57, 211, 121, 0.2);
-            background-image: linear-gradient(180deg, #00891d 0%, ##00893d 100%);
+            background-image: linear-gradient(180deg, #39D379 0%, #2FAD63 100%);
         }
 
-        /* Botão secundário também usa borda redonda para consistência */
+        /* Botão secundário (Interrompida) - AGORA VERDE MAIS CLARO */
         .button-secondary {
-            @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
+            /* Usando um verde mais claro para indicar 'Interrompida' */
+            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
             border-radius: 9999px; 
         }
 
@@ -350,7 +351,7 @@
                 "Abc": "123", 
                 "Def": "123", 
                 "Ghi": "123",
-                "Gerente": "123" // Usuário Gerente
+                "Gerente": "111" // Usuário Gerente
             },
             "Lubrica": { 
                 "Jk": "123", 
@@ -359,7 +360,7 @@
             }
         };
         const MANAGER_USERNAME = "Gerente";
-        const MANAGER_PASSWORD = "123";
+        const MANAGER_PASSWORD = "111";
 
         // DOM element references
         const loginContainer = document.getElementById('login-container');
@@ -889,10 +890,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
