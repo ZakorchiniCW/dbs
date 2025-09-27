@@ -98,6 +98,7 @@
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     <option value="" disabled selected>Selecione a empresa</option>
+                    <!-- Options populated by JS -->
                 </select>
             </div>
             <div>
@@ -152,8 +153,6 @@
             <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-green" style="display:none;">
                 Escanear para Finalizar
             </button>
-            <!-- Button to generate AI summary, permanently hidden in this simplified flow -->
-            <button id="generate-summary-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary" style="display:none;"></button>
         </div>
 
         <!-- Field for Technician's Observations (Visible in Active State) -->
@@ -176,9 +175,18 @@
         </div>
         
         <!-- Finalize Button (Activated after End Scan) -->
-        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6" disabled>
+        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden" disabled>
             Finalizar Serviço
         </button>
+        
+        <!-- Manager Check Container (NEW: Hidden by default, shown after technician finalizes) -->
+        <div id="manager-check-container" class="data-display hidden text-center">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
+            <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
+            <button id="manager-ok-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+                OK
+            </button>
+        </div>
 
 
         <!-- Message Box for User Feedback -->
@@ -186,7 +194,7 @@
             <p id="message-text" class="text-sm font-medium text-gray-700"></p>
         </div>
 
-        <!-- TEMPORARY DATA DISPLAY SECTION (Only shown after "Finalizar Serviço" is clicked) -->
+        <!-- TEMPORARY DATA DISPLAY SECTION (Report View) -->
         <div id="data-display" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço (Simulação)</h2>
             <div id="os-display">
@@ -204,19 +212,15 @@
             <div id="start-data-display">
                 <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
             </div>
-            <!-- INCLUSÃO: Localização de Início (Faltante no HTML) -->
             <div>
                 <span class="font-semibold text-gray-600">Localização Início:</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
             </div>
-            <!-- FIM INCLUSÃO -->
             <div id="end-data-display">
                 <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
             </div>
-            <!-- INCLUSÃO: Localização de Fim (Faltante no HTML) -->
             <div>
                 <span class="font-semibold text-gray-600">Localização Fim:</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
             </div>
-            <!-- FIM INCLUSÃO -->
             <div id="distance-display">
                 <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
             </div>
@@ -229,15 +233,15 @@
             </div>
         </div>
         
-        <!-- TEMPORARY Summary Container (Only shown after "Finalizar Serviço" is clicked) -->
+        <!-- TEMPORARY Summary Container (Report View) -->
         <div id="summary-container" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
             <p id="summary-text" class="text-gray-700 text-sm italic"></p>
         </div>
         
-        <!-- OK Button for Report Acceptance (Only shown with report) -->
-        <button id="report-ok-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
-            OK (Retornar ao Início)
+        <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
+        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+            Encerrar (Voltar ao Início)
         </button>
 
     </div>
@@ -281,6 +285,8 @@
                 location: null,
             },
             scanMode: 'start',
+            // Data persisted after finalization, used for Manager view
+            finalReportData: null, 
         };
 
         // Mock data for login (would be from SharePoint in the real app)
@@ -296,8 +302,6 @@
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
         const loginBtn = document.getElementById('login-btn');
-        const loginMessageBox = document.getElementById('login-message-box');
-        const loginMessageText = document.getElementById('login-message-text');
         const loggedInUserText = document.getElementById('logged-in-user');
 
         const osInput = document.getElementById('os-number');
@@ -305,13 +309,15 @@
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
         const finalizeServiceBtn = document.getElementById('finalize-service-btn');
-        const reportOkBtn = document.getElementById('report-ok-btn');
+        const reportCloseBtn = document.getElementById('report-close-btn'); // Renomeado
 
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const dataDisplay = document.getElementById('data-display');
         const serviceActiveStatus = document.getElementById('service-active-status');
+        const managerCheckContainer = document.getElementById('manager-check-container'); // Novo Container do Gerente
+        const managerOkBtn = document.getElementById('manager-ok-btn'); // Botão OK do Gerente
 
         // Report display elements (simplified names for brevity)
         const osText = document.getElementById('os-text');
@@ -329,6 +335,8 @@
         const photoFileInput = document.getElementById('photo-file-input');
         const photoPreviewContainer = document.getElementById('photo-preview-container');
         const photosReportPreviewContainer = document.getElementById('photos-report-preview-container');
+        const startLocationText = document.getElementById('start-location-text');
+        const endLocationText = document.getElementById('end-location-text');
 
         const summaryContainer = document.getElementById('summary-container');
         const summaryText = document.getElementById('summary-text');
@@ -357,6 +365,7 @@
         }
 
         function resetAppState() {
+            // Reset app state
             appState.osNumber = '';
             appState.barcodeData = '';
             appState.equipmentType = '';
@@ -369,20 +378,23 @@
             appState.end.timestamp = null;
             appState.end.location = null;
             appState.scanMode = 'start';
+            appState.finalReportData = null; // Clear saved report data
             
+            // Reset input/preview fields
             osInput.value = '';
             observationsTextArea.value = '';
             photoPreviewContainer.innerHTML = '';
             
-            // Hide all service-related elements
+            // Hide all post-service/active elements
             dataDisplay.classList.add('hidden');
             summaryContainer.classList.add('hidden');
-            reportOkBtn.classList.add('hidden');
+            reportCloseBtn.classList.add('hidden');
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
             finalizeServiceBtn.classList.add('hidden');
             finishScanBtn.style.display = 'none';
+            managerCheckContainer.classList.add('hidden'); // Esconder Manager Check
             
             // Show initial input/button
             osInput.disabled = false;
@@ -396,20 +408,31 @@
         }
 
         function transitionToActiveServiceUI() {
-            // Hide elements not needed in the active phase
+            // Technician Active Phase
             osInput.disabled = true;
             startScanBtn.style.display = 'none';
 
-            // Show elements for the active phase (New UI)
             osTextActive.textContent = appState.osNumber;
             serviceActiveStatus.classList.remove('hidden');
-            finishScanBtn.style.display = 'block'; // Green button
+            finishScanBtn.style.display = 'block'; 
             observationsInputContainer.classList.remove('hidden');
-            photoInputContainer.classList.remove('hidden'); // Green button
-            finalizeServiceBtn.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden'); 
+            finalizeServiceBtn.classList.remove('hidden'); // Certifica que o botão está visível
             finalizeServiceBtn.disabled = true; // Still disabled until end scan
-            finalizeServiceBtn.classList.add('button-secondary'); // Make it look disabled
+            finalizeServiceBtn.classList.add('button-secondary'); 
             finalizeServiceBtn.classList.remove('button-primary');
+        }
+        
+        function transitionToManagerCheckUI() {
+            // Technician Phase -> Manager Check Phase
+            serviceActiveStatus.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden');
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+
+            managerCheckContainer.classList.remove('hidden');
+            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
         }
 
         async function startScanner() {
@@ -418,7 +441,7 @@
                 // Hide active UI during scan
                 serviceActiveStatus.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
-                finalizeServiceBtn.classList.add('hidden');
+                finalizeServiceBtn.classList.add('hidden'); // Esconde enquanto escaneia
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
 
@@ -499,15 +522,19 @@
             appState.end.timestamp = new Date();
             console.log("End Timestamp captured:", appState.end.timestamp);
             
-            // 2. Enable the Finalize button immediately
+            // 2. Restore active UI and ENABLE Finalize button
             serviceActiveStatus.classList.remove('hidden'); 
-            finalizeServiceBtn.disabled = false;
-            finalizeServiceBtn.classList.remove('button-secondary'); // Visualmente ativo
-            finalizeServiceBtn.classList.add('button-primary');
-            finishScanBtn.style.display = 'none';
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
-            console.log("Finalize Button ENABLED.");
+            
+            // GARANTE que o botão finalize esteja visível e ATIVADO
+            finalizeServiceBtn.classList.remove('hidden'); 
+            finalizeServiceBtn.disabled = false;
+            finalizeServiceBtn.classList.remove('button-secondary');
+            finalizeServiceBtn.classList.add('button-primary');
+            finishScanBtn.style.display = 'none'; // Esconde o botão de scan de fim
+
+            console.log("Finalize Button ENABLED and VISIBLE.");
 
 
             // 3. Get end location (runs asynchronously but doesn't block button)
@@ -545,45 +572,72 @@
         }
         
         // --- Report Generation and Display ---
-        async function generateAndShowReport() {
-            osInput.style.display = 'none'; // Hide OS input field for report view
-            
-            // Prepare data
+        async function prepareReportData() {
+            // Step 1: Save technician inputs to a final data structure
             appState.observations = observationsTextArea.value.trim();
             const distanceKm = calculateDistance(appState.start.location, appState.end.location);
             
-            // Populate Report
-            osText.textContent = appState.osNumber;
-            serviceStatusText.textContent = appState.serviceStatus;
-            barcodeText.textContent = appState.barcodeData;
-            equipmentTypeText.textContent = appState.equipmentType;
-            startDatetimeText.textContent = appState.start.timestamp ? appState.start.timestamp.toLocaleString('pt-BR') : 'N/A';
-            endDatetimeText.textContent = appState.end.timestamp ? appState.end.timestamp.toLocaleString('pt-BR') : 'N/A';
-            distanceText.textContent = distanceKm.toFixed(2) + ' km';
-            observationsTextDisplay.textContent = appState.observations || 'Nenhuma observação registrada.';
+            const report = {
+                osNumber: appState.osNumber,
+                serviceStatus: appState.serviceStatus,
+                barcodeData: appState.barcodeData,
+                equipmentType: appState.equipmentType,
+                start: {
+                    timestamp: appState.start.timestamp,
+                    location: appState.start.location,
+                },
+                end: {
+                    timestamp: appState.end.timestamp,
+                    location: appState.end.location,
+                },
+                distance: distanceKm,
+                observations: appState.observations,
+                photoData: [...appState.photoData], // Deep copy photos
+            };
+
+            // Step 2: Generate AI Summary (runs asynchronously, saves to report object)
+            report.aiSummary = await generateAISummary(report);
+
+            // Save for Manager View
+            appState.finalReportData = report;
+
+            console.log("Relatório final preparado para Manager:", report);
+            transitionToManagerCheckUI();
+        }
+
+        function displayFinalReport() {
+            if (!appState.finalReportData) {
+                showMessage("Erro: Nenhum dado de relatório para exibir.", true);
+                return;
+            }
+
+            const report = appState.finalReportData;
             
-            // Set location text (showing N/A if missing)
-            // Fix: Referencing the newly added elements in HTML
-            const startLocationTextElement = document.getElementById('start-location-text');
-            const endLocationTextElement = document.getElementById('end-location-text');
+            // Hide Manager Check
+            managerCheckContainer.classList.add('hidden');
 
-            if (startLocationTextElement) {
-                startLocationTextElement.textContent = appState.start.location 
-                    ? `Lat: ${appState.start.location.latitude.toFixed(4)}, Long: ${appState.start.location.longitude.toFixed(4)}` 
-                    : 'Localização de Início não capturada.';
-            }
-
-            if (endLocationTextElement) {
-                endLocationTextElement.textContent = appState.end.location 
-                    ? `Lat: ${appState.end.location.latitude.toFixed(4)}, Long: ${appState.end.location.longitude.toFixed(4)}` 
-                    : 'Localização de Fim não capturada.';
-            }
-
+            // Populate Report
+            osText.textContent = report.osNumber;
+            serviceStatusText.textContent = report.serviceStatus;
+            barcodeText.textContent = report.barcodeData;
+            equipmentTypeText.textContent = report.equipmentType;
+            startDatetimeText.textContent = report.start.timestamp ? report.start.timestamp.toLocaleString('pt-BR') : 'N/A';
+            endDatetimeText.textContent = report.end.timestamp ? report.end.timestamp.toLocaleString('pt-BR') : 'N/A';
+            distanceText.textContent = report.distance.toFixed(2) + ' km';
+            observationsTextDisplay.textContent = report.observations || 'Nenhuma observação registrada.';
+            
+            // Set location text 
+            startLocationText.textContent = report.start.location 
+                ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
+                : 'Localização de Início não capturada.';
+            endLocationText.textContent = report.end.location 
+                ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
+                : 'Localização de Fim não capturada.';
 
             // Populate Photo Report Preview
             photosReportPreviewContainer.innerHTML = '';
-            if (appState.photoData.length > 0) {
-                 appState.photoData.forEach(base64Data => {
+            if (report.photoData.length > 0) {
+                 report.photoData.forEach(base64Data => {
                     const img = document.createElement('img');
                     img.src = base64Data;
                     img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
@@ -593,44 +647,27 @@
                  photosReportPreviewContainer.textContent = 'Nenhuma foto capturada.';
             }
 
-            // Generate IA Summary
-            if (appState.equipmentType) {
-                 await generateAISummary();
-            } else {
-                 summaryText.textContent = 'Resumo de IA não gerado pois o tipo de equipamento está faltando.';
-                 summaryContainer.classList.remove('hidden');
-            }
-
-            // Hide active UI elements
-            serviceActiveStatus.classList.add('hidden');
-            finishScanBtn.style.display = 'none';
-            finalizeServiceBtn.classList.add('hidden');
-            observationsInputContainer.classList.add('hidden');
-            photoInputContainer.classList.add('hidden');
+            // Show Summary
+            summaryText.textContent = report.aiSummary;
+            summaryContainer.classList.remove('hidden');
             
-            // Show the report and OK button
+            // Show the report and CLOSE button
             dataDisplay.classList.remove('hidden');
-            reportOkBtn.classList.remove('hidden');
+            reportCloseBtn.classList.remove('hidden');
 
-            console.log("Dados finais do relatório para exportação:", JSON.stringify({
-                'OrdemDeServico': appState.osNumber,
-                'StatusDoServico': appState.serviceStatus,
-                'InicioDoServico': appState.start.timestamp ? appState.start.timestamp.toISOString() : 'N/A',
-                'FimDoServico': appState.end.timestamp ? appState.end.timestamp.toISOString() : 'N/A',
-                'FotosCount': appState.photoData.length,
-            }, null, 2));
-            showMessage(`Relatório do serviço (${appState.serviceStatus}) gerado. Clique em OK para aceitar.`, false);
+            showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
         }
 
         // --- Gemini API Integration ---
         const apiKey = ""; 
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-        async function generateAISummary() {
-            summaryText.textContent = 'Gerando resumo...';
-            summaryContainer.classList.remove('hidden');
-
-            const userPrompt = `Aja como um técnico experiente. Crie um resumo de um relatório de serviço técnico para um equipamento. O número da Ordem de Serviço é ${appState.osNumber} e o tipo de equipamento é ${appState.equipmentType}. O status final do serviço é ${appState.serviceStatus}. Mantenha o tom profissional e conciso.`;
+        async function generateAISummary(report) {
+            if (!report.equipmentType) {
+                return 'Resumo de IA não gerado pois o tipo de equipamento está faltando.';
+            }
+            
+            const userPrompt = `Aja como um técnico experiente. Crie um resumo de um relatório de serviço técnico para um equipamento. O número da Ordem de Serviço é ${report.osNumber} e o tipo de equipamento é ${report.equipmentType}. O status final do serviço é ${report.serviceStatus}. Mantenha o tom profissional e conciso.`;
 
             const payload = {
                 contents: [{ parts: [{ text: userPrompt }] }],
@@ -647,11 +684,10 @@
                 });
                 const result = await response.json();
                 const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                summaryText.textContent = generatedText || "Não foi possível gerar o resumo de IA.";
+                return generatedText || "Não foi possível gerar o resumo de IA.";
             } catch (error) {
                 console.error("Erro na chamada da API Gemini:", error);
-                summaryText.textContent = `Erro ao gerar resumo: ${error.message}.`;
+                return `Erro ao gerar resumo: ${error.message}.`;
             }
         }
 
@@ -699,7 +735,6 @@
                 return;
             }
             appState.osNumber = osInput.value.trim();
-            osTextActive.textContent = appState.osNumber;
             appState.scanMode = 'start';
             startScanner();
         });
@@ -717,31 +752,34 @@
         // Finalize Service Button (Shows Modal)
         finalizeServiceBtn.addEventListener('click', () => {
              if (!appState.end.timestamp) {
-                showMessage("O escaneamento de finalização deve ser feito primeiro. Se já fez, aguarde a geolocalização.", true);
-                console.log("Tentativa de Finalizar Serviço BLOQUEADA: appState.end.timestamp é nulo.");
+                showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
                 return;
             }
-            console.log("Finalizar Serviço clicado. Abrindo modal de confirmação.");
             modalOsNumber.textContent = appState.osNumber;
-            confirmationModal.style.display = 'flex'; // This is the line that opens the modal
+            confirmationModal.style.display = 'flex'; // Abre o modal
         });
 
         // Modal Confirmation: Finalizada
         modalFinalizeBtn.addEventListener('click', () => {
             appState.serviceStatus = 'Finalizada';
             confirmationModal.style.display = 'none';
-            generateAndShowReport();
+            prepareReportData(); // Prepara dados e transiciona para tela do Gerente
         });
 
         // Modal Confirmation: Interrompida
         modalInterruptBtn.addEventListener('click', () => {
             appState.serviceStatus = 'Interrompida';
             confirmationModal.style.display = 'none';
-            generateAndShowReport();
+            prepareReportData(); // Prepara dados e transiciona para tela do Gerente
         });
 
-        // Report OK Button (Resets flow)
-        reportOkBtn.addEventListener('click', () => {
+        // Manager OK Button (Shows Report)
+        managerOkBtn.addEventListener('click', () => {
+            displayFinalReport(); // Exibe o relatório
+        });
+
+        // Report CLOSE Button (Resets flow) - NOVO NOME
+        reportCloseBtn.addEventListener('click', () => {
             resetAppState();
         });
 
