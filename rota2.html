@@ -204,9 +204,19 @@
             <div id="start-data-display">
                 <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
             </div>
+            <!-- INCLUSÃO: Localização de Início (Faltante no HTML) -->
+            <div>
+                <span class="font-semibold text-gray-600">Localização Início:</span> <span id="start-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <!-- FIM INCLUSÃO -->
             <div id="end-data-display">
                 <span class="font-semibold text-gray-600">Fim:</span> <span id="end-datetime-text" class="font-medium text-gray-800"></span>
             </div>
+            <!-- INCLUSÃO: Localização de Fim (Faltante no HTML) -->
+            <div>
+                <span class="font-semibold text-gray-600">Localização Fim:</span> <span id="end-location-text" class="font-medium text-gray-800"></span>
+            </div>
+            <!-- FIM INCLUSÃO -->
             <div id="distance-display">
                 <span class="font-semibold text-gray-600">Distância Percorrida:</span> <span id="distance-text" class="font-medium text-gray-800"></span>
             </div>
@@ -275,8 +285,8 @@
 
         // Mock data for login (would be from SharePoint in the real app)
         const loginData = {
-            "Arcondi": { "Abc": "123", "Def": "123", "Ghi": "123" },
-            "Lubrica": { "Jk": "123", "Lm": "123", "No": "123" }
+            "Arcondi": { "Abc": "123", "Def": "456", "Ghi": "789" },
+            "Lubrica": { "Jk": "123", "Lm": "456", "No": "789" }
         };
 
         // DOM element references
@@ -487,6 +497,7 @@
             
             // 1. Capture end timestamp immediately (CRITICAL FIX)
             appState.end.timestamp = new Date();
+            console.log("End Timestamp captured:", appState.end.timestamp);
             
             // 2. Enable the Finalize button immediately
             serviceActiveStatus.classList.remove('hidden'); 
@@ -496,6 +507,8 @@
             finishScanBtn.style.display = 'none';
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
+            console.log("Finalize Button ENABLED.");
+
 
             // 3. Get end location (runs asynchronously but doesn't block button)
             if (navigator.geolocation) {
@@ -503,6 +516,7 @@
                     (position) => {
                         const coords = position.coords;
                         appState.end.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                        console.log("Localização de encerramento capturada com sucesso.");
                     },
                     (error) => {
                         console.error("Geolocation error (end):", error);
@@ -549,12 +563,22 @@
             observationsTextDisplay.textContent = appState.observations || 'Nenhuma observação registrada.';
             
             // Set location text (showing N/A if missing)
-            document.getElementById('start-location-text').textContent = appState.start.location 
-                ? `Lat: ${appState.start.location.latitude.toFixed(4)}, Long: ${appState.start.location.longitude.toFixed(4)}` 
-                : 'Localização de Início não capturada.';
-            document.getElementById('end-location-text').textContent = appState.end.location 
-                ? `Lat: ${appState.end.location.latitude.toFixed(4)}, Long: ${appState.end.location.longitude.toFixed(4)}` 
-                : 'Localização de Fim não capturada.';
+            // Fix: Referencing the newly added elements in HTML
+            const startLocationTextElement = document.getElementById('start-location-text');
+            const endLocationTextElement = document.getElementById('end-location-text');
+
+            if (startLocationTextElement) {
+                startLocationTextElement.textContent = appState.start.location 
+                    ? `Lat: ${appState.start.location.latitude.toFixed(4)}, Long: ${appState.start.location.longitude.toFixed(4)}` 
+                    : 'Localização de Início não capturada.';
+            }
+
+            if (endLocationTextElement) {
+                endLocationTextElement.textContent = appState.end.location 
+                    ? `Lat: ${appState.end.location.latitude.toFixed(4)}, Long: ${appState.end.location.longitude.toFixed(4)}` 
+                    : 'Localização de Fim não capturada.';
+            }
+
 
             // Populate Photo Report Preview
             photosReportPreviewContainer.innerHTML = '';
@@ -664,7 +688,7 @@
                 document.getElementById('logged-in-user').textContent = employeeSelect.value;
                 resetAppState();
             } else {
-                // ... (login error logic)
+                showMessage("Login ou senha inválidos.", true);
             }
         });
 
@@ -693,9 +717,11 @@
         // Finalize Service Button (Shows Modal)
         finalizeServiceBtn.addEventListener('click', () => {
              if (!appState.end.timestamp) {
-                showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
+                showMessage("O escaneamento de finalização deve ser feito primeiro. Se já fez, aguarde a geolocalização.", true);
+                console.log("Tentativa de Finalizar Serviço BLOQUEADA: appState.end.timestamp é nulo.");
                 return;
             }
+            console.log("Finalizar Serviço clicado. Abrindo modal de confirmação.");
             modalOsNumber.textContent = appState.osNumber;
             confirmationModal.style.display = 'flex'; // This is the line that opens the modal
         });
