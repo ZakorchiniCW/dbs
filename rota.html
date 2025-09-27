@@ -44,10 +44,24 @@
             border-bottom: none;
         }
 
-        /* Estilo de Botão Padrão (removido o estilo 3D complexo) */
+        /* Estilo de Botão Padrão (AGORA VERDE COM SOMBREADO) */
         .button-primary {
-            @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors;
+            /* Strong Green Color */
+            @apply bg-green-600 text-white font-bold transition-all duration-200 ease-in-out;
+            /* Sombreamento/Profundidade customizada (Green-800 for depth) */
+            box-shadow: 0 4px 0 0 #166534; 
+            border-bottom: 4px solid #166534;
         }
+        .button-primary:hover {
+            @apply bg-green-700;
+        }
+        .button-primary:active {
+            /* On press, remove shadow and translate down for press effect */
+            box-shadow: none;
+            transform: translateY(4px);
+            border-bottom: 0;
+        }
+
         .button-secondary {
             @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
         }
