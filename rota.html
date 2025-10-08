@@ -173,7 +173,7 @@
             <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
                 <p class="text-sm font-semibold text-green-700 flex items-center">
                     <span class="green-led mr-2"></span>
-                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> - Ativa e em Andamento.
+                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> Ativa e em Andamento.
                 </p>
             </div>
         </div>
@@ -269,6 +269,13 @@
 
             <div id="manager-alarm-box" class="p-3 bg-red-200 border border-red-400 rounded-lg mb-4 hidden">
                 </div>
+            
+            <div id="company-report-display">
+                <span class="font-semibold text-gray-600">Empresa:</span> <span id="company-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="employee-report-display">
+                <span class="font-semibold text-gray-600">Funcionário:</span> <span id="employee-text" class="font-medium text-gray-800"></span>
+            </div>
 
             <div id="os-display">
                 <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
@@ -429,7 +436,8 @@
             materialsUsed: [], 
             limitExceededMaterials: [], 
             dateAlarms: [], 
-            loggedInCompany: '', // NOVO: Armazena a empresa logada
+            loggedInCompany: '', // Armazena a empresa logada (NÃO É RESETADO NO resetAppState)
+            loggedInEmployee: '', // NOVO: Armazena o funcionário logado
             start: {
                 timestamp: null,
                 location: null,
@@ -494,7 +502,7 @@
         const addMaterialBtn = document.getElementById('add-material-btn');
         const materialsList = document.getElementById('materials-list');
 
-        // Barcode Confirmation Modal Elements (NOVOS)
+        // Barcode Confirmation Modal Elements
         const barcodeConfirmationModal = document.getElementById('barcode-confirmation-modal');
         const scannedCodeDisplay = document.getElementById('scanned-code-display');
         const modalConfirmBarcodeBtn = document.getElementById('modal-confirm-barcode-btn');
@@ -520,6 +528,7 @@
         }
         
         function resetAppState() {
+            // Limpa o estado da O.S. (mas MANTÉM a empresa e o funcionário logado)
             appState.osNumber = '';
             appState.barcodeData = '';
             appState.equipmentType = '';
@@ -530,7 +539,7 @@
             appState.materialsUsed = []; 
             appState.limitExceededMaterials = []; 
             appState.dateAlarms = []; 
-            appState.loggedInCompany = ''; // Reseta a empresa logada
+            // appState.loggedInCompany e appState.loggedInEmployee NÃO são resetados aqui.
             appState.start.timestamp = null;
             appState.start.location = null;
             appState.end.timestamp = null;
@@ -555,13 +564,13 @@
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            materialInputContainer.classList.add('hidden'); // Garante que o container de material comece escondido
+            materialInputContainer.classList.add('hidden'); 
             finishScanBtn.style.display = 'none';
             finalizeServiceBtn.classList.add('hidden');
             document.getElementById('manager-check-container').classList.add('hidden'); 
             document.getElementById('manager-auth-modal').style.display = 'none'; 
             document.getElementById('manager-alarm-box').classList.add('hidden'); 
-            barcodeConfirmationModal.style.display = 'none'; // Garante que o modal de código de barras esteja escondido
+            barcodeConfirmationModal.style.display = 'none'; 
             
             osInput.disabled = false;
             osInput.style.display = 'block';
@@ -576,6 +585,11 @@
 
         // Função para voltar à tela de Login
         function transitionToLoginUI() {
+            // IMPORTANTE: Limpa o estado da empresa logada e funcionário
+            appState.loggedInCompany = '';
+            appState.loggedInEmployee = '';
+            loggedInUserText.textContent = '';
+
             loginContainer.style.display = 'block';
             appContainer.style.display = 'none';
             
@@ -601,7 +615,7 @@
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
 
-            // NOVO: Condição para exibir gerenciamento de materiais apenas para "Lubrica"
+            // Condição para exibir gerenciamento de materiais apenas para "Lubrica"
             if (appState.loggedInCompany === 'Lubrica') {
                 materialInputContainer.classList.remove('hidden');
             } else {
@@ -673,7 +687,7 @@
                 html5QrCode.start( constraints, config,
                     (decodedText, decodedResult) => {
                         html5QrCode.stop().then(() => {
-                            // NOVO: Exibe o modal de confirmação do código de barras
+                            // Exibe o modal de confirmação do código de barras
                             showBarcodeConfirmationModal(decodedText, appState.scanMode); 
                             readerDiv.style.display = 'none';
                         }).catch(err => {
@@ -776,7 +790,7 @@
         }
 
         function runMaterialChecks() {
-            // NOVO: Pular checagem de materiais se a empresa não for "Lubrica"
+            // Pular checagem de materiais se a empresa não for "Lubrica"
             if (appState.loggedInCompany !== 'Lubrica') {
                 appState.limitExceededMaterials = [];
                 appState.dateAlarms = [];
@@ -877,6 +891,11 @@
                 materialsUsed: [...appState.materialsUsed],
                 limitExceededMaterials: [...appState.limitExceededMaterials],
                 dateAlarms: [...appState.dateAlarms], 
+                
+                // NOVO: Dados do Prestador de Serviço
+                company: appState.loggedInCompany,
+                employee: appState.loggedInEmployee,
+                
                 start: {
                     timestamp: appState.start.timestamp,
                     location: appState.start.location,
@@ -966,6 +985,10 @@
                 managerAlarmBox.classList.add('hidden');
             }
 
+            // NOVO: Popula dados da Empresa e Funcionário
+            document.getElementById('company-text').textContent = report.company;
+            document.getElementById('employee-text').textContent = report.employee;
+            
             document.getElementById('os-text').textContent = report.osNumber;
             document.getElementById('service-status-text').textContent = report.serviceStatus;
             document.getElementById('barcode-text').textContent = report.barcodeData;
@@ -1119,10 +1142,12 @@
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
                 appState.loggedInCompany = selectedCompany; // Armazena a empresa
+                appState.loggedInEmployee = selectedEmployee; // NOVO: Armazena o funcionário
+                
                 // Esconde o login e mostra o app
                 loginContainer.style.display = 'none'; 
                 appContainer.style.display = 'block';
-                resetAppState(); // Reseta o estado do app, mas mantém a tela de app visível
+                resetAppState(); // Reseta o estado da OS, mas MANTÉM os dados de login.
             } else {
                 showMessage("Login ou senha inválidos.", true);
             }
