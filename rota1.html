@@ -433,8 +433,8 @@
          // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
         // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
          const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0012345"];          
-        const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42\n";  
-        const MATERIAL_GRAXA = "Graxa para lubrificação do tipo B\n"; 
+        const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42";  
+        const MATERIAL_GRAXA = "Graxa para lubrificação do tipo B"; 
         const MATERIAL_PARAFINA = "Parafina do tipo Branca";         
 
         // Main application state and data container
@@ -640,7 +640,9 @@
         // Lógica de exibição do campo informativo simples
         // *** MUDANÇA AQUI: Usa .includes() para checar se o código está na lista. ***
         if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
-            lubricaInfoContent.textContent = `"${MATERIAL_OLEO}" "${MATERIAL_GRAXA}" "${MATERIAL_PARAFINA}"`;
+            lubricaInfoContent.textContent = `"${MATERIAL_OLEO}"\n` + 
+                `"${MATERIAL_GRAXA}"\n` + 
+                `"${MATERIAL_PARAFINA}"`;
             lubricaInfoField.classList.remove('hidden');
         } else {
             lubricaInfoField.classList.add('hidden');
