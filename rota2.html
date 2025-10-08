@@ -3,13 +3,16 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f5;
         }
+        /* ... Estilos gerais e do scanner ... */
         #reader {
             width: 100%;
             max-width: 400px;
@@ -44,50 +47,32 @@
 
         /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
-            color: white; 
-            font-weight: bold; 
-            transition: all 0.3s ease-in-out;
+            /* Tailwind classes simulation */
+            @apply text-white font-bold transition-all duration-300 ease-in-out;
             
-            /* Cor base do botão (similar ao tom da imagem) */
             background-color: #00891d; 
-            /* Gradiente para o efeito de brilho/gloss */
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
-            
-            /* Borda arredondada completa (Pill Shape) */
             border-radius: 9999px; 
-            
-            /* Sombreamento suave por baixo */
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(57, 211, 121, 0.4);
-            border: none; /* Remove any default border */
+            border: none;
         }
         .button-primary:hover {
-            /* Escurece levemente no hover */
             background-color: #00891d;
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(57, 211, 121, 0.6);
         }
         .button-primary:active {
-            /* Efeito de clique: reduz o tamanho e o brilho */
             transform: scale(0.98); 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(57, 211, 121, 0.2);
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
         }
 
-        /* Botão secundário (Interrompida) - AGORA VERDE MAIS CLARO */
+        /* Botão secundário (Tirar Foto) */
         .button-secondary {
-            /* Usando um verde mais claro para indicar 'Interrompida' */
-            background-color: #86efac; /* bg-green-300 */
-            color: #166534; /* text-green-800 */
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms; /* transition-colors */
+            /* Tailwind classes simulation */
+            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
             border-radius: 9999px; 
         }
-        .button-secondary:hover {
-            background-color: #4ade80; /* hover:bg-green-400 */
-        }
-
 
         .green-led {
             height: 12px;
@@ -99,7 +84,7 @@
         }
         
         /* Modal Overlay Styles */
-        #confirmation-modal, #manager-auth-modal, #material-check-modal {
+        #confirmation-modal, #manager-auth-modal, #barcode-confirmation-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -119,8 +104,30 @@
             max-width: 350px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
+        .input-with-unit-container {
+            display: flex;
+            align-items: center;
+        }
+        .input-with-unit {
+            flex-grow: 1;
+        }
+        .unit-label {
+            padding: 0.75rem;
+            margin-left: -1px;
+            background-color: #e5e7eb;
+            border: 1px solid #d1d5db;
+            border-top-right-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+        /* Style for Material Entry list */
+        .material-entry {
+            display: flex; justify-content: space-between; align-items: center; background-color: #f9fafb; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 0.875rem;
+        }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-sm{max-width:24rem}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.whitespace-pre-wrap{white-space:pre-wrap}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.bg-\[\#d1e7e4\]{--tw-bg-opacity:1;background-color:rgb(209 231 228 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}</style></head>
+</head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
@@ -181,14 +188,61 @@
                 Escanear para Finalizar
             </button>
         </div>
-
+        
+        <div id="lubrica-info-field" class="data-display hidden mt-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-1">Informações de Reposição (LUBRICA)</h2>
+            <p id="lubrica-info-content" class="text-sm text-gray-700 font-mono whitespace-pre-wrap"></p>
+        </div>
         <div id="observations-input-container" class="mt-4 hidden">
             <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
             <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
         </div>
+        
+        <div id="materials-input-container" class="mt-4 hidden space-y-3">
+            <h2 class="block text-sm font-bold text-gray-700 mb-2">Uso de Materiais (Reposição)</h2>
+            
+            <div id="material-entry-form" class="p-3 border border-gray-300 rounded-lg bg-white space-y-3">
+                 <div>
+                    <label for="material-select" class="block text-sm font-medium text-gray-700 mb-1">1. Material</label>
+                    <select id="material-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                        <option value="" disabled selected>Selecione o Material</option>
+                        <option value="Óleo">Óleo</option>
+                        <option value="Graxa">Graxa</option>
+                        <option value="Parafina">Parafina</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label for="material-quantity-input" class="block text-sm font-medium text-gray-700 mb-1">2. Quantidade</label>
+                        <div class="input-with-unit-container">
+                             <input type="number" id="material-quantity-input" placeholder="0.00" min="0" step="any" class="input-with-unit w-full p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                             <span id="material-quantity-unit" class="unit-label rounded-l-none">Unidade</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <label for="material-type-select" class="block text-sm font-medium text-gray-700 mb-1">3. Tipo Específico</label>
+                        <select id="material-type-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
+                            <option value="" disabled selected>Selecione o Tipo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="add-material-btn" class="w-full py-2 px-4 rounded-lg font-semibold text-sm bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors">
+                    + Adicionar Material
+                </button>
+            </div>
+            
+            <h3 class="block text-sm font-bold text-gray-700 mt-4 mb-1">Materiais Registrados:</h3>
+            <div id="materials-list" class="space-y-2">
+                <p id="no-materials-message" class="text-sm italic text-gray-600">Nenhum material adicionado.</p>
+                </div>
+        </div>
+
 
         <div id="photo-input-container" class="mt-4 hidden">
-             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
              <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
                 Tirar Foto 📸
             </button>
@@ -216,6 +270,17 @@
 
         <div id="data-display" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço</h2>
+
+            <div id="manager-alarm-box" class="p-3 bg-red-200 border border-red-400 rounded-lg mb-4 hidden">
+                </div>
+            
+            <div id="company-report-display">
+                <span class="font-semibold text-gray-600">Empresa:</span> <span id="company-text" class="font-medium text-gray-800"></span>
+            </div>
+            <div id="employee-report-display">
+                <span class="font-semibold text-gray-600">Funcionário:</span> <span id="employee-text" class="font-medium text-gray-800"></span>
+            </div>
+
             <div id="os-display">
                 <span class="font-semibold text-gray-600">O.S.:</span> <span id="os-text" class="font-medium text-gray-800"></span>
             </div>
@@ -228,6 +293,12 @@
              <div id="equipment-type-display">
                 <span class="font-semibold text-gray-600">Tipo de Equipamento:</span> <span id="equipment-type-text" class="font-medium text-gray-800"></span>
             </div>
+            
+            <div id="materials-report-display">
+                <span class="font-semibold text-gray-600">Materiais Utilizados:</span> 
+                <div id="materials-report-text" class="font-medium text-gray-800"></div>
+            </div>
+
             <div id="start-data-display">
                 <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
             </div>
@@ -306,20 +377,64 @@
         </div>
     </div>
 
-    <div id="material-check-modal">
+    <div id="barcode-confirmation-modal">
         <div id="modal-content">
-            <h3 class="text-xl font-bold mb-4 text-gray-800">Verificação de Materiais</h3>
-            <p id="material-check-message" class="mb-4 text-gray-600 whitespace-pre-wrap">Este equipamento utiliza os seguintes materiais a serem verificados: </p>
-            <button id="material-check-confirm-btn" class="w-full py-3 font-semibold text-lg button-primary">
-                Confirmo a Verificação
-            </button>
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmar Código de Barras</h3>
+            <p class="mb-2 text-gray-600">O código escaneado foi:</p>
+            <p id="scanned-code-display" class="text-2xl font-bold mb-4 p-3 bg-gray-100 rounded-lg text-center break-all text-gray-800"></p>
+            <p class="mb-4 text-gray-600">Confirma que esta numeração está correta?</p>
+            <div class="flex flex-col space-y-3">
+                <button id="modal-confirm-barcode-btn" class="py-3 font-semibold text-lg button-primary">
+                    Sim, Continuar
+                </button>
+                <button id="modal-rescan-barcode-btn" class="py-3 rounded-lg font-semibold text-lg" style="background-color: #fcd34d; color: #92400e;">
+                    Não, Escanear Novamente
+                </button>
+            </div>
         </div>
     </div>
-
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script>
+        // Data base para vetores de conformidade (Versão 2)
+        const MATERIAL_DATA = {
+            "Óleo": { 
+                unit: "Litros", 
+                lastReplenishmentDate: "2025-10-01", // Data da Última Reposição (YYYY-MM-DD)
+                minIntervalDays: 30, // Intervalo Mínimo (dias)
+                types: { 
+                    "Óleo 32": 1, // Limite de Quantidade (CORRIGIDO)
+                    "Óleo 46": 1  // Limite de Quantidade (CORRIGIDO)
+                } 
+            },
+            "Graxa": { 
+                unit: "Kilos", 
+                lastReplenishmentDate: "2025-10-01",
+                minIntervalDays: 30,
+                types: { 
+                    "Graxa A": 1, // Limite de Quantidade (CORRIGIDO)
+                    "Graxa B": 1  // Limite de Quantidade (CORRIGIDO)
+                } 
+            },
+            "Parafina": { 
+                unit: "Litros", 
+                lastReplenishmentDate: "2025-10-01",
+                minIntervalDays: 30,
+                types: { 
+                    "Branca": 1,      // Limite de Quantidade (CORRIGIDO)
+                    "Translucida": 1  // Limite de Quantidade (CORRIGIDO)
+                } 
+            }
+        };
+        
+        // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
+        const BARCODE_LUBRICA_CHECK = "%H0076936";          
+        const MATERIAL_OLEO = "Óleo hidráulico do tipo 42";  
+        const MATERIAL_GRAXA = "Graxa para lubrificação do tipo B"; 
+        const MATERIAL_PARAFINA = "Parafina do Branca"; 
+        
+
         // Main application state and data container
         const appState = {
             osNumber: '',
@@ -327,8 +442,13 @@
             equipmentType: '',
             inventoryNumber: '',
             observations: '',
-            photoData: [], // Array to hold multiple photo Base64 strings
+            photoData: [], 
             serviceStatus: '',
+            materialsUsed: [], 
+            limitExceededMaterials: [], 
+            dateAlarms: [], 
+            loggedInCompany: '', 
+            loggedInEmployee: '', 
             start: {
                 timestamp: null,
                 location: null,
@@ -338,19 +458,16 @@
                 location: null,
             },
             scanMode: 'start',
-            isServiceActive: false, // Flag to track active service state
-            // Data persisted after finalization, used for Manager view
+            isServiceActive: false, 
             finalReportData: null, 
-            loggedInCompany: null, // RASTREIA A EMPRESA LOGADA PARA LÓGICA ESPECÍFICA
         };
 
-        // Mock data for login (Funcionário: '123', Gerente: '111')
+        // Mock data for login (Funcionário: '123', Gerente: '123')
         const loginData = {
             "Arcondi": { 
                 "Abc": "123", 
                 "Def": "123", 
                 "Ghi": "123",
-                "Gerente": "123" // Usuário Gerente
             },
             "Lubrica": { 
                 "Jk": "123", 
@@ -361,26 +478,16 @@
         const MANAGER_USERNAME = "Gerente";
         const MANAGER_PASSWORD = "123";
 
-        // Material Data for Lubrica (per requested vectors)
-        const LUBRICA_SPECIAL_EQUIPMENT = {
-            BARCODE: "%H0076936", // VETOR DE CÓDIGO DE BARRAS PARA TESTE
-            OIL_TYPE: "Óleo hidráulico do tipo 42",
-            GREASE_TYPE: "Graxa para lubrificação do tipo B",
-            PARAFFIN_TYPE: "Parafina do Branca"
-        };
-
-
         // DOM element references
         const loginContainer = document.getElementById('login-container');
         const appContainer = document.getElementById('app-container');
         const companySelect = document.getElementById('company-select');
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
-        const loginBtn = document.getElementById('login-btn');
         const loggedInUserText = document.getElementById('logged-in-user');
+        const loginBtn = document.getElementById('login-btn'); 
 
         const osInput = document.getElementById('os-number');
-        const osTextActive = document.getElementById('os-text-active');
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
         const finalizeServiceBtn = document.getElementById('finalize-service-btn');
@@ -389,67 +496,54 @@
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
-        const dataDisplay = document.getElementById('data-display');
         const serviceActiveStatus = document.getElementById('service-active-status');
-        const managerCheckContainer = document.getElementById('manager-check-container'); 
-        const managerAuthBtn = document.getElementById('manager-auth-btn'); 
 
-        // Modals
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const modalOsNumber = document.getElementById('modal-os-number');
-        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
-        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
-        
-        // Manager Auth Modal elements
-        const managerAuthModal = document.getElementById('manager-auth-modal');
-        const managerSelect = document.getElementById('manager-select');
-        const managerPasswordInput = document.getElementById('manager-password-input');
-        const managerLoginBtn = document.getElementById('manager-login-btn');
-        const managerMessageBox = document.getElementById('manager-message-box');
-        const managerMessageText = document.getElementById('manager-message-text');
-        
-        // Material Check Modal elements
-        const materialCheckModal = document.getElementById('material-check-modal');
-        const materialCheckMessage = document.getElementById('material-check-message');
-        const materialCheckConfirmBtn = document.getElementById('material-check-confirm-btn');
-
-
-        // Report display elements (simplified names for brevity)
         const observationsTextArea = document.getElementById('observations-text');
         const observationsInputContainer = document.getElementById('observations-input-container');
         const photoInputContainer = document.getElementById('photo-input-container');
         const photoFileInput = document.getElementById('photo-file-input');
         const photoPreviewContainer = document.getElementById('photo-preview-container');
-        const summaryContainer = document.getElementById('summary-container');
+
+        // Material Input Elements
+        const materialInputContainer = document.getElementById('materials-input-container');
+        const materialSelect = document.getElementById('material-select');
+        const materialQuantityInput = document.getElementById('material-quantity-input');
+        const materialTypeSelect = document.getElementById('material-type-select');
+        const materialQuantityUnit = document.getElementById('material-quantity-unit');
+        const addMaterialBtn = document.getElementById('add-material-btn');
+        const materialsList = document.getElementById('materials-list');
         
+        // NOVO CAMPO INFORMATIVO (REQUISITO LUBRICA)
+        const lubricaInfoField = document.getElementById('lubrica-info-field');
+        const lubricaInfoContent = document.getElementById('lubrica-info-content');
+
+        // Barcode Confirmation Modal Elements
+        const barcodeConfirmationModal = document.getElementById('barcode-confirmation-modal');
+        const scannedCodeDisplay = document.getElementById('scanned-code-display');
+        const modalConfirmBarcodeBtn = document.getElementById('modal-confirm-barcode-btn');
+        const modalRescanBarcodeBtn = document.getElementById('modal-rescan-barcode-btn');
+
         let html5QrCode;
+        let pendingDecodedText = ''; 
+        let pendingScanMode = ''; 
 
         function showMessage(text, isError = false) {
             messageText.textContent = text;
             messageBox.style.display = 'block';
             if (isError) {
-                messageBox.classList.remove('bg-gray-200', 'bg-[#d1e7e4]');
-                messageBox.classList.add('bg-red-200');
+                messageBox.style.backgroundColor = '#fca5a5'; /* red-300 */
+                messageText.style.color = '#991b1b'; /* red-800 */
             } else {
-                messageBox.classList.remove('bg-red-200');
-                messageBox.classList.add('bg-gray-200', 'bg-[#d1e7e4]');
+                messageBox.style.backgroundColor = '#d1e7e4'; /* light green */
+                messageText.style.color = '#374151'; /* gray-700 */
             }
             setTimeout(() => {
                 messageBox.style.display = 'none';
             }, 5000);
         }
         
-        function showManagerMessage(text) {
-             managerMessageText.textContent = text;
-             managerMessageBox.style.display = 'block';
-             setTimeout(() => {
-                managerMessageBox.style.display = 'none';
-            }, 5000);
-        }
-
-        // --- Core Reset Function ---
         function resetAppState() {
-            // Reset app state
+            // Limpa o estado da O.S. (mas MANTÉM a empresa e o funcionário logado)
             appState.osNumber = '';
             appState.barcodeData = '';
             appState.equipmentType = '';
@@ -457,123 +551,138 @@
             appState.observations = '';
             appState.photoData = [];
             appState.serviceStatus = '';
+            appState.materialsUsed = []; 
+            appState.limitExceededMaterials = []; 
+            appState.dateAlarms = []; 
             appState.start.timestamp = null;
             appState.start.location = null;
             appState.end.timestamp = null;
             appState.end.location = null;
             appState.scanMode = 'start';
             appState.finalReportData = null;
-            appState.isServiceActive = false; // Reset active flag
-            appState.loggedInCompany = null; // Reset logged-in company
+            appState.isServiceActive = false; 
             
-            // Reset input/preview fields
             osInput.value = '';
             observationsTextArea.value = '';
             photoPreviewContainer.innerHTML = '';
             
-            // Hide all post-service/active elements
-            dataDisplay.classList.add('hidden');
-            summaryContainer.classList.add('hidden');
+            materialSelect.value = '';
+            materialQuantityInput.value = '';
+            materialTypeSelect.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
+            materialQuantityUnit.textContent = 'Unidade';
+            materialsList.innerHTML = '<p id="no-materials-message" class="text-sm italic text-gray-600">Nenhum material adicionado.</p>';
+            
+            lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo
+
+            document.getElementById('data-display').classList.add('hidden');
+            document.getElementById('summary-container').classList.add('hidden');
             reportCloseBtn.classList.add('hidden');
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
+            materialInputContainer.classList.add('hidden'); 
             finishScanBtn.style.display = 'none';
-            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
-            managerCheckContainer.classList.add('hidden'); 
-            managerAuthModal.style.display = 'none'; 
-            materialCheckModal.style.display = 'none'; // Esconde modal de material
+            finalizeServiceBtn.classList.add('hidden');
+            document.getElementById('manager-check-container').classList.add('hidden'); 
+            document.getElementById('manager-auth-modal').style.display = 'none'; 
+            document.getElementById('manager-alarm-box').classList.add('hidden'); 
+            barcodeConfirmationModal.style.display = 'none'; 
             
-            // Show initial input/button
             osInput.disabled = false;
             osInput.style.display = 'block';
             startScanBtn.style.display = 'block';
 
+            // Reseta a interface para o estado inicial (logado, pronto para começar)
             loginContainer.style.display = 'none';
             appContainer.style.display = 'block';
             
             showMessage("Pronto para uma nova Ordem de Serviço!");
         }
 
-        /**
-         * @description Only handles the UI changes to enter the active service registration screen.
-         */
-        function activateServiceUI() {
-            // Technician Active Phase (After Start Scan or failure return)
+        // Função para voltar à tela de Login
+        function transitionToLoginUI() {
+            // IMPORTANTE: Limpa o estado da empresa logada e funcionário
+            appState.loggedInCompany = '';
+            appState.loggedInEmployee = '';
+            loggedInUserText.textContent = '';
+
+            loginContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            
+            // Limpa campos do login
+            employeeSelect.value = '';
+            passwordInput.value = '';
+            companySelect.value = '';
+            employeeSelect.disabled = true;
+            employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
+        }
+
+        function transitionToActiveServiceUI() {
             appState.isServiceActive = true;
 
             osInput.disabled = true;
-            osInput.style.display = 'none'; // Hide input when active
+            osInput.style.display = 'none';
             startScanBtn.style.display = 'none';
 
-            osTextActive.textContent = appState.osNumber;
+            document.getElementById('os-text-active').textContent = appState.osNumber;
             serviceActiveStatus.classList.remove('hidden');
-            finishScanBtn.style.display = 'block'; // Show end scan button
-            observationsInputContainer.classList.remove('hidden');
-            photoInputContainer.classList.remove('hidden'); 
+            finishScanBtn.style.display = 'block';
             
-            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
+            observationsInputContainer.classList.remove('hidden');
+            photoInputContainer.classList.remove('hidden');
+
+            // Condição para exibir gerenciamento de materiais e o campo informativo (NOVO)
+            if (appState.loggedInCompany === 'Lubrica') {
+                materialInputContainer.classList.remove('hidden');
+                
+                // Lógica de exibição do campo informativo simples
+                if (appState.barcodeData === BARCODE_LUBRICA_CHECK) {
+                    lubricaInfoContent.textContent = `"${MATERIAL_OLEO}" "${MATERIAL_GRAXA}" "${MATERIAL_PARAFINA}"`;
+                    lubricaInfoField.classList.remove('hidden');
+                } else {
+                    lubricaInfoField.classList.add('hidden');
+                }
+
+            } else {
+                materialInputContainer.classList.add('hidden');
+                lubricaInfoField.classList.add('hidden');
+            }
+            
+            finalizeServiceBtn.classList.add('hidden');
             finalizeServiceBtn.disabled = true;
         }
 
-        /**
-         * @description Placeholder function for the conceptual "quantity and date" check for Lubrica.
-         * @param {string} barcode The scanned barcode data.
-         * @returns {boolean} True if replenishment check passes, false otherwise.
-         */
-        function checkLubricaReplenishment(barcode) {
-            // --- Lógica de verificação de Reposição (Quantidade e Data) da Lubrica - DEVE PERMANECER ---
-            
-            // IMPLEMENTAÇÃO FUTURA: 
-            // - Buscar no DB a última data de reposição para este 'barcode'.
-            // - Comparar com a regra de intervalo.
-            // - Checar o nível de reposição ('quantidade').
-            
-            console.log(`Verificando Reposição Lubrica para Cód.: ${barcode}.`);
-            // Por enquanto, sempre retorna sucesso para continuar o fluxo.
-            return true; 
+        function showBarcodeConfirmationModal(decodedText, scanMode) {
+            pendingDecodedText = decodedText;
+            pendingScanMode = scanMode;
+
+            scannedCodeDisplay.textContent = decodedText;
+            barcodeConfirmationModal.style.display = 'flex';
         }
 
-        /**
-         * @description Continues the service flow after successful barcode scan OR material confirmation.
-         * @param {string} decodedText The barcode data.
-         */
-        function continueServiceFlow(decodedText) {
+        function continueScanProcess() {
+            barcodeConfirmationModal.style.display = 'none';
+            const decodedText = pendingDecodedText;
+            const scanMode = pendingScanMode;
             
-            // 1. Check for Lubrica-specific rules (Quantity/Date verification).
-            if (appState.loggedInCompany === 'Lubrica') {
-                const replenishmentOK = checkLubricaReplenishment(decodedText);
+            // Reset pending variables
+            pendingDecodedText = '';
+            pendingScanMode = '';
 
-                if (!replenishmentOK) {
-                    showMessage("Verificação de reposição Lubrica falhou. Serviço não pode ser iniciado.", true);
-                    // Reverts UI to initial state, but keeps employee logged in
-                    resetAppState(); 
-                    return; 
-                }
-                // If it passes (or if it's not Lubrica), proceed to activate UI.
+            if (scanMode === 'start') {
+                handleStartScanSuccess(decodedText);
+            } else {
+                handleFinishScanSuccess();
             }
-            
-            // 2. Activate UI
-            showMessage("Código de barras escaneado e verificações internas concluídas. Serviço Iniciado.");
-            activateServiceUI();
         }
 
-        
-        function transitionToManagerCheckUI() {
-            // Technician Phase -> Manager Check Phase
-            serviceActiveStatus.classList.add('hidden');
-            finishScanBtn.style.display = 'none';
-            finalizeServiceBtn.classList.add('hidden');
-            observationsInputContainer.classList.add('hidden');
-            photoInputContainer.classList.add('hidden');
 
-            managerCheckContainer.classList.remove('hidden');
-            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
-        }
-
-        async function startScanner() {
+        function startScanner() {
             try {
-                // Check for OS before scan
+                if (typeof Html5Qrcode === 'undefined') {
+                    throw new Error("A biblioteca do scanner (Html5Qrcode) não foi carregada.");
+                }
+
                 const os = osInput.value.trim();
                 if (appState.scanMode === 'start' && !os) {
                     showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
@@ -584,32 +693,30 @@
                 }
 
                 readerDiv.style.display = 'block';
-                // Hide active UI during scan
                 serviceActiveStatus.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
                 finalizeServiceBtn.classList.add('hidden'); 
+                materialInputContainer.classList.add('hidden'); 
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
+                lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo durante o scan
                 startScanBtn.style.display = 'none';
 
                 const config = {
-                    fps: 10,
+                    fps: 15, 
                     qrbox: { width: 250, height: 250 },
-                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
+                    formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
                 const constraints = { facingMode: { exact: "environment" } };
 
                 html5QrCode = new Html5Qrcode("reader");
 
-                await html5QrCode.start( constraints, config,
+                html5QrCode.start( constraints, config,
                     (decodedText, decodedResult) => {
                         html5QrCode.stop().then(() => {
+                            // Exibe o modal de confirmação do código de barras
+                            showBarcodeConfirmationModal(decodedText, appState.scanMode); 
                             readerDiv.style.display = 'none';
-                            if (appState.scanMode === 'start') {
-                                handleStartScanSuccess(decodedText);
-                            } else {
-                                handleFinishScanSuccess();
-                            }
                         }).catch(err => {
                             console.error("Error stopping scanner:", err);
                             showMessage("Erro ao parar o scanner.", true);
@@ -617,44 +724,46 @@
                         });
                     },
                     (errorMessage) => { /* Ignore continuous error messages */ }
-                );
+                ).catch(err => {
+                    console.error("Erro ao iniciar o scanner:", err);
+                    showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                    readerDiv.style.display = 'none';
+                    resetUIScannerFail();
+                });
             } catch (err) {
-                console.error("Erro ao iniciar o scanner:", err);
-                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                console.error("Erro geral ao iniciar o scanner:", err);
+                showMessage(`Erro geral ao iniciar o scanner.`, true);
                 readerDiv.style.display = 'none';
                 resetUIScannerFail();
             }
         }
-
+        
         function resetUIScannerFail() {
-            // Reverte a UI se o scanner falhar
-            if (appState.isServiceActive) {
-                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visible)
-                if (appState.end.timestamp) {
-                    // Restaura a UI para mostrar o botão Finalizar
-                    serviceActiveStatus.classList.remove('hidden'); 
-                    observationsInputContainer.classList.remove('hidden');
-                    photoInputContainer.classList.remove('hidden');
-                    finalizeServiceBtn.classList.remove('hidden'); // AQUI é onde o botão Finalizar é restaurado
-                    finalizeServiceBtn.disabled = false;
-                    finishScanBtn.style.display = 'none'; 
-                    showMessage("Falha no scanner. O.S. pronta para Finalizar Serviço.");
-                } else {
-                    // Restaura a UI para o estado ativo (aguardando escaneamento de fim)
-                    activateServiceUI(); // Usando a função renomeada
-                    showMessage("Falha no scanner. Por favor, tente escanear novamente para finalizar.", true);
+             readerDiv.style.display = 'none';
+             if (appState.isServiceActive) {
+                // Se estava ativo, volta para a interface ativa (sem o scanner)
+                serviceActiveStatus.classList.remove('hidden');
+                finishScanBtn.style.display = 'block';
+                // Mostra materiais/obs/fotos dependendo da empresa
+                if (appState.loggedInCompany === 'Lubrica') { 
+                    materialInputContainer.classList.remove('hidden');
+                    // Tenta re-exibir o campo informativo se o barcode já estiver no estado
+                    if (appState.barcodeData === BARCODE_LUBRICA_CHECK) {
+                         lubricaInfoField.classList.remove('hidden');
+                    }
                 }
-            } else {
-                // Restaura a UI para o estado inicial (pré-escaneamento de início)
+                observationsInputContainer.classList.remove('hidden');
+                photoInputContainer.classList.remove('hidden');
+             } else {
+                // Se não estava ativo, volta para a tela inicial
                 osInput.style.display = 'block';
-                osInput.disabled = false;
                 startScanBtn.style.display = 'block';
-            }
+             }
         }
         
         function handleStartScanSuccess(decodedText) {
+            showMessage("Código de barras escaneado e confirmado! Serviço Iniciado.");
             
-            // Simulação de parse de dados de equipamento
             const equipmentType = decodedText.charAt(0).toUpperCase();
             const inventoryNumber = decodedText.substring(1);
 
@@ -669,6 +778,7 @@
                     (position) => {
                         const coords = position.coords;
                         appState.start.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
+                        showMessage("Localização de início obtida com sucesso!");
                     },
                     (error) => {
                         console.error("Geolocation error (start):", error);
@@ -678,43 +788,32 @@
             } else {
                 showMessage("Seu navegador não suporta geolocalização.", true);
             }
-            
-            // --- LUBRICA CHECK LOGIC (Material Alert - Step 1) ---
-            if (appState.loggedInCompany === 'Lubrica' && decodedText === LUBRICA_SPECIAL_EQUIPMENT.BARCODE) {
-                
-                // Formata a mensagem modal com os 3 vetores de texto
-                const message = `Este equipamento utiliza os seguintes materiais a serem verificados: \n\n- ${LUBRICA_SPECIAL_EQUIPMENT.OIL_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.GREASE_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.PARAFFIN_TYPE}!\n\nConfirme a verificação dos materiais para continuar.`;
-
-                materialCheckMessage.textContent = message;
-                materialCheckModal.style.display = 'flex';
-                
-                // Pausa o fluxo, esperando pelo botão de confirmação do material
-                return; 
-            }
-            // --- END LUBRICA CHECK LOGIC ---
-
-            // Para todos os outros casos (não Lubrica, ou Lubrica mas não o código de teste),
-            // avança diretamente para o fluxo de serviço completo.
-            continueServiceFlow(decodedText);
+            transitionToActiveServiceUI();
         }
 
         function handleFinishScanSuccess() {
-            showMessage("Escaneamento de Finalização concluído. Pronto para Finalizar Serviço.");
+            showMessage("Escaneamento de Finalização concluído e confirmado. Pronto para Finalizar Serviço.");
             
-            // 1. Capture end timestamp immediately 
             appState.end.timestamp = new Date();
             
-            // 2. Restore active UI and ENABLE Finalize button
             serviceActiveStatus.classList.remove('hidden'); 
+            
+            // Mostra materiais/obs/fotos dependendo da empresa
+            if (appState.loggedInCompany === 'Lubrica') { 
+                materialInputContainer.classList.remove('hidden');
+                 // Mantém o campo informativo visível se aplicável
+                 if (appState.barcodeData === BARCODE_LUBRICA_CHECK) {
+                     lubricaInfoField.classList.remove('hidden');
+                }
+            }
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
             
-            // ENABLE Finalize button
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false; 
             finishScanBtn.style.display = 'none'; 
+            appState.scanMode = 'end-done'; 
 
-            // 3. Get end location (runs asynchronously but doesn't block button)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -729,7 +828,78 @@
             }
         }
 
-        // Haversine formula
+        function runMaterialChecks() {
+            // Pular checagem de materiais se a empresa não for "Lubrica"
+            if (appState.loggedInCompany !== 'Lubrica') {
+                appState.limitExceededMaterials = [];
+                appState.dateAlarms = [];
+                return true; 
+            }
+            
+            appState.limitExceededMaterials = [];
+            appState.dateAlarms = []; 
+            let allGood = true;
+            
+            // --- 1. Checagem de Intervalo Mínimo de Reposição (Data) ---
+            if (appState.end.timestamp && appState.materialsUsed.length > 0) {
+                const currentServiceDate = appState.end.timestamp; 
+                const dateAlarmSet = new Set(); 
+
+                appState.materialsUsed.forEach(entry => {
+                    const { material } = entry;
+                    
+                    if (dateAlarmSet.has(material)) return;
+
+                    const materialConfig = MATERIAL_DATA[material];
+                    const lastDateString = materialConfig.lastReplenishmentDate;
+                    const minInterval = materialConfig.minIntervalDays;
+
+                    const parts = lastDateString.split('-'); // Espera YYYY-MM-DD
+                    // Subtrai 1 do mês pois JavaScript usa 0-indexed (0=Jan, 11=Dec)
+                    const lastDate = new Date(parts[0], parts[1] - 1, parts[2]); 
+
+                    const minAllowedDate = new Date(lastDate);
+                    minAllowedDate.setDate(lastDate.getDate() + minInterval); 
+
+                    if (currentServiceDate < minAllowedDate) {
+                        allGood = false;
+                        dateAlarmSet.add(material); 
+                        
+                        appState.dateAlarms.push({
+                            material: material,
+                            lastDate: lastDate.toLocaleDateString('pt-BR'),
+                            minInterval: minInterval,
+                            currentDate: currentServiceDate.toLocaleDateString('pt-BR'),
+                            minAllowedDate: minAllowedDate.toLocaleDateString('pt-BR'),
+                        });
+                        showMessage(`⚠️ ALARME: Reposição de ${material} feita muito cedo! Prazo mínimo: ${minInterval} dias.`, true);
+                    }
+                });
+            }
+
+
+            // --- 2. Checagem de Limite de Quantidade ---
+            appState.materialsUsed.forEach(entry => {
+                const { material, quantity, type, unit } = entry;
+                
+                const limit = MATERIAL_DATA[material].types[type]; 
+
+                if (quantity > limit) {
+                    allGood = false;
+                    appState.limitExceededMaterials.push({
+                        material,
+                        type,
+                        quantityUsed: quantity,
+                        limit: limit,
+                        unit: unit,
+                    });
+                    showMessage(`⚠️ ALARME: O uso de ${material} (${type}) excedeu o limite planejado de ${limit} ${unit} (Quantidade: ${quantity})!`, true);
+                }
+            });
+
+            return allGood; 
+        }
+
         function calculateDistance(start, end) {
              if (!start || !end) return 0;
             const R = 6371;
@@ -746,10 +916,10 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return R * c;
         }
-        
-        // --- Report Generation and Display ---
-        async function prepareReportData() {
-            // Step 1: Save technician inputs to a final data structure
+
+        function prepareReportData() {
+            runMaterialChecks(); 
+            
             appState.observations = observationsTextArea.value.trim();
             const distanceKm = calculateDistance(appState.start.location, appState.end.location);
             
@@ -758,6 +928,14 @@
                 serviceStatus: appState.serviceStatus,
                 barcodeData: appState.barcodeData,
                 equipmentType: appState.equipmentType,
+                materialsUsed: [...appState.materialsUsed],
+                limitExceededMaterials: [...appState.limitExceededMaterials],
+                dateAlarms: [...appState.dateAlarms], 
+                
+                // Dados do Prestador de Serviço
+                company: appState.loggedInCompany,
+                employee: appState.loggedInEmployee,
+                
                 start: {
                     timestamp: appState.start.timestamp,
                     location: appState.start.location,
@@ -771,28 +949,87 @@
                 photoData: [...appState.photoData], 
             };
 
-            // Step 2: AI Summary is disabled
             report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
 
-            // Save for Manager View
             appState.finalReportData = report;
 
             transitionToManagerCheckUI();
         }
 
+        function transitionToManagerCheckUI() {
+            serviceActiveStatus.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden');
+            materialInputContainer.classList.add('hidden'); 
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+            lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo
+
+            document.getElementById('manager-check-container').classList.remove('hidden');
+            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
+        }
+
         function displayFinalReport() {
-            if (!appState.finalReportData) {
-                showMessage("Erro: Nenhum dado de relatório para exibir.", true);
-                return;
-            }
+            if (!appState.finalReportData) return;
 
             const report = appState.finalReportData;
             
-            // Hide Manager Check and Auth Modal
             document.getElementById('manager-check-container').classList.add('hidden');
             document.getElementById('manager-auth-modal').style.display = 'none';
+            const managerAlarmBox = document.getElementById('manager-alarm-box');
+            const dataDisplay = document.getElementById('data-display');
+            
+            const hasAlarms = report.limitExceededMaterials.length > 0 || report.dateAlarms.length > 0;
 
-            // Populate Report (use specific IDs)
+            if (hasAlarms) {
+                let alarmHtml = '<h3 class="font-bold text-lg text-red-800 mb-2">🚨 ALARME DE CONFORMIDADE (URGENTE)</h3>';
+                
+                const equipmentID = report.barcodeData ? report.barcodeData.substring(1) : 'N/A';
+                
+                // 1. Alarmes de Intervalo Mínimo (Data)
+                if (report.dateAlarms.length > 0) {
+                    alarmHtml += '<h4 class="font-semibold text-red-700 mt-3 mb-2">Intervalo Mínimo Não Respeitado:</h4>';
+                    alarmHtml += '<p class="text-sm text-red-800 mb-3">O intervalo entre reposições foi muito curto. Avaliar por vazamento/defeito!</p>';
+                    
+                    report.dateAlarms.forEach(alarm => {
+                        alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
+                        alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`;
+                        alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material}<br/>`;
+                        alarmHtml += `<span class="font-semibold">Última Reposição:</span> ${alarm.lastDate}<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Reposição Mínima Permitida:</span> ${alarm.minAllowedDate} (Intervalo de ${alarm.minInterval} dias)<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Reposição Atual:</span> ${alarm.currentDate}`;
+                        alarmHtml += `</div>`;
+                    });
+                }
+
+                // 2. Alarmes de Quantidade Excedida
+                if (report.limitExceededMaterials.length > 0) {
+                    alarmHtml += '<h4 class="font-semibold text-red-700 mt-3 mb-2">Quantidades Excedidas:</h4>';
+                    alarmHtml += '<p class="text-sm text-red-800 mb-3">Avaliar urgência por possíveis vazamentos, danos ou desvio de material.</p>';
+                    
+                    report.limitExceededMaterials.forEach(alarm => {
+                        const exceeded = (alarm.quantityUsed - alarm.limit).toFixed(2);
+                        
+                        alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
+                        alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`; 
+                        alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material} (${alarm.type})<br/>`;
+                        alarmHtml += `<span class="font-semibold">Quant. Utilizada:</span> ${alarm.quantityUsed} ${alarm.unit}<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Quantidade Excedida:</span> ${exceeded} ${alarm.unit}`;
+                        alarmHtml += `</div>`;
+                    });
+                }
+                
+                managerAlarmBox.innerHTML = alarmHtml;
+                managerAlarmBox.classList.remove('hidden');
+
+            } else {
+                managerAlarmBox.classList.add('hidden');
+            }
+
+            // Popula dados da Empresa e Funcionário
+            document.getElementById('company-text').textContent = report.company;
+            document.getElementById('employee-text').textContent = report.employee;
+            
             document.getElementById('os-text').textContent = report.osNumber;
             document.getElementById('service-status-text').textContent = report.serviceStatus;
             document.getElementById('barcode-text').textContent = report.barcodeData;
@@ -802,7 +1039,18 @@
             document.getElementById('distance-text').textContent = report.distance.toFixed(2) + ' km';
             document.getElementById('observations-text-display').textContent = report.observations || 'Nenhuma observação registrada.';
             
-            // Set location text 
+            const materialsReportText = document.getElementById('materials-report-text');
+            materialsReportText.innerHTML = '';
+            if (report.materialsUsed.length > 0) {
+                 report.materialsUsed.forEach(entry => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `${entry.material} (${entry.type}): <span class="font-bold">${entry.quantity} ${entry.unit}</span>`;
+                    materialsReportText.appendChild(div);
+                });
+            } else {
+                materialsReportText.textContent = 'Nenhum material registrado.';
+            }
+
             document.getElementById('start-location-text').textContent = report.start.location 
                 ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
                 : 'Localização de Início não capturada.';
@@ -810,7 +1058,7 @@
                 ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
                 : 'Localização de Fim não capturada.';
 
-            // Populate Photo Report Preview
+            // Popula Preview de Fotos 
             document.getElementById('photos-report-preview-container').innerHTML = '';
             if (report.photoData.length > 0) {
                  report.photoData.forEach(base64Data => {
@@ -823,66 +1071,136 @@
                  document.getElementById('photos-report-preview-container').textContent = 'Nenhuma foto capturada.';
             }
 
-            // Show Summary (Inativa, apenas exibe a mensagem)
             document.getElementById('summary-text').textContent = report.aiSummary; 
             document.getElementById('summary-container').classList.remove('hidden');
             
-            // Show the report and CLOSE button
-            document.getElementById('data-display').classList.remove('hidden');
+            dataDisplay.classList.remove('hidden');
             document.getElementById('report-close-btn').classList.remove('hidden');
 
             showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
         }
 
-        // --- Photo Capture Functions ---
-        document.getElementById('take-photo-btn').addEventListener('click', () => { photoFileInput.click(); });
+        // --- Material Logic ---
+        function updateMaterialTypeOptions() {
+            const materialName = materialSelect.value;
+            const unitLabel = materialQuantityUnit;
+            materialTypeSelect.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
+            
+            if (materialName && MATERIAL_DATA[materialName]) {
+                const data = MATERIAL_DATA[materialName];
+                unitLabel.textContent = data.unit;
+                for (const type in data.types) {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    materialTypeSelect.appendChild(option);
+                }
+            } else {
+                unitLabel.textContent = "Unidade";
+            }
+        }
 
-        photoFileInput.addEventListener('change', (event) => {
+        function renderMaterialsList() {
+            materialsList.innerHTML = '';
+            if (appState.materialsUsed.length === 0) {
+                materialsList.innerHTML = '<p id="no-materials-message" class="text-sm italic text-gray-600">Nenhum material adicionado.</p>';
+                return;
+            }
+
+            appState.materialsUsed.forEach((entry, index) => {
+                const div = document.createElement('div');
+                div.className = 'material-entry';
+                div.innerHTML = `
+                    <span class="font-medium text-gray-800">${entry.material} (${entry.type})</span>
+                    <span class="font-bold text-gray-700">${entry.quantity} ${entry.unit}</span>
+                    <button data-index="${index}" class="remove-material-btn text-red-500 hover:text-red-700 font-bold ml-2">X</button>
+                `;
+                materialsList.appendChild(div);
+            });
+
+            document.querySelectorAll('.remove-material-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const indexToRemove = parseInt(this.dataset.index);
+                    appState.materialsUsed.splice(indexToRemove, 1);
+                    renderMaterialsList();
+                    showMessage("Material removido.");
+                });
+            });
+        }
+        
+        // --- Photo Capture Logic ---
+        function handlePhotoCapture(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     const base64Data = e.target.result;
                     appState.photoData.push(base64Data);
-                    
-                    const img = document.createElement('img');
-                    img.src = base64Data;
-                    img.alt = `Foto ${appState.photoData.length}`;
-                    img.className = 'w-20 h-20 object-cover rounded-lg shadow-md';
-                    photoPreviewContainer.appendChild(img);
-                    
-                    showMessage(`Foto ${appState.photoData.length} capturada com sucesso!`);
+                    renderPhotoPreviews();
+                    showMessage(`Foto capturada e adicionada (${appState.photoData.length} total).`);
                 };
                 reader.readAsDataURL(file);
+                // Limpa o valor do input para permitir nova captura com a câmera
+                event.target.value = null; 
             }
-            photoFileInput.value = '';
-        });
+        }
 
+        function renderPhotoPreviews() {
+            photoPreviewContainer.innerHTML = '';
+            if (appState.photoData.length === 0) return;
 
-        // --- Event Listeners for the Main App ---
+            appState.photoData.forEach((base64Data, index) => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'relative';
+                
+                const img = document.createElement('img');
+                img.src = base64Data;
+                img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs font-bold -mt-1 -mr-1 hover:bg-red-700 transition-colors';
+                deleteBtn.onclick = () => {
+                    appState.photoData.splice(index, 1);
+                    renderPhotoPreviews();
+                    showMessage("Foto removida.");
+                };
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(deleteBtn);
+                photoPreviewContainer.appendChild(imgContainer);
+            });
+        }
+
+        // --- Event Listeners ---
         
         // Login - Check technician/employee login
-        document.getElementById('login-btn').addEventListener('click', () => {
+        loginBtn.addEventListener('click', () => {
             const selectedCompany = companySelect.value;
             const selectedEmployee = employeeSelect.value;
             const inputPassword = passwordInput.value;
             
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
-                appState.loggedInCompany = selectedCompany; // Armazena a empresa para a lógica Lubrica
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
-                resetAppState();
+                appState.loggedInCompany = selectedCompany; // Armazena a empresa
+                appState.loggedInEmployee = selectedEmployee; // Armazena o funcionário
+                
+                // Esconde o login e mostra o app
+                loginContainer.style.display = 'none'; 
+                appContainer.style.display = 'block';
+                resetAppState(); // Reseta o estado da OS, mas MANTÉM os dados de login.
             } else {
                 showMessage("Login ou senha inválidos.", true);
             }
         });
 
-        // Start Scan Button (Directly calls scanner after OS check)
+        // Start Scan Button
         startScanBtn.addEventListener('click', () => {
             appState.scanMode = 'start';
             startScanner();
         });
 
-        // Finish Scan Button (Starts barcode scan for end)
+        // Finish Scan Button
         finishScanBtn.addEventListener('click', () => {
             if (!appState.start.timestamp) {
                 showMessage("Por favor, inicie o serviço primeiro.", true);
@@ -892,64 +1210,100 @@
             startScanner();
         });
         
-        // Finalize Service Button (Shows Finalization/Interruption Modal)
+        // Barcode Confirmation - SIM
+        modalConfirmBarcodeBtn.addEventListener('click', continueScanProcess);
+
+        // Barcode Confirmation - NÃO (Reinicia Scan)
+        modalRescanBarcodeBtn.addEventListener('click', () => {
+            barcodeConfirmationModal.style.display = 'none';
+            // Garante que a UI esteja no modo de escaneamento antes de reiniciar
+            readerDiv.style.display = 'block'; 
+            startScanner(); 
+        });
+
+        // Finalize Service Button (Shows Modal)
         finalizeServiceBtn.addEventListener('click', () => {
-             if (!appState.end.timestamp) {
+             if (appState.scanMode !== 'end-done') { // Verifica se o scan de finalização foi feito
                 showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
                 return;
             }
-            modalOsNumber.textContent = appState.osNumber;
-            confirmationModal.style.display = 'flex'; // Abre o modal de finalização/interrupção
+            finalizeServiceBtn.classList.add('hidden'); 
+            document.getElementById('modal-os-number').textContent = appState.osNumber;
+            document.getElementById('confirmation-modal').style.display = 'flex'; 
         });
 
         // Modal Confirmation: Finalizada
-        modalFinalizeBtn.addEventListener('click', () => {
+        document.getElementById('modal-finalize-btn').addEventListener('click', () => {
+            document.getElementById('confirmation-modal').style.display = 'none';
             appState.serviceStatus = 'Finalizada';
-            confirmationModal.style.display = 'none';
-            prepareReportData(); 
+            prepareReportData();
         });
 
         // Modal Confirmation: Interrompida
-        modalInterruptBtn.addEventListener('click', () => {
+        document.getElementById('modal-interrupt-btn').addEventListener('click', () => {
+            document.getElementById('confirmation-modal').style.display = 'none';
             appState.serviceStatus = 'Interrompida';
-            confirmationModal.style.display = 'none';
-            prepareReportData(); 
+            prepareReportData();
         });
 
-        // Material Check Confirmation Button (Continua o fluxo após o alerta)
-        materialCheckConfirmBtn.addEventListener('click', () => {
-            materialCheckModal.style.display = 'none';
-            // Continua o fluxo de serviço, que agora incluirá o check de reposição da Lubrica
-            continueServiceFlow(appState.barcodeData); 
+        // Manager Auth Button 
+        document.getElementById('manager-auth-btn').addEventListener('click', () => {
+            document.getElementById('manager-auth-modal').style.display = 'flex'; 
         });
 
-        // Manager Auth Button (Shows Auth Modal)
-        managerAuthBtn.addEventListener('click', () => {
-            managerAuthModal.style.display = 'flex'; 
-        });
-
-        // Manager Login Button (Checks Auth and Shows Report)
-        managerLoginBtn.addEventListener('click', () => {
-            const selectedManager = managerSelect.value;
-            const inputPassword = managerPasswordInput.value;
+        // Manager Login Button
+        document.getElementById('manager-login-btn').addEventListener('click', () => {
+            const selectedManager = document.getElementById('manager-select').value;
+            const inputPassword = document.getElementById('manager-password-input').value;
             
             if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
-                managerPasswordInput.value = '';
-                managerSelect.value = '';
+                document.getElementById('manager-password-input').value = '';
+                document.getElementById('manager-select').value = '';
                 displayFinalReport(); 
             } else {
-                showManagerMessage("Nome do Gerente ou senha inválidos.", true);
+                showMessage("Nome do Gerente ou senha inválidos.", true);
             }
         });
 
-        // Report CLOSE Button (Resets flow)
+        // Report CLOSE Button (Volta para o Login)
         document.getElementById('report-close-btn').addEventListener('click', () => {
-            resetAppState();
+            transitionToLoginUI();
         });
+        
+        // Material Event Listeners
+        materialSelect.addEventListener('change', updateMaterialTypeOptions);
+        addMaterialBtn.addEventListener('click', () => {
+            const material = materialSelect.value;
+            const quantity = parseFloat(materialQuantityInput.value.replace(',', '.')) || 0; 
+            const type = materialTypeSelect.value;
+            
+            if (!material || quantity <= 0 || !type || !MATERIAL_DATA[material]) {
+                showMessage("Preencha Material, Quantidade e Tipo de Material corretamente.", true);
+                return;
+            }
+            
+            const unit = MATERIAL_DATA[material].unit;
+            const newEntry = { material, quantity, type, unit };
+            appState.materialsUsed.push(newEntry);
+            renderMaterialsList();
+            
+            // Reset form
+            materialSelect.value = '';
+            materialQuantityInput.value = '';
+            updateMaterialTypeOptions('');
+            showMessage(`Material ${material} (${type}, ${quantity} ${unit}) adicionado.`);
+        });
+        
+        // Photo Capture Listeners 
+        document.getElementById('take-photo-btn').addEventListener('click', () => {
+            photoFileInput.click();
+        });
+        photoFileInput.addEventListener('change', handlePhotoCapture);
+
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-             // Initial login setup
+             // Initial login setup - Populating companies list 
              for (const company in loginData) {
                 const option = document.createElement('option');
                 option.value = company;
@@ -970,9 +1324,9 @@
                 }
             });
             
+            // Garante que a tela de login esteja visível ao carregar
+            transitionToLoginUI(); 
+            
         });
     </script>
-
-
-
 </body></html>
