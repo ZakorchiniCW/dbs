@@ -3,7 +3,9 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -320,7 +322,7 @@
     </div>
 
 
-   <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
 
     <script>
         // Main application state and data container
@@ -370,9 +372,9 @@
 
         // Vetores de Alerta para Gerente (Material e Quantidade Máxima)
         const MAX_QUANTITIES = {
-            oleo: { type: ['32', '46'], max: [1, 1], unit: 'litros' }, 
-            graxa: { type: ['A', 'B'], max: [1, 1], unit: 'kilos' },     
-            parafina: { type: ['branca', 'translucida'], max: [1, 1], unit: 'litros' } 
+            oleo: { type: ['32', '46'], max: [1, 2], unit: 'litros' }, 
+            graxa: { type: ['A', 'B'], max: [1, 2], unit: 'kilos' },     
+            parafina: { type: ['branca', 'translucida'], max: [1, 2], unit: 'litros' } 
         };
 
         // DOM element references
@@ -575,6 +577,8 @@
                     qrbox: { width: 250, height: 250 },
                     formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
                 };
+                
+                // Restrição de câmera traseira. Se o erro for de valor não suportado, a falha é aqui.
                 const constraints = { facingMode: { exact: "environment" } };
 
                 html5QrCode = new Html5Qrcode("reader");
@@ -589,7 +593,7 @@
                                 handleFinishScanSuccess();
                             }
                         }).catch(err => {
-                            console.error("Error stopping scanner:", err);
+                            console.error("Erro ao parar o scanner:", err);
                             showMessage("Erro ao parar o scanner.", true);
                             resetUIScannerFail();
                         });
@@ -597,11 +601,25 @@
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 );
             } catch (err) {
-                console.error("Erro ao iniciar o scanner:", err);
-                // Melhorando a mensagem de erro para o usuário
-                showMessage(`Erro ao iniciar a câmera ou valor de restrição não suportado. Verifique as permissões da câmera. Erro: ${err.message}`, true);
+                // --- BLOCO DE DEBUG APRIMORADO ---
+                console.error("DEBUG CÂMERA - Erro Completo:", err);
+                
+                let errorMessage = `ERRO CRÍTICO AO INICIAR CÂMERA.`;
+                
+                // Checagem para erros comuns de restrição ou segurança
+                if (err.message.includes("constraint") || err.name === "NotReadableError" || err.name === "OverconstrainedError") {
+                    errorMessage += ` O valor de restrição da câmera ('environment') não é suportado pelo seu dispositivo. Tente usar a câmera padrão ou aponte o celular para a traseira.`;
+                } else {
+                    errorMessage += ` Por favor, verifique se a página está em **HTTPS** e se as permissões da câmera foram concedidas ao navegador.`;
+                }
+
+                // Adiciona o erro técnico original
+                errorMessage += ` Detalhe: (${err.message}).`;
+
+                showMessage(errorMessage, true);
                 readerDiv.style.display = 'none';
                 resetUIScannerFail();
+                // --- FIM BLOCO DE DEBUG APRIMORADO ---
             }
         }
 
@@ -1044,4 +1062,7 @@
             
         });
     </script>
+
+
+
 </body></html>
