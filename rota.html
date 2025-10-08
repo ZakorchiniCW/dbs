@@ -441,7 +441,7 @@
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
         const loggedInUserText = document.getElementById('logged-in-user');
-        const loginBtn = document.getElementById('login-btn'); // Referência adicionada
+        const loginBtn = document.getElementById('login-btn'); 
 
         const osInput = document.getElementById('os-number');
         const startScanBtn = document.getElementById('start-scan-btn');
@@ -520,7 +520,7 @@
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            materialInputContainer.classList.add('hidden'); // Corrigido
+            materialInputContainer.classList.add('hidden'); 
             finishScanBtn.style.display = 'none';
             finalizeServiceBtn.classList.add('hidden');
             document.getElementById('manager-check-container').classList.add('hidden'); 
@@ -532,7 +532,7 @@
             osInput.style.display = 'block';
             startScanBtn.style.display = 'block';
 
-            // NOVO: Transição de volta para o login ou permanência no app
+            // Reseta a interface para o estado inicial (logado, pronto para começar)
             loginContainer.style.display = 'none';
             appContainer.style.display = 'block';
             
@@ -593,7 +593,8 @@
                 const config = {
                     fps: 15, // Aumentado para 15 FPS 
                     qrbox: { width: 250, height: 250 },
-                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_39],
+                    // CORRIGIDO: Usando strings literais para os formatos
+                    formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
                 const constraints = { facingMode: { exact: "environment" } };
 
@@ -616,7 +617,7 @@
                     },
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 ).catch(err => {
-                    console.error("Erro ao iniciar o scanner:", err);
+                    console.error("Erro geral ao iniciar o scanner:", err);
                     showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
                     readerDiv.style.display = 'none';
                     resetUIScannerFail();
@@ -966,7 +967,7 @@
 
         // --- Event Listeners ---
         
-        // Login - Check technician/employee login (Corrigido)
+        // Login - Check technician/employee login
         loginBtn.addEventListener('click', () => {
             const selectedCompany = companySelect.value;
             const selectedEmployee = employeeSelect.value;
