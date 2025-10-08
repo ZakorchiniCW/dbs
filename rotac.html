@@ -431,7 +431,7 @@
         };
         
         // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
-        const BARCODE_LUBRICA_CHECK = "%H0076936";          
+        const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0012345"];          
         const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42 \n";  
         const MATERIAL_GRAXA = "Graxa para lubrificação do tipo B \n"; 
         const MATERIAL_PARAFINA = "Parafina do tipo Branca"; 
@@ -619,41 +619,42 @@
             employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
         }
 
-        function transitionToActiveServiceUI() {
-            appState.isServiceActive = true;
+       function transitionToActiveServiceUI() {
+    appState.isServiceActive = true;
 
-            osInput.disabled = true;
-            osInput.style.display = 'none';
-            startScanBtn.style.display = 'none';
+    osInput.disabled = true;
+    osInput.style.display = 'none';
+    startScanBtn.style.display = 'none';
 
-            document.getElementById('os-text-active').textContent = appState.osNumber;
-            serviceActiveStatus.classList.remove('hidden');
-            finishScanBtn.style.display = 'block';
-            
-            observationsInputContainer.classList.remove('hidden');
-            photoInputContainer.classList.remove('hidden');
+    document.getElementById('os-text-active').textContent = appState.osNumber;
+    serviceActiveStatus.classList.remove('hidden');
+    finishScanBtn.style.display = 'block';
+    
+    observationsInputContainer.classList.remove('hidden');
+    photoInputContainer.classList.remove('hidden');
 
-            // Condição para exibir gerenciamento de materiais e o campo informativo (NOVO)
-            if (appState.loggedInCompany === 'Lubrica') {
-                materialInputContainer.classList.remove('hidden');
-                
-                // Lógica de exibição do campo informativo simples
-                if (appState.barcodeData === BARCODE_LUBRICA_CHECK) {
-                    lubricaInfoContent.textContent = `"${MATERIAL_OLEO}" "${MATERIAL_GRAXA}" "${MATERIAL_PARAFINA}"`;
-                    lubricaInfoField.classList.remove('hidden');
-                } else {
-                    lubricaInfoField.classList.add('hidden');
-                }
-
-            } else {
-                materialInputContainer.classList.add('hidden');
-                lubricaInfoField.classList.add('hidden');
-            }
-            
-            finalizeServiceBtn.classList.add('hidden');
-            finalizeServiceBtn.disabled = true;
+    // Condição para exibir gerenciamento de materiais e o campo informativo (NOVO)
+    if (appState.loggedInCompany === 'Lubrica') {
+        materialInputContainer.classList.remove('hidden');
+        
+        // Lógica de exibição do campo informativo simples
+        // *** MUDANÇA AQUI: Usa .includes() para checar se o código está na lista. ***
+        if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
+            lubricaInfoContent.textContent = `"${MATERIAL_OLEO}" "${MATERIAL_GRAXA}" "${MATERIAL_PARAFINA}"`;
+            lubricaInfoField.classList.remove('hidden');
+        } else {
+            lubricaInfoField.classList.add('hidden');
         }
 
+    } else {
+        materialInputContainer.classList.add('hidden');
+        lubricaInfoField.classList.add('hidden');
+    }
+    
+    finalizeServiceBtn.classList.add('hidden');
+    finalizeServiceBtn.disabled = true;
+}
+        
         function showBarcodeConfirmationModal(decodedText, scanMode) {
             pendingDecodedText = decodedText;
             pendingScanMode = scanMode;
