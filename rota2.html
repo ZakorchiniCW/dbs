@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
-    <!-- Tailwind CSS CDN for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./Registro de Serviço - Versão Simples_files/saved_resource"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -44,12 +42,40 @@
             border-bottom: none;
         }
 
-        /* Estilo de Botão Padrão (removido o estilo 3D complexo) */
+        /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
-            @apply bg-indigo-600 text-white shadow-md hover:bg-indigo-700 transition-colors;
+            @apply text-white font-bold transition-all duration-300 ease-in-out;
+            
+            /* Cor base do botão (similar ao tom da imagem) */
+            background-color: #00891d; 
+            /* Gradiente para o efeito de brilho/gloss */
+            background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
+            
+            /* Borda arredondada completa (Pill Shape) */
+            border-radius: 9999px; 
+            
+            /* Sombreamento suave por baixo */
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(57, 211, 121, 0.4);
+            border: none; /* Remove any default border */
         }
+        .button-primary:hover {
+            /* Escurece levemente no hover */
+            background-color: #00891d;
+            background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(57, 211, 121, 0.6);
+        }
+        .button-primary:active {
+            /* Efeito de clique: reduz o tamanho e o brilho */
+            transform: scale(0.98); 
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(57, 211, 121, 0.2);
+            background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
+        }
+
+        /* Botão secundário (Interrompida) - AGORA VERDE MAIS CLARO */
         .button-secondary {
-            @apply bg-gray-400 text-gray-800 shadow-sm hover:bg-gray-500 transition-colors;
+            /* Usando um verde mais claro para indicar 'Interrompida' */
+            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
+            border-radius: 9999px; 
         }
 
         .green-led {
@@ -62,7 +88,7 @@
         }
         
         /* Modal Overlay Styles */
-        #confirmation-modal, #manager-auth-modal {
+        #confirmation-modal, #manager-auth-modal, #material-check-modal {
             position: fixed;
             top: 0;
             left: 0;
@@ -83,33 +109,30 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
     </style>
-</head>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-sm{max-width:24rem}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.whitespace-pre-wrap{white-space:pre-wrap}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.bg-\[\#d1e7e4\]{--tw-bg-opacity:1;background-color:rgb(209 231 228 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}</style></head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
-    <!-- Login Container - Visible by default -->
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
 
-        <!-- Login Form -->
         <div class="space-y-4">
             <div>
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                    <option value="" disabled selected>Selecione a empresa</option>
-                    <!-- Options populated by JS -->
-                </select>
+                    <option value="" disabled="" selected="">Selecione a empresa</option>
+                    <option value="Arcondi">Arcondi</option><option value="Lubrica">Lubrica</option></select>
             </div>
             <div>
                 <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
-                <select id="employee-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" disabled>
-                    <option value="" disabled selected>Selecione um funcionário</option>
+                <select id="employee-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" disabled="">
+                    <option value="" disabled="" selected="">Selecione um funcionário</option>
                 </select>
             </div>
             <div>
                 <label for="password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                 <input type="password" id="password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
             </div>
-            <button id="login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="login-btn" class="w-full py-3 font-semibold text-lg button-primary">
                 Entrar
             </button>
         </div>
@@ -120,18 +143,15 @@
 
     </div>
 
-    <!-- Main App Container - Hidden until login -->
     <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full" style="display:none;">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Registro de Serviço</h1>
         
         <p class="text-center text-gray-600 mb-4">Bem-vindo(a), <span id="logged-in-user"></span>!</p>
 
-        <!-- Service Order Number Input / Display -->
         <div class="mb-4">
             <label for="os-number" class="block text-sm font-medium text-gray-700 mb-1">Número da Ordem de Serviço</label>
             <input type="text" id="os-number" placeholder="Digite a O.S." class="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
             
-            <!-- Active Service Status Indicator -->
             <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
                 <p class="text-sm font-semibold text-green-700 flex items-center">
                     <span class="green-led mr-2"></span>
@@ -140,59 +160,49 @@
             </div>
         </div>
 
-        <!-- Barcode Scanner View -->
         <div id="reader"></div>
 
-        <!-- Action Buttons (Start/Finish Scan) -->
         <div id="action-buttons" class="flex flex-col space-y-3">
-            <button id="start-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+            <button id="start-scan-btn" class="w-full py-3 font-semibold text-lg button-primary">
                 Escanear para Iniciar
             </button>
-            <button id="finish-scan-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary" style="display:none;">
+            <button id="finish-scan-btn" class="w-full py-3 font-semibold text-lg button-primary" style="display:none;">
                 Escanear para Finalizar
             </button>
         </div>
 
-        <!-- Field for Technician's Observations (Visible in Active State) -->
         <div id="observations-input-container" class="mt-4 hidden">
             <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
             <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
         </div>
 
-        <!-- Field for Photo Capture (Green and Visible in Active State) -->
         <div id="photo-input-container" class="mt-4 hidden">
              <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
              <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
                 Tirar Foto 📸
             </button>
             
-            <!-- Captured Photo Previews (visible in active state) -->
-             <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
-                 <!-- Photos will be appended here -->
-             </div>
+            <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
+                 </div>
         </div>
         
-        <!-- Finalize Button (Activated after End Scan) -->
-        <button id="finalize-service-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+        <button id="finalize-service-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Finalizar Serviço
         </button>
         
-        <!-- Manager Check Container -->
         <div id="manager-check-container" class="data-display hidden text-center">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Acesso Gerencial</h2>
             <p class="text-gray-700 mb-4">Deseja checar a Ordem de Serviço finalizada/interrompida?</p>
-            <button id="manager-auth-btn" class="py-3 px-6 rounded-lg font-semibold text-lg button-primary">
+            <button id="manager-auth-btn" class="py-3 px-6 font-semibold text-lg button-primary">
                 OK
             </button>
         </div>
 
 
-        <!-- Message Box for User Feedback -->
         <div id="message-box" class="message-box" style="display:none;">
             <p id="message-text" class="text-sm font-medium text-gray-700"></p>
         </div>
 
-        <!-- TEMPORARY DATA DISPLAY SECTION (Report View) -->
         <div id="data-display" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Relatório de Serviço</h2>
             <div id="os-display">
@@ -231,26 +241,23 @@
             </div>
         </div>
         
-        <!-- TEMPORARY Summary Container (Report View) -->
         <div id="summary-container" class="data-display hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-2">Resumo do Serviço (IA)</h2>
             <p id="summary-text" class="text-gray-700 text-sm italic">Resumo de IA desativado conforme solicitado.</p>
         </div>
         
-        <!-- CLOSE Button for Report Acceptance (Shown only with report) -->
-        <button id="report-close-btn" class="w-full py-3 rounded-lg font-bold text-lg button-primary mt-6 hidden">
+        <button id="report-close-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Encerrar (Voltar ao Início)
         </button>
 
     </div>
     
-    <!-- Confirmation Modal Overlay (Technician Finalization - Finalizada/Interrompida) -->
     <div id="confirmation-modal">
         <div id="modal-content">
             <h3 class="text-xl font-bold mb-4 text-gray-800">Confirmação de Serviço</h3>
             <p class="mb-4 text-gray-600">O serviço na O.S. <span id="modal-os-number" class="font-bold"></span> foi:</p>
             <div class="flex flex-col space-y-3">
-                <button id="modal-finalize-btn" class="py-3 rounded-lg font-semibold text-lg button-primary">
+                <button id="modal-finalize-btn" class="py-3 font-semibold text-lg button-primary">
                     Finalizada
                 </button>
                 <button id="modal-interrupt-btn" class="py-3 rounded-lg font-semibold text-lg button-secondary">
@@ -260,7 +267,6 @@
         </div>
     </div>
     
-    <!-- Manager Authentication Modal Overlay -->
     <div id="manager-auth-modal">
         <div id="modal-content">
             <h3 class="text-xl font-bold mb-4 text-gray-800">Autenticação Gerencial</h3>
@@ -270,7 +276,7 @@
                 <div>
                     <label for="manager-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Gerente</label>
                     <select id="manager-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                        <option value="" disabled selected>Selecione o Gerente</option>
+                        <option value="" disabled="" selected="">Selecione o Gerente</option>
                         <option value="Gerente">Gerente</option>
                     </select>
                 </div>
@@ -278,7 +284,7 @@
                     <label for="manager-password-input" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
                     <input type="password" id="manager-password-input" placeholder="Digite sua senha" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                 </div>
-                <button id="manager-login-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-primary">
+                <button id="manager-login-btn" class="w-full py-3 font-semibold text-lg button-primary">
                     Acessar Relatório
                 </button>
             </div>
@@ -289,9 +295,18 @@
         </div>
     </div>
 
+    <div id="material-check-modal">
+        <div id="modal-content">
+            <h3 class="text-xl font-bold mb-4 text-gray-800">Verificação de Materiais</h3>
+            <p id="material-check-message" class="mb-4 text-gray-600 whitespace-pre-wrap">Este equipamento utiliza os seguintes materiais a serem verificados: </p>
+            <button id="material-check-confirm-btn" class="w-full py-3 font-semibold text-lg button-primary">
+                Confirmo a Verificação
+            </button>
+        </div>
+    </div>
 
-    <!-- Html5-QR-Code Library -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script src="./Registro de Serviço - Versão Simples_files/html5-qrcode.min.js.baixados"></script>
 
     <script>
         // Main application state and data container
@@ -315,6 +330,7 @@
             isServiceActive: false, // Flag to track active service state
             // Data persisted after finalization, used for Manager view
             finalReportData: null, 
+            loggedInCompany: null, // ADDED: Track logged-in company
         };
 
         // Mock data for login (Funcionário: '123', Gerente: '111')
@@ -323,7 +339,7 @@
                 "Abc": "123", 
                 "Def": "123", 
                 "Ghi": "123",
-                "Gerente": "111" // Usuário Gerente
+                "Gerente": "123" // Usuário Gerente
             },
             "Lubrica": { 
                 "Jk": "123", 
@@ -332,7 +348,16 @@
             }
         };
         const MANAGER_USERNAME = "Gerente";
-        const MANAGER_PASSWORD = "111";
+        const MANAGER_PASSWORD = "123";
+
+        // NEW: Material Data for Lubrica (per requested vectors)
+        const LUBRICA_SPECIAL_EQUIPMENT = {
+            BARCODE: "%H0076936",
+            OIL_TYPE: "Óleo hidráulico do tipo 42",
+            GREASE_TYPE: "Graxa para lubrificação do tipo B",
+            PARAFFIN_TYPE: "Parafina do Branca"
+        };
+
 
         // DOM element references
         const loginContainer = document.getElementById('login-container');
@@ -371,6 +396,11 @@
         const managerLoginBtn = document.getElementById('manager-login-btn');
         const managerMessageBox = document.getElementById('manager-message-box');
         const managerMessageText = document.getElementById('manager-message-text');
+        
+        // NEW Material Check Modal elements
+        const materialCheckModal = document.getElementById('material-check-modal');
+        const materialCheckMessage = document.getElementById('material-check-message');
+        const materialCheckConfirmBtn = document.getElementById('material-check-confirm-btn');
 
 
         // Report display elements (simplified names for brevity)
@@ -423,6 +453,7 @@
             appState.scanMode = 'start';
             appState.finalReportData = null;
             appState.isServiceActive = false; // Reset active flag
+            appState.loggedInCompany = null; // MODIFIED: Reset logged-in company
             
             // Reset input/preview fields
             osInput.value = '';
@@ -440,6 +471,7 @@
             finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
             managerCheckContainer.classList.add('hidden'); 
             managerAuthModal.style.display = 'none'; 
+            materialCheckModal.style.display = 'none'; // ADDED: Hide material check modal
             
             // Show initial input/button
             osInput.disabled = false;
@@ -540,7 +572,7 @@
         function resetUIScannerFail() {
             // Reverte a UI se o scanner falhar
             if (appState.isServiceActive) {
-                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visível)
+                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visible)
                 if (appState.end.timestamp) {
                     // Restaura a UI para mostrar o botão Finalizar
                     serviceActiveStatus.classList.remove('hidden'); 
@@ -564,7 +596,6 @@
         }
         
         function handleStartScanSuccess(decodedText) {
-            showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
             
             // Simulação de parse de dados de equipamento
             const equipmentType = decodedText.charAt(0).toUpperCase();
@@ -581,7 +612,7 @@
                     (position) => {
                         const coords = position.coords;
                         appState.start.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
-                        showMessage("Localização de início obtida com sucesso!");
+                        // Note: Geolocation success message removed here to avoid conflict with Material Check modal message
                     },
                     (error) => {
                         console.error("Geolocation error (start):", error);
@@ -591,6 +622,22 @@
             } else {
                 showMessage("Seu navegador não suporta geolocalização.", true);
             }
+            
+            // MODIFIED: NEW LUBRICA CHECK LOGIC
+            if (appState.loggedInCompany === 'Lubrica' && decodedText === LUBRICA_SPECIAL_EQUIPMENT.BARCODE) {
+                
+                const message = `Este equipamento utiliza os seguintes materiais a serem verificados: \n\n- ${LUBRICA_SPECIAL_EQUIPMENT.OIL_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.GREASE_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.PARAFFIN_TYPE}!\n\nConfirme a verificação dos materiais para continuar.`;
+
+                materialCheckMessage.textContent = message;
+                materialCheckModal.style.display = 'flex';
+                
+                // Pause the flow, waiting for confirmation button
+                return; 
+            }
+            // END NEW LUBRICA CHECK LOGIC
+
+            // Original logic proceeds here for all other cases
+            showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
             transitionToActiveServiceUI();
         }
 
@@ -764,6 +811,7 @@
             const inputPassword = passwordInput.value;
             
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
+                appState.loggedInCompany = selectedCompany; // MODIFIED: Save logged-in company
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
                 resetAppState();
             } else {
@@ -810,6 +858,14 @@
             confirmationModal.style.display = 'none';
             prepareReportData(); 
         });
+        
+        // MODIFIED: Material Check Confirmation Button
+        materialCheckConfirmBtn.addEventListener('click', () => {
+            materialCheckModal.style.display = 'none';
+            showMessage("Verificação de materiais confirmada. Serviço Iniciado.");
+            transitionToActiveServiceUI(); 
+        });
+
 
         // Manager Auth Button (Shows Auth Modal)
         managerAuthBtn.addEventListener('click', () => {
@@ -851,6 +907,13 @@
                 if (selectedCompany && loginData[selectedCompany]) {
                     for (const employee in loginData[selectedCompany]) {
                         const option = document.createElement('option');
+                        const isManager = employee === MANAGER_USERNAME;
+                        
+                        // Check if the selected company is Arcondi and the employee is the manager. 
+                        // If so, only show the manager option if the company allows. 
+                        // Since all users have the same password '123' in the mock, 
+                        // we just list them all.
+                        
                         option.value = employee;
                         option.textContent = employee;
                         employeeSelect.appendChild(option);
@@ -860,5 +923,7 @@
             
         });
     </script>
-</body>
-</html>
+
+
+
+</body></html>
