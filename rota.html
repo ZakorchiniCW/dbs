@@ -3,6 +3,7 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
@@ -47,7 +48,7 @@
         /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
             /* Tailwind classes simulation */
-            color: white; font-weight: bold; transition: all 0.3s ease-in-out;
+            @apply text-white font-bold transition-all duration-300 ease-in-out;
             
             background-color: #00891d; 
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
@@ -66,17 +67,11 @@
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
         }
 
-        /* Botão secundário (Interrompida) */
+        /* Botão secundário (Tirar Foto) */
         .button-secondary {
             /* Tailwind classes simulation */
-            background-color: #a7f3d0; /* green-300 */
-            color: #065f46; /* green-800 */
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
-            transition: background-color 0.15s;
+            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
             border-radius: 9999px; 
-        }
-        .button-secondary:hover {
-            background-color: #6ee7b7; /* green-400 */
         }
 
         .green-led {
@@ -372,6 +367,7 @@
         </div>
     </div>
 
+
     <script>
         // NEW: Data with material types, units, and limit vectors
         const MATERIAL_DATA = {
@@ -445,6 +441,7 @@
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
         const loggedInUserText = document.getElementById('logged-in-user');
+        const loginBtn = document.getElementById('login-btn'); // Referência adicionada
 
         const osInput = document.getElementById('os-number');
         const startScanBtn = document.getElementById('start-scan-btn');
@@ -464,6 +461,7 @@
         const photoPreviewContainer = document.getElementById('photo-preview-container');
 
         // NEW Material Input Elements
+        const materialInputContainer = document.getElementById('materials-input-container');
         const materialSelect = document.getElementById('material-select');
         const materialQuantityInput = document.getElementById('material-quantity-input');
         const materialTypeSelect = document.getElementById('material-type-select');
@@ -488,7 +486,6 @@
             }, 5000);
         }
         
-        // ... (Functions like resetAppState, transitionToActiveServiceUI, transitionToManagerCheckUI) ...
         function resetAppState() {
             appState.osNumber = '';
             appState.barcodeData = '';
@@ -523,7 +520,7 @@
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            materialsInputContainer.classList.add('hidden'); 
+            materialInputContainer.classList.add('hidden'); // Corrigido
             finishScanBtn.style.display = 'none';
             finalizeServiceBtn.classList.add('hidden');
             document.getElementById('manager-check-container').classList.add('hidden'); 
@@ -535,10 +532,24 @@
             osInput.style.display = 'block';
             startScanBtn.style.display = 'block';
 
+            // NOVO: Transição de volta para o login ou permanência no app
             loginContainer.style.display = 'none';
             appContainer.style.display = 'block';
             
             showMessage("Pronto para uma nova Ordem de Serviço!");
+        }
+
+        // Função para voltar à tela de Login
+        function transitionToLoginUI() {
+            loginContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            
+            // Limpa campos do login
+            employeeSelect.value = '';
+            passwordInput.value = '';
+            companySelect.value = '';
+            employeeSelect.disabled = true;
+            employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
         }
 
         function transitionToActiveServiceUI() {
@@ -551,7 +562,7 @@
             document.getElementById('os-text-active').textContent = appState.osNumber;
             serviceActiveStatus.classList.remove('hidden');
             finishScanBtn.style.display = 'block';
-            materialsInputContainer.classList.remove('hidden');
+            materialInputContainer.classList.remove('hidden');
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
             
@@ -574,13 +585,13 @@
                 serviceActiveStatus.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
                 finalizeServiceBtn.classList.add('hidden'); 
-                materialsInputContainer.classList.add('hidden'); 
+                materialInputContainer.classList.add('hidden'); 
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
                 startScanBtn.style.display = 'none';
 
                 const config = {
-                    fps: 15, // Aumentado para 15 FPS (Corrigido)
+                    fps: 15, // Aumentado para 15 FPS 
                     qrbox: { width: 250, height: 250 },
                     formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_39],
                 };
@@ -617,8 +628,23 @@
                 resetUIScannerFail();
             }
         }
-        // ... (handleStartScanSuccess, handleFinishScanSuccess, checkMaterialLimits, calculateDistance, prepareReportData, displayFinalReport functions remain the same) ...
-
+        
+        function resetUIScannerFail() {
+             readerDiv.style.display = 'none';
+             if (appState.isServiceActive) {
+                // Se estava ativo, volta para a interface ativa (sem o scanner)
+                serviceActiveStatus.classList.remove('hidden');
+                finishScanBtn.style.display = 'block';
+                materialInputContainer.classList.remove('hidden');
+                observationsInputContainer.classList.remove('hidden');
+                photoInputContainer.classList.remove('hidden');
+             } else {
+                // Se não estava ativo, volta para a tela inicial
+                osInput.style.display = 'block';
+                startScanBtn.style.display = 'block';
+             }
+        }
+        
         function handleStartScanSuccess(decodedText) {
             showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
             
@@ -655,13 +681,14 @@
             appState.end.timestamp = new Date();
             
             serviceActiveStatus.classList.remove('hidden'); 
-            materialsInputContainer.classList.remove('hidden'); 
+            materialInputContainer.classList.remove('hidden'); 
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
             
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false; 
             finishScanBtn.style.display = 'none'; 
+            appState.scanMode = 'end-done'; // Nova flag para indicar que finalização foi feita
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -756,7 +783,7 @@
             serviceActiveStatus.classList.add('hidden');
             finishScanBtn.style.display = 'none';
             finalizeServiceBtn.classList.add('hidden');
-            materialsInputContainer.classList.add('hidden'); 
+            materialInputContainer.classList.add('hidden'); 
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
 
@@ -823,7 +850,7 @@
                 ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
                 : 'Localização de Fim não capturada.';
 
-            // Popula Preview de Fotos (Corrigido)
+            // Popula Preview de Fotos 
             document.getElementById('photos-report-preview-container').innerHTML = '';
             if (report.photoData.length > 0) {
                  report.photoData.forEach(base64Data => {
@@ -845,7 +872,7 @@
             showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
         }
 
-        // --- NEW Material Logic ---
+        // --- Material Logic ---
         function updateMaterialTypeOptions() {
             const materialName = materialSelect.value;
             const unitLabel = materialQuantityUnit;
@@ -893,7 +920,7 @@
             });
         }
         
-        // --- Photo Capture Logic (Corrigido) ---
+        // --- Photo Capture Logic ---
         function handlePhotoCapture(event) {
             const file = event.target.files[0];
             if (file) {
@@ -939,15 +966,18 @@
 
         // --- Event Listeners ---
         
-        // Login - Check technician/employee login
-        document.getElementById('login-btn').addEventListener('click', () => {
+        // Login - Check technician/employee login (Corrigido)
+        loginBtn.addEventListener('click', () => {
             const selectedCompany = companySelect.value;
             const selectedEmployee = employeeSelect.value;
             const inputPassword = passwordInput.value;
             
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
-                resetAppState();
+                // Esconde o login e mostra o app
+                loginContainer.style.display = 'none'; 
+                appContainer.style.display = 'block';
+                resetAppState(); // Reseta o estado do app, mas mantém a tela de app visível
             } else {
                 showMessage("Login ou senha inválidos.", true);
             }
@@ -971,7 +1001,7 @@
         
         // Finalize Service Button (Shows Modal)
         finalizeServiceBtn.addEventListener('click', () => {
-             if (!appState.end.timestamp) {
+             if (appState.scanMode !== 'end-done') { // Verifica se o scan de finalização foi feito
                 showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
                 return;
             }
@@ -1013,9 +1043,9 @@
             }
         });
 
-        // Report CLOSE Button
+        // Report CLOSE Button (Volta para o Login)
         document.getElementById('report-close-btn').addEventListener('click', () => {
-            resetAppState();
+            transitionToLoginUI();
         });
         
         // Material Event Listeners
@@ -1042,7 +1072,7 @@
             showMessage(`Material ${material} (${type}, ${quantity} ${unit}) adicionado.`);
         });
         
-        // Photo Capture Listeners (Corrigido)
+        // Photo Capture Listeners 
         document.getElementById('take-photo-btn').addEventListener('click', () => {
             photoFileInput.click();
         });
@@ -1051,7 +1081,7 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-             // Initial login setup - Populating companies list (Corrigido)
+             // Initial login setup - Populating companies list 
              for (const company in loginData) {
                 const option = document.createElement('option');
                 option.value = company;
@@ -1071,6 +1101,9 @@
                     }
                 }
             });
+            
+            // Garante que a tela de login esteja visível ao carregar
+            transitionToLoginUI(); 
             
         });
     </script>
