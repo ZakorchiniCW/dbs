@@ -3,7 +3,7 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
-    <script src="./Registro de Serviço - Versão Simples_files/saved_resource"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -44,7 +44,9 @@
 
         /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
-            @apply text-white font-bold transition-all duration-300 ease-in-out;
+            color: white; 
+            font-weight: bold; 
+            transition: all 0.3s ease-in-out;
             
             /* Cor base do botão (similar ao tom da imagem) */
             background-color: #00891d; 
@@ -74,9 +76,18 @@
         /* Botão secundário (Interrompida) - AGORA VERDE MAIS CLARO */
         .button-secondary {
             /* Usando um verde mais claro para indicar 'Interrompida' */
-            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
+            background-color: #86efac; /* bg-green-300 */
+            color: #166534; /* text-green-800 */
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* shadow-sm */
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms; /* transition-colors */
             border-radius: 9999px; 
         }
+        .button-secondary:hover {
+            background-color: #4ade80; /* hover:bg-green-400 */
+        }
+
 
         .green-led {
             height: 12px;
@@ -120,7 +131,7 @@
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     <option value="" disabled="" selected="">Selecione a empresa</option>
-                    <option value="Arcondi">Arcondi</option><option value="Lubrica">Lubrica</option></select>
+                    </select>
             </div>
             <div>
                 <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
@@ -306,7 +317,7 @@
     </div>
 
 
-    <script src="./Registro de Serviço - Versão Simples_files/html5-qrcode.min.js.baixados"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script>
         // Main application state and data container
@@ -330,7 +341,7 @@
             isServiceActive: false, // Flag to track active service state
             // Data persisted after finalization, used for Manager view
             finalReportData: null, 
-            loggedInCompany: null, // ADDED: Track logged-in company
+            loggedInCompany: null, // RASTREIA A EMPRESA LOGADA PARA LÓGICA ESPECÍFICA
         };
 
         // Mock data for login (Funcionário: '123', Gerente: '111')
@@ -350,9 +361,9 @@
         const MANAGER_USERNAME = "Gerente";
         const MANAGER_PASSWORD = "123";
 
-        // NEW: Material Data for Lubrica (per requested vectors)
+        // Material Data for Lubrica (per requested vectors)
         const LUBRICA_SPECIAL_EQUIPMENT = {
-            BARCODE: "%H0076936",
+            BARCODE: "%H0076936", // VETOR DE CÓDIGO DE BARRAS PARA TESTE
             OIL_TYPE: "Óleo hidráulico do tipo 42",
             GREASE_TYPE: "Graxa para lubrificação do tipo B",
             PARAFFIN_TYPE: "Parafina do Branca"
@@ -397,7 +408,7 @@
         const managerMessageBox = document.getElementById('manager-message-box');
         const managerMessageText = document.getElementById('manager-message-text');
         
-        // NEW Material Check Modal elements
+        // Material Check Modal elements
         const materialCheckModal = document.getElementById('material-check-modal');
         const materialCheckMessage = document.getElementById('material-check-message');
         const materialCheckConfirmBtn = document.getElementById('material-check-confirm-btn');
@@ -453,7 +464,7 @@
             appState.scanMode = 'start';
             appState.finalReportData = null;
             appState.isServiceActive = false; // Reset active flag
-            appState.loggedInCompany = null; // MODIFIED: Reset logged-in company
+            appState.loggedInCompany = null; // Reset logged-in company
             
             // Reset input/preview fields
             osInput.value = '';
@@ -471,7 +482,7 @@
             finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
             managerCheckContainer.classList.add('hidden'); 
             managerAuthModal.style.display = 'none'; 
-            materialCheckModal.style.display = 'none'; // ADDED: Hide material check modal
+            materialCheckModal.style.display = 'none'; // Esconde modal de material
             
             // Show initial input/button
             osInput.disabled = false;
@@ -484,7 +495,10 @@
             showMessage("Pronto para uma nova Ordem de Serviço!");
         }
 
-        function transitionToActiveServiceUI() {
+        /**
+         * @description Only handles the UI changes to enter the active service registration screen.
+         */
+        function activateServiceUI() {
             // Technician Active Phase (After Start Scan or failure return)
             appState.isServiceActive = true;
 
@@ -501,6 +515,49 @@
             finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
             finalizeServiceBtn.disabled = true;
         }
+
+        /**
+         * @description Placeholder function for the conceptual "quantity and date" check for Lubrica.
+         * @param {string} barcode The scanned barcode data.
+         * @returns {boolean} True if replenishment check passes, false otherwise.
+         */
+        function checkLubricaReplenishment(barcode) {
+            // --- Lógica de verificação de Reposição (Quantidade e Data) da Lubrica - DEVE PERMANECER ---
+            
+            // IMPLEMENTAÇÃO FUTURA: 
+            // - Buscar no DB a última data de reposição para este 'barcode'.
+            // - Comparar com a regra de intervalo.
+            // - Checar o nível de reposição ('quantidade').
+            
+            console.log(`Verificando Reposição Lubrica para Cód.: ${barcode}.`);
+            // Por enquanto, sempre retorna sucesso para continuar o fluxo.
+            return true; 
+        }
+
+        /**
+         * @description Continues the service flow after successful barcode scan OR material confirmation.
+         * @param {string} decodedText The barcode data.
+         */
+        function continueServiceFlow(decodedText) {
+            
+            // 1. Check for Lubrica-specific rules (Quantity/Date verification).
+            if (appState.loggedInCompany === 'Lubrica') {
+                const replenishmentOK = checkLubricaReplenishment(decodedText);
+
+                if (!replenishmentOK) {
+                    showMessage("Verificação de reposição Lubrica falhou. Serviço não pode ser iniciado.", true);
+                    // Reverts UI to initial state, but keeps employee logged in
+                    resetAppState(); 
+                    return; 
+                }
+                // If it passes (or if it's not Lubrica), proceed to activate UI.
+            }
+            
+            // 2. Activate UI
+            showMessage("Código de barras escaneado e verificações internas concluídas. Serviço Iniciado.");
+            activateServiceUI();
+        }
+
         
         function transitionToManagerCheckUI() {
             // Technician Phase -> Manager Check Phase
@@ -584,7 +641,7 @@
                     showMessage("Falha no scanner. O.S. pronta para Finalizar Serviço.");
                 } else {
                     // Restaura a UI para o estado ativo (aguardando escaneamento de fim)
-                    transitionToActiveServiceUI(); 
+                    activateServiceUI(); // Usando a função renomeada
                     showMessage("Falha no scanner. Por favor, tente escanear novamente para finalizar.", true);
                 }
             } else {
@@ -612,7 +669,6 @@
                     (position) => {
                         const coords = position.coords;
                         appState.start.location = { latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy };
-                        // Note: Geolocation success message removed here to avoid conflict with Material Check modal message
                     },
                     (error) => {
                         console.error("Geolocation error (start):", error);
@@ -623,22 +679,23 @@
                 showMessage("Seu navegador não suporta geolocalização.", true);
             }
             
-            // MODIFIED: NEW LUBRICA CHECK LOGIC
+            // --- LUBRICA CHECK LOGIC (Material Alert - Step 1) ---
             if (appState.loggedInCompany === 'Lubrica' && decodedText === LUBRICA_SPECIAL_EQUIPMENT.BARCODE) {
                 
+                // Formata a mensagem modal com os 3 vetores de texto
                 const message = `Este equipamento utiliza os seguintes materiais a serem verificados: \n\n- ${LUBRICA_SPECIAL_EQUIPMENT.OIL_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.GREASE_TYPE}\n- ${LUBRICA_SPECIAL_EQUIPMENT.PARAFFIN_TYPE}!\n\nConfirme a verificação dos materiais para continuar.`;
 
                 materialCheckMessage.textContent = message;
                 materialCheckModal.style.display = 'flex';
                 
-                // Pause the flow, waiting for confirmation button
+                // Pausa o fluxo, esperando pelo botão de confirmação do material
                 return; 
             }
-            // END NEW LUBRICA CHECK LOGIC
+            // --- END LUBRICA CHECK LOGIC ---
 
-            // Original logic proceeds here for all other cases
-            showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
-            transitionToActiveServiceUI();
+            // Para todos os outros casos (não Lubrica, ou Lubrica mas não o código de teste),
+            // avança diretamente para o fluxo de serviço completo.
+            continueServiceFlow(decodedText);
         }
 
         function handleFinishScanSuccess() {
@@ -811,7 +868,7 @@
             const inputPassword = passwordInput.value;
             
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
-                appState.loggedInCompany = selectedCompany; // MODIFIED: Save logged-in company
+                appState.loggedInCompany = selectedCompany; // Armazena a empresa para a lógica Lubrica
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
                 resetAppState();
             } else {
@@ -858,14 +915,13 @@
             confirmationModal.style.display = 'none';
             prepareReportData(); 
         });
-        
-        // MODIFIED: Material Check Confirmation Button
+
+        // Material Check Confirmation Button (Continua o fluxo após o alerta)
         materialCheckConfirmBtn.addEventListener('click', () => {
             materialCheckModal.style.display = 'none';
-            showMessage("Verificação de materiais confirmada. Serviço Iniciado.");
-            transitionToActiveServiceUI(); 
+            // Continua o fluxo de serviço, que agora incluirá o check de reposição da Lubrica
+            continueServiceFlow(appState.barcodeData); 
         });
-
 
         // Manager Auth Button (Shows Auth Modal)
         managerAuthBtn.addEventListener('click', () => {
@@ -907,13 +963,6 @@
                 if (selectedCompany && loginData[selectedCompany]) {
                     for (const employee in loginData[selectedCompany]) {
                         const option = document.createElement('option');
-                        const isManager = employee === MANAGER_USERNAME;
-                        
-                        // Check if the selected company is Arcondi and the employee is the manager. 
-                        // If so, only show the manager option if the company allows. 
-                        // Since all users have the same password '123' in the mock, 
-                        // we just list them all.
-                        
                         option.value = employee;
                         option.textContent = employee;
                         employeeSelect.appendChild(option);
