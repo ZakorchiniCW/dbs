@@ -10,6 +10,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f5;
         }
+        /* ... Estilos gerais e do scanner ... */
         #reader {
             width: 100%;
             max-width: 400px;
@@ -44,38 +45,37 @@
 
         /* Estilo de Botão Padrão (Finalizada - Verde Escuro) */
         .button-primary {
-            @apply text-white font-bold transition-all duration-300 ease-in-out;
+            /* Tailwind classes simulation */
+            color: white; font-weight: bold; transition: all 0.3s ease-in-out;
             
-            /* Cor base do botão (similar ao tom da imagem) */
             background-color: #00891d; 
-            /* Gradiente para o efeito de brilho/gloss */
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
-            
-            /* Borda arredondada completa (Pill Shape) */
             border-radius: 9999px; 
-            
-            /* Sombreamento suave por baixo */
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(57, 211, 121, 0.4);
-            border: none; /* Remove any default border */
+            border: none;
         }
         .button-primary:hover {
-            /* Escurece levemente no hover */
             background-color: #00891d;
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 12px rgba(57, 211, 121, 0.6);
         }
         .button-primary:active {
-            /* Efeito de clique: reduz o tamanho e o brilho */
             transform: scale(0.98); 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1), 0 0 5px rgba(57, 211, 121, 0.2);
             background-image: linear-gradient(180deg, #00893d 0%, #00891d 100%);
         }
 
-        /* Botão secundário (Interrompida) - AGORA VERDE MAIS CLARO */
+        /* Botão secundário (Interrompida) */
         .button-secondary {
-            /* Usando um verde mais claro para indicar 'Interrompida' */
-            @apply bg-green-300 text-green-800 shadow-sm hover:bg-green-400 transition-colors;
+            /* Tailwind classes simulation */
+            background-color: #a7f3d0; /* green-300 */
+            color: #065f46; /* green-800 */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            transition: background-color 0.15s;
             border-radius: 9999px; 
+        }
+        .button-secondary:hover {
+            background-color: #6ee7b7; /* green-400 */
         }
 
         .green-led {
@@ -117,7 +117,7 @@
         }
         .unit-label {
             padding: 0.75rem;
-            margin-left: -1px; /* Overlap border with input */
+            margin-left: -1px;
             background-color: #e5e7eb;
             border: 1px solid #d1d5db;
             border-top-right-radius: 0.5rem;
@@ -128,10 +128,11 @@
         }
         /* Style for Material Entry list */
         .material-entry {
-            @apply flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-200 text-sm;
+            display: flex; justify-content: space-between; align-items: center; background-color: #f9fafb; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 0.875rem;
         }
     </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.ml-1{margin-left:0.25rem}.mr-2{margin-right:0.5rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.flex{display:flex}.hidden{display:none}.min-h-screen{min-height:100vh}.w-full{width:100%}.max-w-sm{max-width:24rem}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.whitespace-pre-wrap{white-space:pre-wrap}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-gray-300{--tw-border-opacity:1;border-color:rgb(209 213 219 / var(--tw-border-opacity, 1))}.border-green-300{--tw-border-opacity:1;border-color:rgb(134 239 172 / var(--tw-border-opacity, 1))}.bg-\[\#d1e7e4\]{--tw-bg-opacity:1;background-color:rgb(209 231 228 / var(--tw-bg-opacity, 1))}.bg-gray-100{--tw-bg-opacity:1;background-color:rgb(243 244 246 / var(--tw-bg-opacity, 1))}.bg-green-100{--tw-bg-opacity:1;background-color:rgb(220 252 231 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.text-center{text-align:center}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.italic{font-style:italic}.text-gray-600{--tw-text-opacity:1;color:rgb(75 85 99 / var(--tw-text-opacity, 1))}.text-gray-700{--tw-text-opacity:1;color:rgb(55 65 81 / var(--tw-text-opacity, 1))}.text-gray-800{--tw-text-opacity:1;color:rgb(31 41 55 / var(--tw-text-opacity, 1))}.text-green-700{--tw-text-opacity:1;color:rgb(21 128 61 / var(--tw-text-opacity, 1))}.text-red-800{--tw-text-opacity:1;color:rgb(153 27 27 / var(--tw-text-opacity, 1))}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition-shadow{transition-property:box-shadow;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}</style></head>
+    <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
+</head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
@@ -142,7 +143,7 @@
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     <option value="" disabled="" selected="">Selecione a empresa</option>
-                    <option value="Arcondi">Arcondi</option><option value="Lubrica">Lubrica</option></select>
+                    </select>
             </div>
             <div>
                 <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
@@ -242,7 +243,7 @@
 
 
         <div id="photo-input-container" class="mt-4 hidden">
-             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
              <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
                 Tirar Foto 📸
             </button>
@@ -291,6 +292,7 @@
                 <span class="font-semibold text-gray-600">Materiais Utilizados:</span> 
                 <div id="materials-report-text" class="font-medium text-gray-800"></div>
             </div>
+
             <div id="start-data-display">
                 <span class="font-semibold text-gray-600">Início:</span> <span id="start-datetime-text" class="font-medium text-gray-800"></span>
             </div>
@@ -369,9 +371,7 @@
         </div>
     </div>
 
-
-    <script src="https://unpkg.com/html5-qrcode@2.3.0/html5-qrcode.min.js"></script>
-
+<script>src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"</script>
     <script>
         // NEW: Data with material types, units, and limit vectors
         const MATERIAL_DATA = {
@@ -390,7 +390,7 @@
                 } 
             },
             "Parafina": { 
-                unit: "Litros", // Unit assumed to be Litros based on vector 2c
+                unit: "Litros", 
                 types: { 
                     "Branca": 1, // Limit vector 2c: 2 litros
                     "Translucida": 1  // Limit vector 2c: 4 litros
@@ -407,8 +407,8 @@
             observations: '',
             photoData: [], // Array to hold multiple photo Base64 strings
             serviceStatus: '',
-            materialsUsed: [], // NEW: Array to hold all entries: [{ material: 'Óleo', quantity: 15, type: 'Óleo 32', unit: 'Litros' }]
-            limitExceededMaterials: [], // NEW: Array to store exceeded limits for the report
+            materialsUsed: [], 
+            limitExceededMaterials: [], 
             start: {
                 timestamp: null,
                 location: null,
@@ -418,8 +418,7 @@
                 location: null,
             },
             scanMode: 'start',
-            isServiceActive: false, // Flag to track active service state
-            // Data persisted after finalization, used for Manager view
+            isServiceActive: false, 
             finalReportData: null, 
         };
 
@@ -429,7 +428,6 @@
                 "Abc": "123", 
                 "Def": "123", 
                 "Ghi": "123",
-                "Gerente": "123" // Usuário Gerente
             },
             "Lubrica": { 
                 "Jk": "123", 
@@ -446,11 +444,9 @@
         const companySelect = document.getElementById('company-select');
         const employeeSelect = document.getElementById('employee-select');
         const passwordInput = document.getElementById('password-input');
-        const loginBtn = document.getElementById('login-btn');
         const loggedInUserText = document.getElementById('logged-in-user');
 
         const osInput = document.getElementById('os-number');
-        const osTextActive = document.getElementById('os-text-active');
         const startScanBtn = document.getElementById('start-scan-btn');
         const finishScanBtn = document.getElementById('finish-scan-btn');
         const finalizeServiceBtn = document.getElementById('finalize-service-btn');
@@ -459,36 +455,14 @@
         const readerDiv = document.getElementById('reader');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
-        const dataDisplay = document.getElementById('data-display');
         const serviceActiveStatus = document.getElementById('service-active-status');
-        const managerCheckContainer = document.getElementById('manager-check-container'); 
-        const managerAuthBtn = document.getElementById('manager-auth-btn'); 
-        const managerAlarmBox = document.getElementById('manager-alarm-box'); // NEW
 
-        // Modals
-        const confirmationModal = document.getElementById('confirmation-modal');
-        const modalOsNumber = document.getElementById('modal-os-number');
-        const modalFinalizeBtn = document.getElementById('modal-finalize-btn');
-        const modalInterruptBtn = document.getElementById('modal-interrupt-btn');
-        
-        // Manager Auth Modal elements
-        const managerAuthModal = document.getElementById('manager-auth-modal');
-        const managerSelect = document.getElementById('manager-select');
-        const managerPasswordInput = document.getElementById('manager-password-input');
-        const managerLoginBtn = document.getElementById('manager-login-btn');
-        const managerMessageBox = document.getElementById('manager-message-box');
-        const managerMessageText = document.getElementById('manager-message-text');
-
-
-        // Report display elements (simplified names for brevity)
         const observationsTextArea = document.getElementById('observations-text');
         const observationsInputContainer = document.getElementById('observations-input-container');
         const photoInputContainer = document.getElementById('photo-input-container');
         const photoFileInput = document.getElementById('photo-file-input');
         const photoPreviewContainer = document.getElementById('photo-preview-container');
-        const summaryContainer = document.getElementById('summary-container');
-        const materialsInputContainer = document.getElementById('materials-input-container'); 
-        
+
         // NEW Material Input Elements
         const materialSelect = document.getElementById('material-select');
         const materialQuantityInput = document.getElementById('material-quantity-input');
@@ -503,28 +477,19 @@
             messageText.textContent = text;
             messageBox.style.display = 'block';
             if (isError) {
-                messageBox.classList.remove('bg-gray-200', 'bg-[#d1e7e4]');
-                messageBox.classList.add('bg-red-200');
+                messageBox.style.backgroundColor = '#fca5a5'; /* red-300 */
+                messageText.style.color = '#991b1b'; /* red-800 */
             } else {
-                messageBox.classList.remove('bg-red-200');
-                messageBox.classList.add('bg-gray-200', 'bg-[#d1e7e4]');
+                messageBox.style.backgroundColor = '#d1e7e4'; /* light green */
+                messageText.style.color = '#374151'; /* gray-700 */
             }
             setTimeout(() => {
                 messageBox.style.display = 'none';
             }, 5000);
         }
         
-        function showManagerMessage(text) {
-             managerMessageText.textContent = text;
-             managerMessageBox.style.display = 'block';
-             setTimeout(() => {
-                managerMessageBox.style.display = 'none';
-            }, 5000);
-        }
-
-        // --- Core Reset Function ---
+        // ... (Functions like resetAppState, transitionToActiveServiceUI, transitionToManagerCheckUI) ...
         function resetAppState() {
-            // Reset app state
             appState.osNumber = '';
             appState.barcodeData = '';
             appState.equipmentType = '';
@@ -532,44 +497,40 @@
             appState.observations = '';
             appState.photoData = [];
             appState.serviceStatus = '';
-            appState.materialsUsed = []; // NEW: Reset materials array
-            appState.limitExceededMaterials = []; // NEW: Reset alarm list
+            appState.materialsUsed = []; 
+            appState.limitExceededMaterials = []; 
             appState.start.timestamp = null;
             appState.start.location = null;
             appState.end.timestamp = null;
             appState.end.location = null;
             appState.scanMode = 'start';
             appState.finalReportData = null;
-            appState.isServiceActive = false; // Reset active flag
+            appState.isServiceActive = false; 
             
-            // Reset input/preview fields
             osInput.value = '';
             observationsTextArea.value = '';
             photoPreviewContainer.innerHTML = '';
             
-            // NEW: Reset material form and list
             materialSelect.value = '';
             materialQuantityInput.value = '';
             materialTypeSelect.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
             materialQuantityUnit.textContent = 'Unidade';
             materialsList.innerHTML = '<p id="no-materials-message" class="text-sm italic text-gray-600">Nenhum material adicionado.</p>';
 
-            // Hide all post-service/active elements
-            dataDisplay.classList.add('hidden');
-            summaryContainer.classList.add('hidden');
+            document.getElementById('data-display').classList.add('hidden');
+            document.getElementById('summary-container').classList.add('hidden');
             reportCloseBtn.classList.add('hidden');
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
             materialsInputContainer.classList.add('hidden'); 
             finishScanBtn.style.display = 'none';
-            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
-            managerCheckContainer.classList.add('hidden'); 
-            managerAuthModal.style.display = 'none'; 
-            managerAlarmBox.classList.add('hidden'); // NEW: Hide alarm box
+            finalizeServiceBtn.classList.add('hidden');
+            document.getElementById('manager-check-container').classList.add('hidden'); 
+            document.getElementById('manager-auth-modal').style.display = 'none'; 
+            document.getElementById('manager-alarm-box').classList.add('hidden'); 
 
             
-            // Show initial input/button
             osInput.disabled = false;
             osInput.style.display = 'block';
             startScanBtn.style.display = 'block';
@@ -581,40 +542,25 @@
         }
 
         function transitionToActiveServiceUI() {
-            // Technician Active Phase (After Start Scan or failure return)
             appState.isServiceActive = true;
 
             osInput.disabled = true;
-            osInput.style.display = 'none'; // Hide input when active
+            osInput.style.display = 'none';
             startScanBtn.style.display = 'none';
 
-            osTextActive.textContent = appState.osNumber;
+            document.getElementById('os-text-active').textContent = appState.osNumber;
             serviceActiveStatus.classList.remove('hidden');
-            finishScanBtn.style.display = 'block'; // Show end scan button
-            materialsInputContainer.classList.remove('hidden'); // Show materials input
+            finishScanBtn.style.display = 'block';
+            materialsInputContainer.classList.remove('hidden');
             observationsInputContainer.classList.remove('hidden');
-            photoInputContainer.classList.remove('hidden'); 
+            photoInputContainer.classList.remove('hidden');
             
-            finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
+            finalizeServiceBtn.classList.add('hidden');
             finalizeServiceBtn.disabled = true;
         }
-        
-        function transitionToManagerCheckUI() {
-            // Technician Phase -> Manager Check Phase
-            serviceActiveStatus.classList.add('hidden');
-            finishScanBtn.style.display = 'none';
-            finalizeServiceBtn.classList.add('hidden');
-            materialsInputContainer.classList.add('hidden'); 
-            observationsInputContainer.classList.add('hidden');
-            photoInputContainer.classList.add('hidden');
 
-            managerCheckContainer.classList.remove('hidden');
-            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
-        }
-
-        async function startScanner() {
+        function startScanner() {
             try {
-                // Check for OS before scan
                 const os = osInput.value.trim();
                 if (appState.scanMode === 'start' && !os) {
                     showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
@@ -625,7 +571,6 @@
                 }
 
                 readerDiv.style.display = 'block';
-                // Hide active UI during scan
                 serviceActiveStatus.classList.add('hidden');
                 finishScanBtn.style.display = 'none';
                 finalizeServiceBtn.classList.add('hidden'); 
@@ -635,16 +580,15 @@
                 startScanBtn.style.display = 'none';
 
                 const config = {
-                    fps: 10,
+                    fps: 15, // Aumentado para 15 FPS (Corrigido)
                     qrbox: { width: 250, height: 250 },
-                    // UPDATED: Added CODE_39 for faster industrial scanning
                     formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_39],
                 };
                 const constraints = { facingMode: { exact: "environment" } };
 
                 html5QrCode = new Html5Qrcode("reader");
 
-                await html5QrCode.start( constraints, config,
+                html5QrCode.start( constraints, config,
                     (decodedText, decodedResult) => {
                         html5QrCode.stop().then(() => {
                             readerDiv.style.display = 'none';
@@ -660,46 +604,24 @@
                         });
                     },
                     (errorMessage) => { /* Ignore continuous error messages */ }
-                );
+                ).catch(err => {
+                    console.error("Erro ao iniciar o scanner:", err);
+                    showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                    readerDiv.style.display = 'none';
+                    resetUIScannerFail();
+                });
             } catch (err) {
-                console.error("Erro ao iniciar o scanner:", err);
-                showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
+                console.error("Erro geral ao iniciar o scanner:", err);
+                showMessage(`Erro geral ao iniciar o scanner.`, true);
                 readerDiv.style.display = 'none';
                 resetUIScannerFail();
             }
         }
+        // ... (handleStartScanSuccess, handleFinishScanSuccess, checkMaterialLimits, calculateDistance, prepareReportData, displayFinalReport functions remain the same) ...
 
-        function resetUIScannerFail() {
-            // Reverte a UI se o scanner falhar
-            if (appState.isServiceActive) {
-                // Verifica se já estamos no estado pós-escaneamento de fim (onde o botão de Finalizar deveria estar visível)
-                if (appState.end.timestamp) {
-                    // Restaura a UI para mostrar o botão Finalizar
-                    serviceActiveStatus.classList.remove('hidden'); 
-                    materialsInputContainer.classList.remove('hidden'); 
-                    observationsInputContainer.classList.remove('hidden');
-                    photoInputContainer.classList.remove('hidden');
-                    finalizeServiceBtn.classList.remove('hidden'); 
-                    finalizeServiceBtn.disabled = false;
-                    finishScanBtn.style.display = 'none'; 
-                    showMessage("Falha no scanner. O.S. pronta para Finalizar Serviço.");
-                } else {
-                    // Restaura a UI para o estado ativo (aguardando escaneamento de fim)
-                    transitionToActiveServiceUI(); 
-                    showMessage("Falha no scanner. Por favor, tente escanear novamente para finalizar.", true);
-                }
-            } else {
-                // Restaura a UI para o estado inicial (pré-escaneamento de início)
-                osInput.style.display = 'block';
-                osInput.disabled = false;
-                startScanBtn.style.display = 'block';
-            }
-        }
-        
         function handleStartScanSuccess(decodedText) {
             showMessage("Código de barras escaneado com sucesso! Serviço Iniciado.");
             
-            // Simulação de parse de dados de equipamento: 1st char = Type, rest = Inventory
             const equipmentType = decodedText.charAt(0).toUpperCase();
             const inventoryNumber = decodedText.substring(1);
 
@@ -730,21 +652,17 @@
         function handleFinishScanSuccess() {
             showMessage("Escaneamento de Finalização concluído. Pronto para Finalizar Serviço.");
             
-            // 1. Capture end timestamp immediately 
             appState.end.timestamp = new Date();
             
-            // 2. Restore active UI and ENABLE Finalize button
             serviceActiveStatus.classList.remove('hidden'); 
             materialsInputContainer.classList.remove('hidden'); 
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
             
-            // ENABLE Finalize button
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false; 
             finishScanBtn.style.display = 'none'; 
 
-            // 3. Get end location (runs asynchronously but doesn't block button)
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
@@ -759,15 +677,14 @@
             }
         }
 
-        // NEW: Function to check material usage against limits
         function checkMaterialLimits() {
-            appState.limitExceededMaterials = []; // Clear previous alarms
+            appState.limitExceededMaterials = []; 
             let allGood = true;
 
             appState.materialsUsed.forEach(entry => {
                 const { material, quantity, type, unit } = entry;
                 
-                const limit = MATERIAL_DATA[material].types[type]; // Get limit from the specific type
+                const limit = MATERIAL_DATA[material].types[type]; 
 
                 if (quantity > limit) {
                     allGood = false;
@@ -778,7 +695,6 @@
                         limit: limit,
                         unit: unit,
                     });
-                    // Show alert to technician
                     showMessage(`⚠️ ALARME: O uso de ${material} (${type}) excedeu o limite planejado de ${limit} ${unit} (Quantidade: ${quantity})!`, true);
                 }
             });
@@ -786,7 +702,6 @@
             return allGood; 
         }
 
-        // Haversine formula
         function calculateDistance(start, end) {
              if (!start || !end) return 0;
             const R = 6371;
@@ -803,13 +718,10 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             return R * c;
         }
-        
-        // --- Report Generation and Display ---
-        async function prepareReportData() {
-            // Check material limits and populate appState.limitExceededMaterials
+
+        function prepareReportData() {
             checkMaterialLimits(); 
             
-            // Step 1: Save technician inputs to a final data structure
             appState.observations = observationsTextArea.value.trim();
             const distanceKm = calculateDistance(appState.start.location, appState.end.location);
             
@@ -818,8 +730,8 @@
                 serviceStatus: appState.serviceStatus,
                 barcodeData: appState.barcodeData,
                 equipmentType: appState.equipmentType,
-                materialsUsed: [...appState.materialsUsed], // NEW: Include materials array
-                limitExceededMaterials: [...appState.limitExceededMaterials], // NEW: Include alarm data
+                materialsUsed: [...appState.materialsUsed],
+                limitExceededMaterials: [...appState.limitExceededMaterials],
                 start: {
                     timestamp: appState.start.timestamp,
                     location: appState.start.location,
@@ -833,28 +745,35 @@
                 photoData: [...appState.photoData], 
             };
 
-            // Step 2: AI Summary is disabled
             report.aiSummary = 'Resumo de IA desativado conforme solicitado.';
 
-            // Save for Manager View
             appState.finalReportData = report;
 
             transitionToManagerCheckUI();
         }
 
+        function transitionToManagerCheckUI() {
+            serviceActiveStatus.classList.add('hidden');
+            finishScanBtn.style.display = 'none';
+            finalizeServiceBtn.classList.add('hidden');
+            materialsInputContainer.classList.add('hidden'); 
+            observationsInputContainer.classList.add('hidden');
+            photoInputContainer.classList.add('hidden');
+
+            document.getElementById('manager-check-container').classList.remove('hidden');
+            showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
+        }
+
         function displayFinalReport() {
-            if (!appState.finalReportData) {
-                showMessage("Erro: Nenhum dado de relatório para exibir.", true);
-                return;
-            }
+            if (!appState.finalReportData) return;
 
             const report = appState.finalReportData;
             
-            // Hide Manager Check and Auth Modal
             document.getElementById('manager-check-container').classList.add('hidden');
             document.getElementById('manager-auth-modal').style.display = 'none';
+            const managerAlarmBox = document.getElementById('manager-alarm-box');
+            const dataDisplay = document.getElementById('data-display');
 
-            // ALARM FOR MANAGER (NEW)
             if (report.limitExceededMaterials && report.limitExceededMaterials.length > 0) {
                 let alarmHtml = '<h3 class="font-bold text-lg text-red-800 mb-2">🚨 ALARME DE LIMITE EXCEDIDO (URGENTE)</h3>';
                 alarmHtml += '<p class="text-sm text-red-800 mb-3">Avaliar com urgência possíveis danos ou vazamentos!</p>';
@@ -876,7 +795,6 @@
                 managerAlarmBox.classList.add('hidden');
             }
 
-            // Populate Report (use specific IDs)
             document.getElementById('os-text').textContent = report.osNumber;
             document.getElementById('service-status-text').textContent = report.serviceStatus;
             document.getElementById('barcode-text').textContent = report.barcodeData;
@@ -886,7 +804,6 @@
             document.getElementById('distance-text').textContent = report.distance.toFixed(2) + ' km';
             document.getElementById('observations-text-display').textContent = report.observations || 'Nenhuma observação registrada.';
             
-            // Populate Material Usage Report
             const materialsReportText = document.getElementById('materials-report-text');
             materialsReportText.innerHTML = '';
             if (report.materialsUsed.length > 0) {
@@ -899,7 +816,6 @@
                 materialsReportText.textContent = 'Nenhum material registrado.';
             }
 
-            // Set location text 
             document.getElementById('start-location-text').textContent = report.start.location 
                 ? `Lat: ${report.start.location.latitude.toFixed(4)}, Long: ${report.start.location.longitude.toFixed(4)}` 
                 : 'Localização de Início não capturada.';
@@ -907,7 +823,7 @@
                 ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
                 : 'Localização de Fim não capturada.';
 
-            // Populate Photo Report Preview
+            // Popula Preview de Fotos (Corrigido)
             document.getElementById('photos-report-preview-container').innerHTML = '';
             if (report.photoData.length > 0) {
                  report.photoData.forEach(base64Data => {
@@ -920,12 +836,10 @@
                  document.getElementById('photos-report-preview-container').textContent = 'Nenhuma foto capturada.';
             }
 
-            // Show Summary (Inativa, apenas exibe a mensagem)
             document.getElementById('summary-text').textContent = report.aiSummary; 
             document.getElementById('summary-container').classList.remove('hidden');
             
-            // Show the report and CLOSE button
-            document.getElementById('data-display').classList.remove('hidden');
+            dataDisplay.classList.remove('hidden');
             document.getElementById('report-close-btn').classList.remove('hidden');
 
             showMessage(`Relatório do serviço (${report.serviceStatus}) em exibição. Clique em Encerrar para retornar.`, false);
@@ -949,30 +863,6 @@
             } else {
                 unitLabel.textContent = "Unidade";
             }
-        }
-
-        function addMaterialEntry() {
-            const material = materialSelect.value;
-            // Use comma or dot as decimal separator
-            const quantity = parseFloat(materialQuantityInput.value.replace(',', '.')) || 0; 
-            const type = materialTypeSelect.value;
-            
-            if (!material || quantity <= 0 || !type || !MATERIAL_DATA[material]) {
-                showMessage("Preencha Material, Quantidade e Tipo de Material corretamente.", true);
-                return;
-            }
-            
-            const unit = MATERIAL_DATA[material].unit;
-
-            const newEntry = { material, quantity, type, unit };
-            appState.materialsUsed.push(newEntry);
-            renderMaterialsList();
-            
-            // Reset form
-            materialSelect.value = '';
-            materialQuantityInput.value = '';
-            updateMaterialTypeOptions('');
-            showMessage(`Material ${material} (${type}, ${quantity} ${unit}) adicionado.`);
         }
 
         function renderMaterialsList() {
@@ -1002,9 +892,52 @@
                 });
             });
         }
+        
+        // --- Photo Capture Logic (Corrigido) ---
+        function handlePhotoCapture(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64Data = e.target.result;
+                    appState.photoData.push(base64Data);
+                    renderPhotoPreviews();
+                    showMessage(`Foto capturada e adicionada (${appState.photoData.length} total).`);
+                };
+                reader.readAsDataURL(file);
+                // Limpa o valor do input para permitir nova captura com a câmera
+                event.target.value = null; 
+            }
+        }
 
+        function renderPhotoPreviews() {
+            photoPreviewContainer.innerHTML = '';
+            if (appState.photoData.length === 0) return;
 
-        // --- Event Listeners for the Main App ---
+            appState.photoData.forEach((base64Data, index) => {
+                const imgContainer = document.createElement('div');
+                imgContainer.className = 'relative';
+                
+                const img = document.createElement('img');
+                img.src = base64Data;
+                img.className = 'w-24 h-24 object-cover rounded-lg shadow-md';
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'absolute top-0 right-0 bg-red-600 text-white rounded-full w-5 h-5 text-xs font-bold -mt-1 -mr-1 hover:bg-red-700 transition-colors';
+                deleteBtn.onclick = () => {
+                    appState.photoData.splice(index, 1);
+                    renderPhotoPreviews();
+                    showMessage("Foto removida.");
+                };
+
+                imgContainer.appendChild(img);
+                imgContainer.appendChild(deleteBtn);
+                photoPreviewContainer.appendChild(imgContainer);
+            });
+        }
+
+        // --- Event Listeners ---
         
         // Login - Check technician/employee login
         document.getElementById('login-btn').addEventListener('click', () => {
@@ -1012,11 +945,7 @@
             const selectedEmployee = employeeSelect.value;
             const inputPassword = passwordInput.value;
             
-            // Check Manager login for report view (in a real scenario, this is bad practice, but follows the mock logic)
-            if (selectedEmployee === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
-                document.getElementById('logged-in-user').textContent = selectedEmployee;
-                resetAppState();
-            } else if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
+            if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
                 resetAppState();
             } else {
@@ -1024,13 +953,13 @@
             }
         });
 
-        // Start Scan Button (Directly calls scanner after OS check)
+        // Start Scan Button
         startScanBtn.addEventListener('click', () => {
             appState.scanMode = 'start';
             startScanner();
         });
 
-        // Finish Scan Button (Starts barcode scan for end)
+        // Finish Scan Button
         finishScanBtn.addEventListener('click', () => {
             if (!appState.start.timestamp) {
                 showMessage("Por favor, inicie o serviço primeiro.", true);
@@ -1040,64 +969,89 @@
             startScanner();
         });
         
-        // Finalize Service Button (Shows Finalization/Interruption Modal)
+        // Finalize Service Button (Shows Modal)
         finalizeServiceBtn.addEventListener('click', () => {
              if (!appState.end.timestamp) {
                 showMessage("O escaneamento de finalização deve ser feito primeiro.", true);
                 return;
             }
-            // Temporarily hide this button while confirmation modal is active
             finalizeServiceBtn.classList.add('hidden'); 
-            modalOsNumber.textContent = appState.osNumber;
-            confirmationModal.style.display = 'flex'; // Abre o modal de finalização/interrupção
+            document.getElementById('modal-os-number').textContent = appState.osNumber;
+            document.getElementById('confirmation-modal').style.display = 'flex'; 
         });
 
         // Modal Confirmation: Finalizada
-        modalFinalizeBtn.addEventListener('click', () => {
-            confirmationModal.style.display = 'none';
+        document.getElementById('modal-finalize-btn').addEventListener('click', () => {
+            document.getElementById('confirmation-modal').style.display = 'none';
             appState.serviceStatus = 'Finalizada';
-            prepareReportData(); // Check limits and generate report
+            prepareReportData();
         });
 
         // Modal Confirmation: Interrompida
-        modalInterruptBtn.addEventListener('click', () => {
-            confirmationModal.style.display = 'none';
+        document.getElementById('modal-interrupt-btn').addEventListener('click', () => {
+            document.getElementById('confirmation-modal').style.display = 'none';
             appState.serviceStatus = 'Interrompida';
-            prepareReportData(); // Check limits and generate report
+            prepareReportData();
         });
 
-        // Manager Auth Button (Shows Auth Modal)
-        managerAuthBtn.addEventListener('click', () => {
-            managerAuthModal.style.display = 'flex'; 
+        // Manager Auth Button 
+        document.getElementById('manager-auth-btn').addEventListener('click', () => {
+            document.getElementById('manager-auth-modal').style.display = 'flex'; 
         });
 
-        // Manager Login Button (Checks Auth and Shows Report)
-        managerLoginBtn.addEventListener('click', () => {
-            const selectedManager = managerSelect.value;
-            const inputPassword = managerPasswordInput.value;
+        // Manager Login Button
+        document.getElementById('manager-login-btn').addEventListener('click', () => {
+            const selectedManager = document.getElementById('manager-select').value;
+            const inputPassword = document.getElementById('manager-password-input').value;
             
             if (selectedManager === MANAGER_USERNAME && inputPassword === MANAGER_PASSWORD) {
-                managerPasswordInput.value = '';
-                managerSelect.value = '';
+                document.getElementById('manager-password-input').value = '';
+                document.getElementById('manager-select').value = '';
                 displayFinalReport(); 
             } else {
-                showManagerMessage("Nome do Gerente ou senha inválidos.", true);
+                showMessage("Nome do Gerente ou senha inválidos.", true);
             }
         });
 
-        // Report CLOSE Button (Resets flow)
+        // Report CLOSE Button
         document.getElementById('report-close-btn').addEventListener('click', () => {
             resetAppState();
         });
         
-        // NEW Material Event Listeners
+        // Material Event Listeners
         materialSelect.addEventListener('change', updateMaterialTypeOptions);
-        addMaterialBtn.addEventListener('click', addMaterialEntry);
+        addMaterialBtn.addEventListener('click', () => {
+            const material = materialSelect.value;
+            const quantity = parseFloat(materialQuantityInput.value.replace(',', '.')) || 0; 
+            const type = materialTypeSelect.value;
+            
+            if (!material || quantity <= 0 || !type || !MATERIAL_DATA[material]) {
+                showMessage("Preencha Material, Quantidade e Tipo de Material corretamente.", true);
+                return;
+            }
+            
+            const unit = MATERIAL_DATA[material].unit;
+            const newEntry = { material, quantity, type, unit };
+            appState.materialsUsed.push(newEntry);
+            renderMaterialsList();
+            
+            // Reset form
+            materialSelect.value = '';
+            materialQuantityInput.value = '';
+            updateMaterialTypeOptions('');
+            showMessage(`Material ${material} (${type}, ${quantity} ${unit}) adicionado.`);
+        });
+        
+        // Photo Capture Listeners (Corrigido)
+        document.getElementById('take-photo-btn').addEventListener('click', () => {
+            photoFileInput.click();
+        });
+        photoFileInput.addEventListener('change', handlePhotoCapture);
 
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-             // Initial login setup
+             // Initial login setup - Populating companies list (Corrigido)
              for (const company in loginData) {
                 const option = document.createElement('option');
                 option.value = company;
