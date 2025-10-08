@@ -3,10 +3,7 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
-
+    <script src="https://cdn.tailwindcss.com"></script> 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -123,7 +120,7 @@
                 <label for="company-select" class="block text-sm font-medium text-gray-700 mb-1">Empresa Terceirizada</label>
                 <select id="company-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
                     <option value="" disabled="" selected="">Selecione a empresa</option>
-                    </select>
+                    <option value="Arcondi">Arcondi</option><option value="Lubrica">Lubrica</option></select>
             </div>
             <div>
                 <label for="employee-select" class="block text-sm font-medium text-gray-700 mb-1">Nome do Funcionário</label>
@@ -178,31 +175,7 @@
             <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
             <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
         </div>
-        
-        <div id="lubrica-inputs-container" class="mt-4 hidden">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">Reposição de Material</h3>
-            <div class="space-y-4">
-                <div>
-                    <label for="material-select" class="block text-sm font-medium text-gray-700 mb-1">Material</label>
-                    <select id="material-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                        <option value="" disabled="" selected="">Selecione o material</option>
-                        <option value="oleo">Óleo</option>
-                        <option value="graxa">Graxa</option>
-                        <option value="parafina">Parafina</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="quantity-input" class="block text-sm font-medium text-gray-700 mb-1">Quantidade (Litros/Kilos)</label>
-                    <input type="number" id="quantity-input" min="1" placeholder="Digite a quantidade (Litros/Kilos)" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow">
-                </div>
-                <div>
-                    <label for="type-select" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Material</label>
-                    <select id="type-select" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow" disabled>
-                        <option value="" disabled="" selected="">Selecione o tipo</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+
         <div id="photo-input-container" class="mt-4 hidden">
              <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden">
              <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
@@ -323,7 +296,9 @@
     </div>
 
 
-        <script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.0/html5-qrcode.min.js"></script>
+
+    <script>
         // Main application state and data container
         const appState = {
             osNumber: '',
@@ -345,11 +320,6 @@
             isServiceActive: false, // Flag to track active service state
             // Data persisted after finalization, used for Manager view
             finalReportData: null, 
-            
-            // NEW Lubrica-specific fields
-            material: '', 
-            quantity: 0,
-            materialType: '',
         };
 
         // Mock data for login (Funcionário: '123', Gerente: '111')
@@ -368,13 +338,6 @@
         };
         const MANAGER_USERNAME = "Gerente";
         const MANAGER_PASSWORD = "123";
-
-        // Vetores de Alerta para Gerente (Material e Quantidade Máxima)
-        const MAX_QUANTITIES = {
-            oleo: { type: ['32', '46'], max: [1, 2], unit: 'litros' }, 
-            graxa: { type: ['A', 'B'], max: [1, 2], unit: 'kilos' },     
-            parafina: { type: ['branca', 'translucida'], max: [1, 2], unit: 'litros' } 
-        };
 
         // DOM element references
         const loginContainer = document.getElementById('login-container');
@@ -400,12 +363,6 @@
         const managerCheckContainer = document.getElementById('manager-check-container'); 
         const managerAuthBtn = document.getElementById('manager-auth-btn'); 
 
-        // NEW DOM References for Lubrica inputs
-        const lubricaInputsContainer = document.getElementById('lubrica-inputs-container');
-        const materialSelect = document.getElementById('material-select');
-        const quantityInput = document.getElementById('quantity-input');
-        const typeSelect = document.getElementById('type-select');
-        
         // Modals
         const confirmationModal = document.getElementById('confirmation-modal');
         const modalOsNumber = document.getElementById('modal-os-number');
@@ -472,15 +429,6 @@
             appState.finalReportData = null;
             appState.isServiceActive = false; // Reset active flag
             
-            // Reset NEW Lubrica fields
-            appState.material = '';
-            appState.quantity = 0;
-            appState.materialType = '';
-            materialSelect.value = '';
-            quantityInput.value = '';
-            typeSelect.innerHTML = '<option value="" disabled="" selected="">Selecione o tipo</option>';
-            typeSelect.disabled = true;
-            
             // Reset input/preview fields
             osInput.value = '';
             observationsTextArea.value = '';
@@ -493,7 +441,6 @@
             serviceActiveStatus.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            lubricaInputsContainer.classList.add('hidden'); // Hide Lubrica container
             finishScanBtn.style.display = 'none';
             finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden initially
             managerCheckContainer.classList.add('hidden'); 
@@ -524,14 +471,6 @@
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden'); 
             
-            // NEW: Show Lubrica inputs only for 'Lubrica' company
-            const selectedCompany = companySelect.value;
-            if (selectedCompany === 'Lubrica') {
-                 lubricaInputsContainer.classList.remove('hidden');
-            } else {
-                 lubricaInputsContainer.classList.add('hidden');
-            }
-            
             finalizeServiceBtn.classList.add('hidden'); // Ensure finalize is hidden until end scan
             finalizeServiceBtn.disabled = true;
         }
@@ -543,7 +482,6 @@
             finalizeServiceBtn.classList.add('hidden');
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
-            lubricaInputsContainer.classList.add('hidden'); // Hide Lubrica inputs
 
             managerCheckContainer.classList.remove('hidden');
             showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
@@ -568,16 +506,14 @@
                 finalizeServiceBtn.classList.add('hidden'); 
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
-                lubricaInputsContainer.classList.add('hidden'); // Hide Lubrica inputs during scan
                 startScanBtn.style.display = 'none';
 
                 const config = {
                     fps: 10,
                     qrbox: { width: 250, height: 250 },
-                    formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.QR_CODE],
+                    // CORREÇÃO: Usando strings literais e configurado para aceitar APENAS CODE_128 (código de barras).
+                    formatsToSupport: ["CODE_128"], 
                 };
-                
-                // Restrição de câmera traseira. Se o erro for de valor não suportado, a falha é aqui.
                 const constraints = { facingMode: { exact: "environment" } };
 
                 html5QrCode = new Html5Qrcode("reader");
@@ -592,7 +528,7 @@
                                 handleFinishScanSuccess();
                             }
                         }).catch(err => {
-                            console.error("Erro ao parar o scanner:", err);
+                            console.error("Error stopping scanner:", err);
                             showMessage("Erro ao parar o scanner.", true);
                             resetUIScannerFail();
                         });
@@ -600,25 +536,12 @@
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 );
             } catch (err) {
-                // --- BLOCO DE DEBUG APRIMORADO ---
-                console.error("DEBUG CÂMERA - Erro Completo:", err);
-                
-                let errorMessage = `ERRO CRÍTICO AO INICIAR CÂMERA.`;
-                
-                // Checagem para erros comuns de restrição ou segurança
-                if (err.message.includes("constraint") || err.name === "NotReadableError" || err.name === "OverconstrainedError") {
-                    errorMessage += ` O valor de restrição da câmera ('environment') não é suportado pelo seu dispositivo. Tente usar a câmera padrão ou aponte o celular para a traseira.`;
-                } else {
-                    errorMessage += ` Por favor, verifique se a página está em **HTTPS** e se as permissões da câmera foram concedidas ao navegador.`;
-                }
-
-                // Adiciona o erro técnico original
-                errorMessage += ` Detalhe: (${err.message}).`;
-
-                showMessage(errorMessage, true);
+                console.error("Erro ao iniciar o scanner:", err);
+                // NOTA: A falha pode ser devido à falta de HTTPS ou permissões da câmera,
+                // conforme a mensagem de erro original da imagem.
+                showMessage(`Erro ao iniciar a câmera. Verifique as permissões e se a página está em HTTPS. Erro: ${err.message}`, true);
                 readerDiv.style.display = 'none';
                 resetUIScannerFail();
-                // --- FIM BLOCO DE DEBUG APRIMORADO ---
             }
         }
 
@@ -631,7 +554,6 @@
                     serviceActiveStatus.classList.remove('hidden'); 
                     observationsInputContainer.classList.remove('hidden');
                     photoInputContainer.classList.remove('hidden');
-                    if (companySelect.value === 'Lubrica') lubricaInputsContainer.classList.remove('hidden'); // Restore Lubrica inputs
                     finalizeServiceBtn.classList.remove('hidden'); // AQUI é onde o botão Finalizar é restaurado
                     finalizeServiceBtn.disabled = false;
                     finishScanBtn.style.display = 'none'; 
@@ -690,7 +612,6 @@
             serviceActiveStatus.classList.remove('hidden'); 
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
-            if (companySelect.value === 'Lubrica') lubricaInputsContainer.classList.remove('hidden'); // Restore Lubrica inputs
             
             // ENABLE Finalize button
             finalizeServiceBtn.classList.remove('hidden'); 
@@ -736,33 +657,6 @@
             appState.observations = observationsTextArea.value.trim();
             const distanceKm = calculateDistance(appState.start.location, appState.end.location);
             
-            // CAPTURA DOS NOVOS CAMPOS
-            appState.material = materialSelect.value;
-            appState.quantity = parseFloat(quantityInput.value) || 0;
-            appState.materialType = typeSelect.value;
-            
-            // CHECAGEM DE EXCESSO
-            let alertMessage = null;
-            const isLubrica = companySelect.value === 'Lubrica';
-            
-            if (isLubrica && appState.material && appState.materialType && appState.quantity > 0) {
-                 const materialKey = appState.material;
-                 const materialInfo = MAX_QUANTITIES[materialKey];
-                 const typeIndex = materialInfo.type.map(t => t.toLowerCase().replace(' ', '')).findIndex(t => t === appState.materialType);
-                 
-                 if (typeIndex !== -1) {
-                     const max = materialInfo.max[typeIndex];
-                     const unit = materialInfo.unit;
-                     const typeText = materialInfo.type[typeIndex]; // The non-slugified text
-                     
-                     if (appState.quantity > max) {
-                         const exceededBy = appState.quantity - max;
-                         alertMessage = `[ALERTA DE EXCESSO] Reposição Excedida! O.S.: ${appState.osNumber}, Material: ${materialKey.toUpperCase()}, Tipo: ${typeText}, Quantidade: ${appState.quantity} ${unit} (Excesso de ${exceededBy.toFixed(2)} ${unit}). Gerente, Avaliar Urgente possíveis danos/vazamentos.`;
-                     }
-                 }
-            }
-
-
             const report = {
                 osNumber: appState.osNumber,
                 serviceStatus: appState.serviceStatus,
@@ -779,14 +673,6 @@
                 distance: distanceKm,
                 observations: appState.observations,
                 photoData: [...appState.photoData], 
-                
-                // NOVOS CAMPOS NO RELATÓRIO
-                material: appState.material ? `${materialSelect.options[materialSelect.selectedIndex].textContent}` : 'N/A',
-                materialType: appState.materialType ? `${typeSelect.options[typeSelect.selectedIndex].textContent}` : 'N/A',
-                quantity: appState.quantity > 0 ? `${appState.quantity} ${MAX_QUANTITIES[appState.material]?.unit || ''}` : 'N/A',
-
-                // NOVO CAMPO DE ALERTA
-                managerAlert: alertMessage, 
             };
 
             // Step 2: AI Summary is disabled
@@ -809,14 +695,6 @@
             // Hide Manager Check and Auth Modal
             document.getElementById('manager-check-container').classList.add('hidden');
             document.getElementById('manager-auth-modal').style.display = 'none';
-            
-            // Remove previous dynamic report elements (especially the alert div)
-            const oldAlert = document.getElementById('manager-alert-display');
-            if (oldAlert) oldAlert.remove();
-            const oldMaterial = document.getElementById('material-report-display');
-            if (oldMaterial) oldMaterial.remove();
-            const oldQuantity = document.getElementById('quantity-report-display');
-            if (oldQuantity) oldQuantity.remove();
 
             // Populate Report (use specific IDs)
             document.getElementById('os-text').textContent = report.osNumber;
@@ -836,52 +714,6 @@
                 ? `Lat: ${report.end.location.latitude.toFixed(4)}, Long: ${report.end.location.longitude.toFixed(4)}` 
                 : 'Localização de Fim não capturada.';
 
-            
-            // --- NEW: Display Material, Quantity, and Alert ---
-            const statusDisplay = document.getElementById('status-display');
-            const equipmentTypeDisplay = document.getElementById('equipment-type-display');
-
-            // 1. Alerta de Gerente
-            const managerAlertDiv = document.createElement('div');
-            managerAlertDiv.id = 'manager-alert-display';
-            managerAlertDiv.style.borderBottom = '1px dashed #a3b2b4';
-            
-            const alertTextContent = document.createElement('span');
-            alertTextContent.id = 'alert-text';
-
-            if (report.managerAlert) {
-                managerAlertDiv.innerHTML = `<span class="font-semibold text-gray-600">⚠ ALERTA DE REPOSIÇÃO:</span>`;
-                alertTextContent.textContent = report.managerAlert;
-                alertTextContent.className = 'font-bold text-red-800 block mt-1';
-                managerAlertDiv.style.backgroundColor = '#fca5a5'; // Fundo vermelho claro
-                managerAlertDiv.style.borderRadius = '0.5rem';
-                managerAlertDiv.style.padding = '0.75rem';
-                managerAlertDiv.style.border = '1px solid #ef4444';
-            } else {
-                 managerAlertDiv.innerHTML = `<span class="font-semibold text-gray-600">Alerta de Reposição:</span>`;
-                 alertTextContent.textContent = 'Nenhum alerta de excesso.';
-                 alertTextContent.className = 'font-medium text-gray-800 block mt-1';
-                 managerAlertDiv.style.backgroundColor = 'transparent';
-                 managerAlertDiv.style.borderRadius = '0';
-                 managerAlertDiv.style.padding = '0.5rem 0';
-                 managerAlertDiv.style.border = 'none';
-            }
-            managerAlertDiv.appendChild(alertTextContent);
-            statusDisplay.parentNode.insertBefore(managerAlertDiv, statusDisplay.nextSibling); 
-
-            // 2. Material Reposto (Óleo/Graxa/Parafina)
-            const materialDisplay = document.createElement('div');
-            materialDisplay.id = 'material-report-display';
-            materialDisplay.innerHTML = `<span class="font-semibold text-gray-600">Material Reposto:</span> <span class="font-medium text-gray-800">${report.material} (${report.materialType})</span>`;
-            equipmentTypeDisplay.parentNode.insertBefore(materialDisplay, equipmentTypeDisplay.nextSibling);
-
-            // 3. Quantidade
-            const quantityDisplay = document.createElement('div');
-            quantityDisplay.id = 'quantity-report-display';
-            quantityDisplay.innerHTML = `<span class="font-semibold text-gray-600">Quantidade:</span> <span class="font-medium text-gray-800">${report.quantity}</span>`;
-            materialDisplay.parentNode.insertBefore(quantityDisplay, materialDisplay.nextSibling);
-            // --- END NEW DISPLAY ---
-            
             // Populate Photo Report Preview
             document.getElementById('photos-report-preview-container').innerHTML = '';
             if (report.photoData.length > 0) {
@@ -986,31 +818,6 @@
             confirmationModal.style.display = 'none';
             prepareReportData(); 
         });
-        
-        // NEW: Lógica de dependência para o dropdown de Tipo de Material
-        materialSelect.addEventListener('change', (event) => {
-            const selectedMaterial = event.target.value;
-            typeSelect.innerHTML = '<option value="" disabled="" selected="">Selecione o tipo</option>';
-            typeSelect.disabled = true;
-            
-            if (selectedMaterial && MAX_QUANTITIES[selectedMaterial]) {
-                const materialInfo = MAX_QUANTITIES[selectedMaterial];
-                materialInfo.type.forEach(typeText => {
-                    const option = document.createElement('option');
-                    // Use um valor 'slugified' (sem espaços/maiusculas) para a checagem, mas mantenha o texto legível
-                    option.value = typeText.toLowerCase().replace(' ', ''); 
-                    
-                    let display = typeText;
-                    if (selectedMaterial === 'oleo') display = `Óleo ${typeText}`;
-                    if (selectedMaterial === 'graxa') display = `Graxa ${typeText}`;
-                    
-                    option.textContent = display;
-                    typeSelect.appendChild(option);
-                });
-                typeSelect.disabled = false;
-            }
-        });
-
 
         // Manager Auth Button (Shows Auth Modal)
         managerAuthBtn.addEventListener('click', () => {
