@@ -127,11 +127,11 @@
             display: flex; justify-content: space-between; align-items: center; background-color: #f9fafb; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 0.875rem;
         }
     </style>
-    </head>
+</head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionár</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
 
         <div class="space-y-4">
             <div>
@@ -366,7 +366,7 @@
         </div>
     </div>
 
-   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script>
         // NEW: Data with material types, units, and limit vectors
@@ -393,7 +393,6 @@
                 } 
             }
         };
-
 
         // Main application state and data container
         const appState = {
@@ -573,7 +572,7 @@
 
         function startScanner() {
             try {
-                // Adiciona uma verificação simples para o objeto Html5Qrcode
+                // VERIFICAÇÃO CUSTOMIZADA: Se a biblioteca não carregou, lança um erro amigável.
                 if (typeof Html5Qrcode === 'undefined') {
                     throw new Error("A biblioteca do scanner (Html5Qrcode) não foi carregada. Verifique sua conexão ou cache do navegador.");
                 }
@@ -814,8 +813,13 @@
                 
                 report.limitExceededMaterials.forEach(alarm => {
                     const exceeded = (alarm.quantityUsed - alarm.limit).toFixed(2);
+                    
+                    // ALTERAÇÃO AQUI: Obtém o código de barras ignorando o primeiro caractere (tipo de equipamento)
+                    const equipmentID = report.barcodeData ? report.barcodeData.substring(1) : 'N/A';
+                    
                     alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
-                    alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${report.equipmentType || 'N/A'}<br/>`;
+                    // Exibe o ID do equipamento/inventário
+                    alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`; 
                     alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material} (${alarm.type})<br/>`;
                     alarmHtml += `<span class="font-semibold">Quant. Utilizada:</span> ${alarm.quantityUsed} ${alarm.unit}<br/>`;
                     alarmHtml += `<span class="font-semibold text-red-700">Quantidade Excedida:</span> ${exceeded} ${alarm.unit}`;
