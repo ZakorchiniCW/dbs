@@ -127,12 +127,11 @@
             display: flex; justify-content: space-between; align-items: center; background-color: #f9fafb; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; font-size: 0.875rem;
         }
     </style>
-    <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
-</head>
+    </head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionár</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionáro</h1>
 
         <div class="space-y-4">
             <div>
@@ -367,10 +366,11 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/html5-qrcode@2.3.4/minified/html5-qrcode.min.js"></script>
 
     <script>
         // NEW: Data with material types, units, and limit vectors
-        const MATERIAL_DATA = {
+       const MATERIAL_DATA = {
             "Óleo": { 
                 unit: "Litros", 
                 types: { 
@@ -393,6 +393,7 @@
                 } 
             }
         };
+
 
         // Main application state and data container
         const appState = {
@@ -572,6 +573,11 @@
 
         function startScanner() {
             try {
+                // Adiciona uma verificação simples para o objeto Html5Qrcode
+                if (typeof Html5Qrcode === 'undefined') {
+                    throw new Error("A biblioteca do scanner (Html5Qrcode) não foi carregada. Verifique sua conexão ou cache do navegador.");
+                }
+
                 const os = osInput.value.trim();
                 if (appState.scanMode === 'start' && !os) {
                     showMessage("Por favor, digite o número da O.S. antes de escanear.", true);
@@ -593,12 +599,11 @@
                 const config = {
                     fps: 15, // Aumentado para 15 FPS 
                     qrbox: { width: 250, height: 250 },
-                    // CORRIGIDO: Usando strings literais para os formatos
+                    // Usando strings literais para os formatos
                     formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
                 const constraints = { facingMode: { exact: "environment" } };
 
-                // A linha abaixo pode falhar se o script Html5Qrcode.min.js não tiver carregado.
                 html5QrCode = new Html5Qrcode("reader");
 
                 html5QrCode.start( constraints, config,
