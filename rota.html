@@ -132,7 +132,7 @@
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionár</h1>
 
         <div class="space-y-4">
             <div>
@@ -598,6 +598,7 @@
                 };
                 const constraints = { facingMode: { exact: "environment" } };
 
+                // A linha abaixo pode falhar se o script Html5Qrcode.min.js não tiver carregado.
                 html5QrCode = new Html5Qrcode("reader");
 
                 html5QrCode.start( constraints, config,
@@ -617,7 +618,7 @@
                     },
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 ).catch(err => {
-                    console.error("Erro geral ao iniciar o scanner:", err);
+                    console.error("Erro ao iniciar o scanner:", err);
                     showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
                     readerDiv.style.display = 'none';
                     resetUIScannerFail();
