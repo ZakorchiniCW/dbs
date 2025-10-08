@@ -369,27 +369,33 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
     <script>
-        // NEW: Data with material types, units, and limit vectors
-       const MATERIAL_DATA = {
+        // Data base para vetores de conformidade (Versão 2)
+        const MATERIAL_DATA = {
             "Óleo": { 
                 unit: "Litros", 
+                lastReplenishmentDate: "2025-10-01", // Data da Última Reposição (DD/MM/AAAA)
+                minIntervalDays: 30, // Intervalo Mínimo (dias)
                 types: { 
-                    "Óleo 32": 1, // Limit vector 2a: 10 litros
-                    "Óleo 46": 1  // Limit vector 2a: 20 litros
+                    "Óleo 32": 1, // Limite de Quantidade
+                    "Óleo 46": 1  // Limite de Quantidade
                 } 
             },
             "Graxa": { 
                 unit: "Kilos", 
+                lastReplenishmentDate: "2025-10-01",
+                minIntervalDays: 30,
                 types: { 
-                    "Graxa A": 1, // Limit vector 2b: 1 kilo
-                    "Graxa B": 1  // Limit vector 2b: 3 kilos
+                    "Graxa A": 1,
+                    "Graxa B": 1
                 } 
             },
             "Parafina": { 
                 unit: "Litros", 
+                lastReplenishmentDate: "2025-10-01",
+                minIntervalDays: 30,
                 types: { 
-                    "Branca": 1, // Limit vector 2c: 2 litros
-                    "Translucida": 1  // Limit vector 2c: 4 litros
+                    "Branca": 1,
+                    "Translucida": 1
                 } 
             }
         };
@@ -401,10 +407,11 @@
             equipmentType: '',
             inventoryNumber: '',
             observations: '',
-            photoData: [], // Array to hold multiple photo Base64 strings
+            photoData: [], 
             serviceStatus: '',
             materialsUsed: [], 
             limitExceededMaterials: [], 
+            dateAlarms: [], // NOVO: Array para alarmes de data
             start: {
                 timestamp: null,
                 location: null,
@@ -460,7 +467,7 @@
         const photoFileInput = document.getElementById('photo-file-input');
         const photoPreviewContainer = document.getElementById('photo-preview-container');
 
-        // NEW Material Input Elements
+        // Material Input Elements
         const materialInputContainer = document.getElementById('materials-input-container');
         const materialSelect = document.getElementById('material-select');
         const materialQuantityInput = document.getElementById('material-quantity-input');
@@ -496,6 +503,7 @@
             appState.serviceStatus = '';
             appState.materialsUsed = []; 
             appState.limitExceededMaterials = []; 
+            appState.dateAlarms = []; // Reseta alarmes de data
             appState.start.timestamp = null;
             appState.start.location = null;
             appState.end.timestamp = null;
@@ -596,9 +604,8 @@
                 startScanBtn.style.display = 'none';
 
                 const config = {
-                    fps: 15, // Aumentado para 15 FPS 
+                    fps: 15, 
                     qrbox: { width: 250, height: 250 },
-                    // Usando strings literais para os formatos
                     formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
                 const constraints = { facingMode: { exact: "environment" } };
@@ -694,7 +701,7 @@
             finalizeServiceBtn.classList.remove('hidden'); 
             finalizeServiceBtn.disabled = false; 
             finishScanBtn.style.display = 'none'; 
-            appState.scanMode = 'end-done'; // Nova flag para indicar que finalização foi feita
+            appState.scanMode = 'end-done'; 
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -710,10 +717,51 @@
             }
         }
 
-        function checkMaterialLimits() {
-            appState.limitExceededMaterials = []; 
+        function runMaterialChecks() {
+            appState.limitExceededMaterials = [];
+            appState.dateAlarms = []; 
             let allGood = true;
+            
+            // --- 1. Checagem de Intervalo Mínimo de Reposição (Data) ---
+            if (appState.end.timestamp && appState.materialsUsed.length > 0) {
+                const currentServiceDate = appState.end.timestamp; 
+                const dateAlarmSet = new Set(); // Para garantir que o alarme de data seja gerado apenas uma vez por material
 
+                appState.materialsUsed.forEach(entry => {
+                    const { material } = entry;
+                    
+                    if (dateAlarmSet.has(material)) return;
+
+                    const materialConfig = MATERIAL_DATA[material];
+                    const lastDateString = materialConfig.lastReplenishmentDate;
+                    const minInterval = materialConfig.minIntervalDays;
+
+                    // Converte a data base para objeto Date
+                    const parts = lastDateString.split('-'); // Espera YYYY-MM-DD
+                    const lastDate = new Date(parts[0], parts[1] - 1, parts[2]); // Month is 0-indexed
+
+                    // Calcula a Data Mínima Permitida para a Próxima Reposição
+                    const minAllowedDate = new Date(lastDate);
+                    minAllowedDate.setDate(lastDate.getDate() + minInterval); // Adiciona o intervalo
+
+                    if (currentServiceDate < minAllowedDate) {
+                        allGood = false;
+                        dateAlarmSet.add(material); 
+                        
+                        appState.dateAlarms.push({
+                            material: material,
+                            lastDate: lastDate.toLocaleDateString('pt-BR'),
+                            minInterval: minInterval,
+                            currentDate: currentServiceDate.toLocaleDateString('pt-BR'),
+                            minAllowedDate: minAllowedDate.toLocaleDateString('pt-BR'),
+                        });
+                        showMessage(`⚠️ ALARME: Reposição de ${material} feita muito cedo! Prazo mínimo: ${minInterval} dias.`, true);
+                    }
+                });
+            }
+
+
+            // --- 2. Checagem de Limite de Quantidade ---
             appState.materialsUsed.forEach(entry => {
                 const { material, quantity, type, unit } = entry;
                 
@@ -753,7 +801,7 @@
         }
 
         function prepareReportData() {
-            checkMaterialLimits(); 
+            runMaterialChecks(); 
             
             appState.observations = observationsTextArea.value.trim();
             const distanceKm = calculateDistance(appState.start.location, appState.end.location);
@@ -765,6 +813,7 @@
                 equipmentType: appState.equipmentType,
                 materialsUsed: [...appState.materialsUsed],
                 limitExceededMaterials: [...appState.limitExceededMaterials],
+                dateAlarms: [...appState.dateAlarms], // INCLUI ALARMES DE DATA
                 start: {
                     timestamp: appState.start.timestamp,
                     location: appState.start.location,
@@ -806,26 +855,47 @@
             document.getElementById('manager-auth-modal').style.display = 'none';
             const managerAlarmBox = document.getElementById('manager-alarm-box');
             const dataDisplay = document.getElementById('data-display');
+            
+            const hasAlarms = report.limitExceededMaterials.length > 0 || report.dateAlarms.length > 0;
 
-            if (report.limitExceededMaterials && report.limitExceededMaterials.length > 0) {
-                let alarmHtml = '<h3 class="font-bold text-lg text-red-800 mb-2">🚨 ALARME DE LIMITE EXCEDIDO (URGENTE)</h3>';
-                alarmHtml += '<p class="text-sm text-red-800 mb-3">Avaliar com urgência possíveis danos ou vazamentos!</p>';
+            if (hasAlarms) {
+                let alarmHtml = '<h3 class="font-bold text-lg text-red-800 mb-2">🚨 ALARME DE CONFORMIDADE (URGENTE)</h3>';
                 
-                report.limitExceededMaterials.forEach(alarm => {
-                    const exceeded = (alarm.quantityUsed - alarm.limit).toFixed(2);
+                const equipmentID = report.barcodeData ? report.barcodeData.substring(1) : 'N/A';
+                
+                // 1. Alarmes de Intervalo Mínimo (Data)
+                if (report.dateAlarms.length > 0) {
+                    alarmHtml += '<h4 class="font-semibold text-red-700 mt-3 mb-2">Intervalo Mínimo Não Respeitado:</h4>';
+                    alarmHtml += '<p class="text-sm text-red-800 mb-3">O intervalo entre reposições foi muito curto. Avaliar por vazamento/defeito!</p>';
                     
-                    // ALTERAÇÃO AQUI: Obtém o código de barras ignorando o primeiro caractere (tipo de equipamento)
-                    const equipmentID = report.barcodeData ? report.barcodeData.substring(1) : 'N/A';
-                    
-                    alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
-                    // Exibe o ID do equipamento/inventário
-                    alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`; 
-                    alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material} (${alarm.type})<br/>`;
-                    alarmHtml += `<span class="font-semibold">Quant. Utilizada:</span> ${alarm.quantityUsed} ${alarm.unit}<br/>`;
-                    alarmHtml += `<span class="font-semibold text-red-700">Quantidade Excedida:</span> ${exceeded} ${alarm.unit}`;
-                    alarmHtml += `</div>`;
-                });
+                    report.dateAlarms.forEach(alarm => {
+                        alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
+                        alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`;
+                        alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material}<br/>`;
+                        alarmHtml += `<span class="font-semibold">Última Reposição:</span> ${alarm.lastDate}<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Reposição Mínima Permitida:</span> ${alarm.minAllowedDate} (Intervalo de ${alarm.minInterval} dias)<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Reposição Atual:</span> ${alarm.currentDate}`;
+                        alarmHtml += `</div>`;
+                    });
+                }
 
+                // 2. Alarmes de Quantidade Excedida
+                if (report.limitExceededMaterials.length > 0) {
+                    alarmHtml += '<h4 class="font-semibold text-red-700 mt-3 mb-2">Quantidades Excedidas:</h4>';
+                    alarmHtml += '<p class="text-sm text-red-800 mb-3">Avaliar urgência por possíveis vazamentos, danos ou desvio de material.</p>';
+                    
+                    report.limitExceededMaterials.forEach(alarm => {
+                        const exceeded = (alarm.quantityUsed - alarm.limit).toFixed(2);
+                        
+                        alarmHtml += `<div class="mb-2 p-2 border border-red-400 bg-red-100 rounded-lg">`;
+                        alarmHtml += `<span class="font-semibold">Máquina/Equipamento:</span> ${equipmentID}<br/>`; 
+                        alarmHtml += `<span class="font-semibold">Material:</span> ${alarm.material} (${alarm.type})<br/>`;
+                        alarmHtml += `<span class="font-semibold">Quant. Utilizada:</span> ${alarm.quantityUsed} ${alarm.unit}<br/>`;
+                        alarmHtml += `<span class="font-semibold text-red-700">Quantidade Excedida:</span> ${exceeded} ${alarm.unit}`;
+                        alarmHtml += `</div>`;
+                    });
+                }
+                
                 managerAlarmBox.innerHTML = alarmHtml;
                 managerAlarmBox.classList.remove('hidden');
 
