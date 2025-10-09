@@ -192,7 +192,7 @@
         </div>
         
         <div id="lubrica-info-field" class="data-display hidden mt-4">
-            <h2 class="text-lg font-bold text-gray-800 mb-1">Informações de Reposição (LUBRICA)</h2>
+            <h2 class="text-lg font-bold text-gray-800 mb-1">Informações de Reposição</h2>
             <p id="lubrica-info-content" class="text-sm text-gray-700 font-mono whitespace-pre-wrap"></p>
         </div>
         <div id="observations-input-container" class="mt-4 hidden">
@@ -432,7 +432,7 @@
         
          // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
         // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
-         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0012345"];          
+         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089"];          
         const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42";  
         const MATERIAL_GRAXA = "Graxa de lubrificação do tipo B"; 
         const MATERIAL_PARAFINA = "Parafina do tipo Branca";         
@@ -639,10 +639,14 @@
         
         // Lógica de exibição do campo informativo simples
         // *** MUDANÇA AQUI: Usa .includes() para checar se o código está na lista. ***
-        if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
-            lubricaInfoContent.textContent = `"${MATERIAL_OLEO}"\n` + 
-                `"${MATERIAL_GRAXA}"\n` + 
-                `"${MATERIAL_PARAFINA}"`;
+         if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
+            
+            // CORREÇÃO: Usando innerHTML e tags <strong> para negrito.
+            lubricaInfoContent.innerHTML = 
+                `<strong>"${MATERIAL_OLEO}"</strong><br>` + 
+                `<strong>"${MATERIAL_GRAXA}"</strong><br>` + 
+                `<strong>"${MATERIAL_PARAFINA}"</strong>`;
+            
             lubricaInfoField.classList.remove('hidden');
         } else {
             lubricaInfoField.classList.add('hidden');
