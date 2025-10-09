@@ -175,7 +175,7 @@
             <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
                 <p class="text-sm font-semibold text-green-700 flex items-center">
                     <span class="green-led mr-2"></span>
-                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span>  - Ativa e em Andamento.
+                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> - Ativa e em Andamento.
                 </p>
             </div>
         </div>
@@ -195,6 +195,17 @@
             <h2 class="text-lg font-bold text-gray-800 mb-1">Informações de Reposição</h2>
             <p id="lubrica-info-content" class="text-sm text-gray-700 font-mono whitespace-pre-wrap"></p>
         </div>
+
+<div id="photo-input-container" class="mt-4 hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
+                Tirar Foto 📸
+            </button>
+            
+            <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
+                 </div>
+        </div>
+        
         <div id="observations-input-container" class="mt-4 hidden">
             <label for="observations-text" class="block text-sm font-medium text-gray-700 mb-1">Observações do Técnico</label>
             <textarea id="observations-text" placeholder="Descreva o serviço realizado, pendências, etc." rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"></textarea>
@@ -242,16 +253,7 @@
                 </div>
         </div>
 
-
-        <div id="photo-input-container" class="mt-4 hidden">
-             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
-             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
-                Tirar Foto 📸
-            </button>
-            
-            <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
-                 </div>
-        </div>
+     
         
         <button id="finalize-service-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Finalizar Serviço
@@ -432,7 +434,7 @@
         
          // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
         // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
-         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089"];          
+         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089", "%H4076936", "%H4075089"];          
         const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42";  
         const MATERIAL_GRAXA = "Graxa de lubrificação do tipo B"; 
         const MATERIAL_PARAFINA = "Parafina do tipo Branca";         
