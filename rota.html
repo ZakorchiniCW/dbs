@@ -409,7 +409,7 @@
                 minIntervalDays: 30, // Intervalo Mínimo (dias)
                 types: { 
                     "Óleo 32": 1, // Limite de Quantidade (CORRIGIDO)
-                    "Óleo 46": 1  // Limite de Quantidade (CORRIGIDO)
+                    "Óleo OSO 46": 1  // Limite de Quantidade (CORRIGIDO)
                 } 
             },
             "Graxa": { 
@@ -434,8 +434,9 @@
         
          // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
         // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
-         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089", "%H4076936", "%H4075089"];          
-        const MATERIAL_OLEO = "Óleo Hidráulico do tipo 42";  
+         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089", "%H4076936", "%H4075089", "M12234967"];
+        const MAQUINA_NOME = "Retífica AFE 2S-88";
+        const MATERIAL_OLEO = "Óleo Hidráulico do tipo OSO 46";  
         const MATERIAL_GRAXA = "Graxa de lubrificação do tipo B"; 
         const MATERIAL_PARAFINA = "Parafina do tipo Branca";         
 
@@ -645,6 +646,8 @@
             
             // CORREÇÃO: Usando innerHTML e tags <strong> para negrito.
             lubricaInfoContent.innerHTML = 
+                `<strong>"${MAQUINA_NOME}"</strong><br>` +
+                `<strong>"${BARCODE_LUBRICA_CHECK}"</strong><br>` +
                 `<strong>"${MATERIAL_OLEO}"</strong><br>` + 
                 `<strong>"${MATERIAL_GRAXA}"</strong><br>` + 
                 `<strong>"${MATERIAL_PARAFINA}"</strong>`;
