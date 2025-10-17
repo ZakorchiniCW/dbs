@@ -136,7 +136,7 @@
 </head>
 <body class="bg-gray-100 p-4"> 
     <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full mx-auto">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de FuncionáriO</h1>
 
         <div class="space-y-4">
             <div>
@@ -534,7 +534,7 @@
         let pendingDecodedText = ''; 
         let pendingScanMode = ''; 
         
-        // --- NOVO: Input de arquivo temporário para o fallback (Crucial para Edge/iPad) ---
+        // --- Input de arquivo temporário para o fallback (Crucial para Edge/iPad) ---
         const barcodeFileInput = document.createElement('input');
         barcodeFileInput.type = 'file';
         barcodeFileInput.accept = 'image/*';
@@ -701,7 +701,7 @@
             }
         }
 
-        // --- NOVO: FUNÇÃO DE FALLBACK PARA CAPTURA DE IMAGEM (Edge/iPad) ---
+        // --- FUNÇÃO DE FALLBACK PARA CAPTURA DE IMAGEM (Edge/iPad) ---
         function startImageCaptureFallback(scanMode) {
             // Garante que o html5QrCode esteja parado
             if (html5QrCode && html5QrCode.isScanning) {
@@ -749,6 +749,7 @@
         }
         // ---------------------------------------------------------------------------------
 
+        // --- NOVO startScanner com formato de constraints alternativo (Tentativa final de WebRTC) ---
         function startScanner() {
             try {
                 if (typeof Html5Qrcode === 'undefined') {
@@ -774,28 +775,29 @@
                 lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo durante o scan
                 startScanBtn.style.display = 'none';
 
+                // Tenta iniciar SEM o primeiro parâmetro de constraints (passando null)
+                // e move as constraints de vídeo para a chave videoConstraints na config
+                const constraints = null; 
+                
                 const config = {
                     fps: 15, 
                     qrbox: { width: 250, height: 250 },
                     formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
-                };
-                
-                // --- Constraints de Vídeo Otimizadas para iOS/iPadOS/Edge ---
-                const constraints = {
-                    video: {
-                        facingMode: "environment", 
-                        width: { ideal: 1280 }, // Tenta forçar uma resolução que o WebKit consiga inicializar
+                    // --- NOVA POSIÇÃO DAS CONSTRAINTS DE VÍDEO ---
+                    videoConstraints: {
+                        facingMode: "environment",
+                        width: { ideal: 1280 }, 
                         height: { ideal: 720 }
                     }
+                    // ---------------------------------------------
                 };
-                // -------------------------------------------------------------
-
+                
                 html5QrCode = new Html5Qrcode("reader");
 
                 html5QrCode.start( constraints, config,
                     (decodedText, decodedResult) => {
                         html5QrCode.stop().then(() => {
-                            // Exibe o modal de confirmação do código de barras
+                            // Sucesso do WebRTC
                             showBarcodeConfirmationModal(decodedText, appState.scanMode); 
                             readerDiv.style.display = 'none';
                         }).catch(err => {
@@ -807,7 +809,7 @@
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 ).catch(err => {
                     console.error("Erro ao iniciar o scanner:", err);
-                    // *** CHAMA O FALLBACK EM CASO DE FALHA DO WEBRTC ***
+                    // *** CHAMA O FALLBACK IMEDIATAMENTE APÓS A FALHA DO WEBRTC ***
                     startImageCaptureFallback(appState.scanMode);
                 });
             } catch (err) {
@@ -816,6 +818,7 @@
                 startImageCaptureFallback(appState.scanMode);
             }
         }
+        // --- Fim do startScanner ---
         
         function resetUIScannerFail() {
              readerDiv.style.display = 'none';
