@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="pt-BR">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Serviço - Versão Simples</title>
@@ -11,8 +13,12 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f5;
+            /* **AJUSTE DE TECLADO MÓVEL** */
+            min-height: 100vh;
+            padding-top: 1.5rem; 
+            padding-bottom: 5rem; /* Padding extra para evitar que o teclado esconda elementos */
         }
-        /* ... Estilos gerais e do scanner ... */
+        /* ... Outros estilos ... */
         #reader {
             width: 100%;
             max-width: 400px;
@@ -128,9 +134,8 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
-
-    <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full">
+<body class="bg-gray-100 p-4"> 
+    <div id="login-container" class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full mx-auto">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Login de Funcionário</h1>
 
         <div class="space-y-4">
@@ -161,7 +166,7 @@
 
     </div>
 
-    <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full" style="display:none;">
+    <div id="app-container" class="bg-[#d1e7e4] rounded-xl shadow-lg p-6 max-w-sm w-full mx-auto" style="display:none;">
         <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Registro de Serviço</h1>
         
         <p class="text-center text-gray-600 mb-4">Bem-vindo(a), <span id="logged-in-user"></span>!</p>
@@ -173,7 +178,7 @@
             <div id="service-active-status" class="mt-2 hidden items-center justify-between p-2 bg-green-100 border border-green-300 rounded-lg">
                 <p class="text-sm font-semibold text-green-700 flex items-center">
                     <span class="green-led mr-2"></span>
-                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> Ativa e em Andamento.
+                    O.S. <span id="os-text-active" class="ml-1 font-bold"></span> - Ativa e em Andamento.
                 </p>
             </div>
         </div>
@@ -187,6 +192,21 @@
             <button id="finish-scan-btn" class="w-full py-3 font-semibold text-lg button-primary" style="display:none;">
                 Escanear para Finalizar
             </button>
+        </div>
+        
+        <div id="lubrica-info-field" class="data-display hidden mt-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-1">Informações de Reposição</h2>
+            <p id="lubrica-info-content" class="text-sm text-gray-700 font-mono whitespace-pre-wrap"></p>
+        </div>
+
+        <div id="photo-input-container" class="mt-4 hidden">
+             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
+             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
+                Tirar Foto 📸
+            </button>
+            
+            <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
+                 </div>
         </div>
         
         <div id="observations-input-container" class="mt-4 hidden">
@@ -236,16 +256,7 @@
                 </div>
         </div>
 
-
-        <div id="photo-input-container" class="mt-4 hidden">
-             <input type="file" id="photo-file-input" accept="image/*" capture="camera" class="hidden"> 
-             <button id="take-photo-btn" class="w-full py-3 rounded-lg font-semibold text-lg button-secondary">
-                Tirar Foto 📸
-            </button>
-            
-            <div id="photo-preview-container" class="mt-3 flex flex-wrap gap-2">
-                 </div>
-        </div>
+     
         
         <button id="finalize-service-btn" class="w-full py-3 font-bold text-lg button-primary mt-6 hidden">
             Finalizar Serviço
@@ -397,11 +408,11 @@
         const MATERIAL_DATA = {
             "Óleo": { 
                 unit: "Litros", 
-                lastReplenishmentDate: "2025-10-01", // Data da Última Reposição (DD/MM/AAAA)
+                lastReplenishmentDate: "2025-10-01", // Data da Última Reposição (YYYY-MM-DD)
                 minIntervalDays: 30, // Intervalo Mínimo (dias)
                 types: { 
-                    "Óleo 32": 1, // Limite de Quantidade
-                    "Óleo 46": 1  // Limite de Quantidade
+                    "Óleo 32": 1, // Limite de Quantidade (CORRIGIDO)
+                    "Óleo OSO 46": 1  // Limite de Quantidade (CORRIGIDO)
                 } 
             },
             "Graxa": { 
@@ -409,8 +420,8 @@
                 lastReplenishmentDate: "2025-10-01",
                 minIntervalDays: 30,
                 types: { 
-                    "Graxa A": 1,
-                    "Graxa B": 1
+                    "Graxa A": 1, // Limite de Quantidade (CORRIGIDO)
+                    "Graxa B": 1  // Limite de Quantidade (CORRIGIDO)
                 } 
             },
             "Parafina": { 
@@ -418,11 +429,19 @@
                 lastReplenishmentDate: "2025-10-01",
                 minIntervalDays: 30,
                 types: { 
-                    "Branca": 1,
-                    "Translucida": 1
+                    "Branca": 1,      // Limite de Quantidade (CORRIGIDO)
+                    "Translucida": 1  // Limite de Quantidade (CORRIGIDO)
                 } 
             }
         };
+        
+         // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
+        // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
+         const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089", "%H4076936", "%H4075089", "M12234967"];
+        const MAQUINA_NOME = "Retífica AFE 2S-88";
+        const MATERIAL_OLEO = "Óleo Hidráulico do tipo OSO 46";  
+        const MATERIAL_GRAXA = "Graxa de lubrificação do tipo B"; 
+        const MATERIAL_PARAFINA = "Parafina do tipo Branca";         
 
         // Main application state and data container
         const appState = {
@@ -436,8 +455,8 @@
             materialsUsed: [], 
             limitExceededMaterials: [], 
             dateAlarms: [], 
-            loggedInCompany: '', // Armazena a empresa logada (NÃO É RESETADO NO resetAppState)
-            loggedInEmployee: '', // NOVO: Armazena o funcionário logado
+            loggedInCompany: '', 
+            loggedInEmployee: '', 
             start: {
                 timestamp: null,
                 location: null,
@@ -501,6 +520,10 @@
         const materialQuantityUnit = document.getElementById('material-quantity-unit');
         const addMaterialBtn = document.getElementById('add-material-btn');
         const materialsList = document.getElementById('materials-list');
+        
+        // NOVO CAMPO INFORMATIVO (REQUISITO LUBRICA)
+        const lubricaInfoField = document.getElementById('lubrica-info-field');
+        const lubricaInfoContent = document.getElementById('lubrica-info-content');
 
         // Barcode Confirmation Modal Elements
         const barcodeConfirmationModal = document.getElementById('barcode-confirmation-modal');
@@ -509,8 +532,17 @@
         const modalRescanBarcodeBtn = document.getElementById('modal-rescan-barcode-btn');
 
         let html5QrCode;
-        let pendingDecodedText = ''; // Variável temporária para o código escaneado
-        let pendingScanMode = ''; // Variável temporária para o modo de escaneamento
+        let pendingDecodedText = ''; 
+        let pendingScanMode = ''; 
+        
+        // --- NOVO: Input de arquivo temporário para o fallback (Crucial para Edge/iPad) ---
+        const barcodeFileInput = document.createElement('input');
+        barcodeFileInput.type = 'file';
+        barcodeFileInput.accept = 'image/*';
+        barcodeFileInput.capture = 'environment'; // Força câmera traseira em iOS
+        barcodeFileInput.className = 'hidden'; 
+        document.body.appendChild(barcodeFileInput); 
+        // ---------------------------------------------------------------------------------
 
         function showMessage(text, isError = false) {
             messageText.textContent = text;
@@ -539,7 +571,6 @@
             appState.materialsUsed = []; 
             appState.limitExceededMaterials = []; 
             appState.dateAlarms = []; 
-            // appState.loggedInCompany e appState.loggedInEmployee NÃO são resetados aqui.
             appState.start.timestamp = null;
             appState.start.location = null;
             appState.end.timestamp = null;
@@ -547,6 +578,8 @@
             appState.scanMode = 'start';
             appState.finalReportData = null;
             appState.isServiceActive = false; 
+            pendingDecodedText = ''; 
+            pendingScanMode = ''; 
             
             osInput.value = '';
             observationsTextArea.value = '';
@@ -557,6 +590,8 @@
             materialTypeSelect.innerHTML = '<option value="" disabled selected>Selecione o Tipo</option>';
             materialQuantityUnit.textContent = 'Unidade';
             materialsList.innerHTML = '<p id="no-materials-message" class="text-sm italic text-gray-600">Nenhum material adicionado.</p>';
+            
+            lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo
 
             document.getElementById('data-display').classList.add('hidden');
             document.getElementById('summary-container').classList.add('hidden');
@@ -601,7 +636,7 @@
             employeeSelect.innerHTML = '<option value="" disabled selected>Selecione um funcionário</option>';
         }
 
-        function transitionToActiveServiceUI() {
+       function transitionToActiveServiceUI() {
             appState.isServiceActive = true;
 
             osInput.disabled = true;
@@ -615,17 +650,35 @@
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
 
-            // Condição para exibir gerenciamento de materiais apenas para "Lubrica"
+            // Condição para exibir gerenciamento de materiais e o campo informativo (NOVO)
             if (appState.loggedInCompany === 'Lubrica') {
                 materialInputContainer.classList.remove('hidden');
+                
+                // Lógica de exibição do campo informativo simples
+                // *** MUDANÇA AQUI: Usa .includes() para checar se o código está na lista. ***
+                 if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
+                    
+                    // CORREÇÃO: Usando innerHTML e tags <strong> para negrito.
+                    lubricaInfoContent.innerHTML = 
+                        `<strong>"${MAQUINA_NOME}"</strong><br>` +
+                        `<strong>"${MATERIAL_OLEO}"</strong><br>` + 
+                        `<strong>"${MATERIAL_GRAXA}"</strong><br>` + 
+                        `<strong>"${MATERIAL_PARAFINA}"</strong>`;
+                    
+                    lubricaInfoField.classList.remove('hidden');
+                } else {
+                    lubricaInfoField.classList.add('hidden');
+                }
+
             } else {
                 materialInputContainer.classList.add('hidden');
+                lubricaInfoField.classList.add('hidden');
             }
             
             finalizeServiceBtn.classList.add('hidden');
             finalizeServiceBtn.disabled = true;
         }
-
+        
         function showBarcodeConfirmationModal(decodedText, scanMode) {
             pendingDecodedText = decodedText;
             pendingScanMode = scanMode;
@@ -650,6 +703,53 @@
             }
         }
 
+        // --- NOVO: FUNÇÃO DE FALLBACK PARA CAPTURA DE IMAGEM (Edge/iPad) ---
+        function startImageCaptureFallback(scanMode) {
+            // Garante que o html5QrCode esteja parado
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().catch(() => {});
+            }
+            
+            // Oculta a div do leitor
+            readerDiv.style.display = 'none';
+            
+            // Armazena o modo atual para uso no callback
+            pendingScanMode = scanMode;
+            
+            // Adiciona um listener temporário e dispara o clique no input de arquivo
+            barcodeFileInput.onchange = handleImageCaptureFallback;
+            barcodeFileInput.click();
+            
+            showMessage("O scanner WebRTC falhou. Use a câmera para tirar uma foto do código de barras.", false);
+        }
+
+        function handleImageCaptureFallback(event) {
+            const file = event.target.files[0];
+            barcodeFileInput.onchange = null; // Remove o listener
+
+            if (file) {
+                // Re-instancia o objeto com a div de exibição, embora ela não seja usada para scanFile
+                html5QrCode = new Html5Qrcode("reader"); 
+
+                html5QrCode.scanFile(file, true)
+                    .then(decodedText => {
+                        // Simula o sucesso do escaneamento do código de barras
+                        showBarcodeConfirmationModal(decodedText, pendingScanMode);
+                    })
+                    .catch(err => {
+                        console.error("Erro ao ler o código de barras da imagem capturada:", err);
+                        showMessage("Erro ao ler o código de barras da imagem capturada. Tente novamente.", true);
+                        resetUIScannerFail();
+                    });
+            } else {
+                // Usuário cancelou a foto
+                showMessage("Captura de código de barras cancelada. Tente novamente.", false);
+                resetUIScannerFail();
+            }
+            // Limpa o valor do input para permitir nova captura
+            event.target.value = null; 
+        }
+        // ---------------------------------------------------------------------------------
 
         function startScanner() {
             try {
@@ -673,6 +773,7 @@
                 materialInputContainer.classList.add('hidden'); 
                 observationsInputContainer.classList.add('hidden');
                 photoInputContainer.classList.add('hidden');
+                lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo durante o scan
                 startScanBtn.style.display = 'none';
 
                 const config = {
@@ -680,7 +781,8 @@
                     qrbox: { width: 250, height: 250 },
                     formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
-                const constraints = { facingMode: { exact: "environment" } };
+                // *** Modificação: Remover 'exact' para maior compatibilidade no iOS/Edge ***
+                const constraints = { facingMode: "environment" };
 
                 html5QrCode = new Html5Qrcode("reader");
 
@@ -699,26 +801,33 @@
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 ).catch(err => {
                     console.error("Erro ao iniciar o scanner:", err);
-                    showMessage(`Erro ao iniciar a câmera. Verifique as permissões. Erro: ${err.message}`, true);
-                    readerDiv.style.display = 'none';
-                    resetUIScannerFail();
+                    // *** CHAMA O FALLBACK AQUI ***
+                    startImageCaptureFallback(appState.scanMode);
                 });
             } catch (err) {
                 console.error("Erro geral ao iniciar o scanner:", err);
-                showMessage(`Erro geral ao iniciar o scanner.`, true);
-                readerDiv.style.display = 'none';
-                resetUIScannerFail();
+                // *** CHAMA O FALLBACK AQUI TAMBÉM ***
+                startImageCaptureFallback(appState.scanMode);
             }
         }
         
         function resetUIScannerFail() {
              readerDiv.style.display = 'none';
+             pendingDecodedText = ''; 
+             pendingScanMode = ''; // Garante o reset do modo pendente
+             
              if (appState.isServiceActive) {
                 // Se estava ativo, volta para a interface ativa (sem o scanner)
                 serviceActiveStatus.classList.remove('hidden');
                 finishScanBtn.style.display = 'block';
                 // Mostra materiais/obs/fotos dependendo da empresa
-                if (appState.loggedInCompany === 'Lubrica') { materialInputContainer.classList.remove('hidden'); }
+                if (appState.loggedInCompany === 'Lubrica') { 
+                    materialInputContainer.classList.remove('hidden');
+                    // Tenta re-exibir o campo informativo se o barcode já estiver no estado
+                    if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
+                         lubricaInfoField.classList.remove('hidden');
+                    }
+                }
                 observationsInputContainer.classList.remove('hidden');
                 photoInputContainer.classList.remove('hidden');
              } else {
@@ -766,7 +875,13 @@
             serviceActiveStatus.classList.remove('hidden'); 
             
             // Mostra materiais/obs/fotos dependendo da empresa
-            if (appState.loggedInCompany === 'Lubrica') { materialInputContainer.classList.remove('hidden'); }
+            if (appState.loggedInCompany === 'Lubrica') { 
+                materialInputContainer.classList.remove('hidden');
+                 // Mantém o campo informativo visível se aplicável
+                 if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
+                     lubricaInfoField.classList.remove('hidden');
+                }
+            }
             observationsInputContainer.classList.remove('hidden');
             photoInputContainer.classList.remove('hidden');
             
@@ -816,7 +931,8 @@
                     const minInterval = materialConfig.minIntervalDays;
 
                     const parts = lastDateString.split('-'); // Espera YYYY-MM-DD
-                    const lastDate = new Date(parts[0], parts[1] - 1, parts[2]); // Month is 0-indexed
+                    // Subtrai 1 do mês pois JavaScript usa 0-indexed (0=Jan, 11=Dec)
+                    const lastDate = new Date(parts[0], parts[1] - 1, parts[2]); 
 
                     const minAllowedDate = new Date(lastDate);
                     minAllowedDate.setDate(lastDate.getDate() + minInterval); 
@@ -892,7 +1008,7 @@
                 limitExceededMaterials: [...appState.limitExceededMaterials],
                 dateAlarms: [...appState.dateAlarms], 
                 
-                // NOVO: Dados do Prestador de Serviço
+                // Dados do Prestador de Serviço
                 company: appState.loggedInCompany,
                 employee: appState.loggedInEmployee,
                 
@@ -923,6 +1039,7 @@
             materialInputContainer.classList.add('hidden'); 
             observationsInputContainer.classList.add('hidden');
             photoInputContainer.classList.add('hidden');
+            lubricaInfoField.classList.add('hidden'); // Esconde o campo informativo
 
             document.getElementById('manager-check-container').classList.remove('hidden');
             showMessage("Serviço finalizado. Aguardando conferência do Gerente.");
@@ -985,7 +1102,7 @@
                 managerAlarmBox.classList.add('hidden');
             }
 
-            // NOVO: Popula dados da Empresa e Funcionário
+            // Popula dados da Empresa e Funcionário
             document.getElementById('company-text').textContent = report.company;
             document.getElementById('employee-text').textContent = report.employee;
             
@@ -1142,7 +1259,7 @@
             if (loginData[selectedCompany] && loginData[selectedCompany][selectedEmployee] === inputPassword) {
                 document.getElementById('logged-in-user').textContent = selectedEmployee;
                 appState.loggedInCompany = selectedCompany; // Armazena a empresa
-                appState.loggedInEmployee = selectedEmployee; // NOVO: Armazena o funcionário
+                appState.loggedInEmployee = selectedEmployee; // Armazena o funcionário
                 
                 // Esconde o login e mostra o app
                 loginContainer.style.display = 'none'; 
@@ -1176,7 +1293,6 @@
         modalRescanBarcodeBtn.addEventListener('click', () => {
             barcodeConfirmationModal.style.display = 'none';
             // Garante que a UI esteja no modo de escaneamento antes de reiniciar
-            readerDiv.style.display = 'block'; 
             startScanner(); 
         });
 
@@ -1288,4 +1404,5 @@
             
         });
     </script>
-</body></html>
+</body>
+</html>
