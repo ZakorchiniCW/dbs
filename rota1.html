@@ -436,7 +436,6 @@
         };
         
          // VETORES SIMPLES INFORMATIVOS (MANTIDOS E CORRIGIDOS COMO SOLICITADO)
-        // A constante agora é um ARRAY (lista) para suportar múltiplos códigos.
          const BARCODE_LUBRICA_CHECK = ["%H0076936", "%H0075089", "%H4076936", "%H4075089", "M12234967"];
         const MAQUINA_NOME = "Retífica AFE 2S-88";
         const MATERIAL_OLEO = "Óleo Hidráulico do tipo OSO 46";  
@@ -655,7 +654,6 @@
                 materialInputContainer.classList.remove('hidden');
                 
                 // Lógica de exibição do campo informativo simples
-                // *** MUDANÇA AQUI: Usa .includes() para checar se o código está na lista. ***
                  if (BARCODE_LUBRICA_CHECK.includes(appState.barcodeData)) {
                     
                     // CORREÇÃO: Usando innerHTML e tags <strong> para negrito.
@@ -781,8 +779,16 @@
                     qrbox: { width: 250, height: 250 },
                     formatsToSupport: ["CODE_128", "QR_CODE", "CODE_39"],
                 };
-                // *** Modificação: Remover 'exact' para maior compatibilidade no iOS/Edge ***
-                const constraints = { facingMode: "environment" };
+                
+                // --- Constraints de Vídeo Otimizadas para iOS/iPadOS/Edge ---
+                const constraints = {
+                    video: {
+                        facingMode: "environment", 
+                        width: { ideal: 1280 }, // Tenta forçar uma resolução que o WebKit consiga inicializar
+                        height: { ideal: 720 }
+                    }
+                };
+                // -------------------------------------------------------------
 
                 html5QrCode = new Html5Qrcode("reader");
 
@@ -801,12 +807,12 @@
                     (errorMessage) => { /* Ignore continuous error messages */ }
                 ).catch(err => {
                     console.error("Erro ao iniciar o scanner:", err);
-                    // *** CHAMA O FALLBACK AQUI ***
+                    // *** CHAMA O FALLBACK EM CASO DE FALHA DO WEBRTC ***
                     startImageCaptureFallback(appState.scanMode);
                 });
             } catch (err) {
                 console.error("Erro geral ao iniciar o scanner:", err);
-                // *** CHAMA O FALLBACK AQUI TAMBÉM ***
+                // *** CHAMA O FALLBACK EM CASO DE ERRO GERAL ***
                 startImageCaptureFallback(appState.scanMode);
             }
         }
